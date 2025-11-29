@@ -358,6 +358,31 @@ def place_format_information(matrix, format_bits="111011111000100"):
 
     return matrix
 
+# ================================================================
+# STEP 12: RENDER FINAL QR CODE (ASCII OUTPUT)
+# ================================================================
+
+def render_qr_ascii(matrix):
+    """
+    Renders the 21x21 QR matrix in ASCII form.
+    1 = black square (█)
+    0 = white square ( )
+    None = background ( )
+    """
+
+    black = "██"   # two blocks for proper square aspect ratio
+    white = "  "   # two spaces
+
+    print("\n=== STEP 12: FINAL QR CODE (ASCII RENDER) ===")
+
+    for row in matrix:
+        line = ""
+        for cell in row:
+            if cell == 1:
+                line += black
+            else:
+                line += white
+        print(line)
 
 
 # ============================================================
@@ -399,11 +424,14 @@ if __name__ == "__main__":
     print("\n=== STEP 11: FORMAT INFORMATION ===")
     place_format_information(M)
 
+    print("\n=== STEP 12: FINAL QR CODE (ASCII RENDER) ===")
+    render_qr_ascii(M)
+
+
 for row in M:
     print(row)
 
 
 
-    for row in M:
-        print(row)
+    
 
