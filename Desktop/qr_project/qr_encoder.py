@@ -225,6 +225,19 @@ def place_timing_patterns(matrix):
 
     return matrix
 
+# ===============================================================
+# STEP 8: ALIGNMENT PATTERN (Version 1 = NONE)
+# ===============================================================
+
+def place_alignment_pattern(matrix):
+    """
+    Version 1 QR codes do NOT contain any alignment patterns.
+    This function exists for compatibility with higher versions.
+    """
+    # No action required
+    return matrix
+
+
 
 # ============================================================
 # DEMO WHEN RUN DIRECTLY (MAIN EXECUTION)
@@ -252,6 +265,9 @@ if __name__ == "__main__":
 
     print("\n=== STEP 7: TIMING PATTERNS ===")
     place_timing_patterns(M)
+
+    print("\n=== STEP 8: ALIGNMENT PATTERN (Version 1 has none) ===")
+    place_alignment_pattern(M)
 
     for row in M:
         print(row)
