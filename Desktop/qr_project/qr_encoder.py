@@ -177,31 +177,34 @@ def place_dark_module(M):
 
 
 # ============================================================
-# STEP 11: FORMAT INFORMATION (Mask 0, ECC Level L)
+# STEP 11: FORMAT INFORMATION (Correct Version)
+# ECC Level L + Mask Pattern 0 → 15-bit string:
+# 111011111000100
 # ============================================================
 
-FORMAT_BITS = [0,1,1,0,0,0,0,1,1,1,0,0,1,0,0]  # 15 bits
+FORMAT_BITS = [1,1,1,0,1,1,1,1,1,0,0,0,1,0,0]
 
 def place_format_info(M):
     fb = FORMAT_BITS
 
-    # Row 8, columns 0–5
+    # --- Horizontal (Row 8) ---
+    # bits 0..5
     for i in range(6):
         M[8, i] = fb[i]
 
-    # Skip timing module at (8,6)
+    # skip column 6 (timing)
     M[8, 7] = fb[6]
     M[8, 8] = fb[7]
-    M[7, 8] = fb[8]
 
-    for i in range(9, 15):
-        M[14 - (i-9), 8] = fb[i]
+    # --- Vertical (Column 8) ---
+    # bits 8..14 (but reversed)
+    # rows 0..5 get bits 14..9
+    idx = 14
+    for r in range(6):
+        M[r, 8] = fb[idx]
+        idx -= 1
 
-    # Top-left vertical
-    for i in range(6):
-        M[i, 8] = fb[14 - i]
-
-    # Skip timing module
+    # row 6 is timing → skip
     M[7, 8] = fb[8]
 
     return M
