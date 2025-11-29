@@ -237,7 +237,45 @@ def place_alignment_pattern(matrix):
     # No action required
     return matrix
 
+# ================================================================
+# STEP 9: POPULATE MATRIX WITH DATA + ECC BITS
+# ================================================================
 
+def place_data_bits(matrix, full_bitstream):
+    """
+    Places the data+ECC bitstream into the QR matrix using the standard
+    zigzag vertical placement algorithm (Version 1-L).
+    """
+    size = len(matrix)
+    bit_index = 0
+    direction_up = True  # zigzag direction
+
+    # Start from right-most column pair
+    col = size - 1
+
+    while col > 0:
+        if col == 6:
+            # Skip timing column
+            col -= 1
+
+        # Process two columns at a time: col and col-1
+        cols = [col, col - 1]
+
+        # Determine traversal order for this column pair
+        rows = range(size - 1, -1, -1) if direction_up else range(size)
+
+        for r in rows:
+            for c in cols:
+                # Skip reserved cells (None = free, 0/1 = reserved)
+                if matrix[r][c] is None:
+                    if bit_index < len(full_bitstream):
+                        matrix[r][c] = int(full_bitstream[bit_index])
+                        bit_index += 1
+
+        direction_up = not direction_up  # flip zigzag direction
+        col -= 2
+
+    return matrix
 
 # ============================================================
 # DEMO WHEN RUN DIRECTLY (MAIN EXECUTION)
@@ -268,6 +306,10 @@ if __name__ == "__main__":
 
     print("\n=== STEP 8: ALIGNMENT PATTERN (Version 1 has none) ===")
     place_alignment_pattern(M)
+
+    print("\n=== STEP 9: PLACE DATA + ECC BITS ===")
+    M = place_data_bits(M, full_bits)
+
 
     for row in M:
         print(row)
