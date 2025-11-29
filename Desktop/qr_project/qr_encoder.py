@@ -289,6 +289,76 @@ def place_dark_module(matrix):
     matrix[8][13] = 1
     return matrix
 
+# ===============================================================
+# STEP 11: FORMAT INFORMATION (EC Level + Mask Pattern)
+# ===============================================================
+
+def place_format_information(matrix, format_bits="111011111000100"):
+    """
+    Places the 15 format bits into their required positions.
+    Default bits correspond to: EC Level L, Mask Pattern 0.
+    """
+
+    size = len(matrix)
+
+    # 15 bits as list of ints
+    bits = list(map(int, format_bits))
+
+    # ------------------------------------------------------------------
+    # 1. Format bits around TOP-LEFT finder (vertical)
+    # ------------------------------------------------------------------
+    # Positions: (8,0–5), (8,7–8)
+    tl_vertical_positions = [
+        (8, 0), (8, 1), (8, 2), (8, 3), (8, 4), (8, 5),
+        (8, 7), (8, 8)
+    ]
+
+    # ------------------------------------------------------------------
+    # 2. Format bits around TOP-LEFT finder (horizontal)
+    # ------------------------------------------------------------------
+    # Positions: (0–5,8), (7–8,8)
+    tl_horizontal_positions = [
+        (0, 8), (1, 8), (2, 8), (3, 8), (4, 8), (5, 8),
+        (7, 8), (8, 8)
+    ]
+
+    # ------------------------------------------------------------------
+    # 3. Format bits near TOP-RIGHT finder (horizontal)
+    # ------------------------------------------------------------------
+    tr_positions = [(8, c) for c in range(size - 8, size)]
+
+    # ------------------------------------------------------------------
+    # 4. Format bits near BOTTOM-LEFT finder (vertical)
+    # ------------------------------------------------------------------
+    bl_positions = [(r, 8) for r in range(size - 8, size)]
+
+    # ------------------------------------------------------------------
+    # Fill the matrix
+    # ------------------------------------------------------------------
+
+    # Top-left vertical (first 7 bits)
+    for i in range(7):
+        r, c = tl_vertical_positions[i]
+        matrix[r][c] = bits[i]
+
+    # Top-left horizontal (next 8 bits)
+    for i in range(8):
+        r, c = tl_horizontal_positions[i]
+        matrix[r][c] = bits[7 + i]
+
+    # Top-right (next 7 bits)
+    for i in range(7):
+        r, c = tr_positions[i]
+        matrix[r][c] = bits[i]
+
+    # Bottom-left (next 7 bits)
+    for i in range(7):
+        r, c = bl_positions[i]
+        matrix[r][c] = bits[i]
+
+    return matrix
+
+
 
 # ============================================================
 # DEMO WHEN RUN DIRECTLY (MAIN EXECUTION)
@@ -325,6 +395,13 @@ if __name__ == "__main__":
 
     print("\n=== STEP 10: DARK MODULE ===")
     place_dark_module(M)
+
+    print("\n=== STEP 11: FORMAT INFORMATION ===")
+    place_format_information(M)
+
+for row in M:
+    print(row)
+
 
 
     for row in M:
