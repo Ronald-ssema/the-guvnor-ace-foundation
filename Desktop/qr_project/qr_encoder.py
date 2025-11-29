@@ -198,6 +198,34 @@ def place_finder_patterns(matrix):
 
     return matrix
 
+# ================================================================
+# STEP 7: TIMING PATTERNS (HORIZONTAL + VERTICAL)
+# ================================================================
+def place_timing_patterns(matrix):
+    """
+    Places the two timing patterns for Version 1-L:
+    - Horizontal on row 6, from col 8 to end
+    - Vertical on col 6, from row 8 to end
+    Alternating 1/0 pattern. Only fills cells that are None.
+    """
+
+    size = len(matrix)
+
+    # Horizontal timing pattern (row 6)
+    row = 6
+    for c in range(8, size):
+        if matrix[row][c] is None:
+            matrix[row][c] = (c % 2)  # alternating 0/1
+
+    # Vertical timing pattern (column 6)
+    col = 6
+    for r in range(8, size):
+        if matrix[r][col] is None:
+            matrix[r][col] = (r % 2)  # alternating 0/1
+
+    return matrix
+
+
 # ============================================================
 # DEMO WHEN RUN DIRECTLY (MAIN EXECUTION)
 # ============================================================
@@ -221,6 +249,9 @@ if __name__ == "__main__":
     print("\n=== STEP 6: FINDER PATTERNS + SEPARATORS ===")
     M = create_empty_matrix()
     place_finder_patterns(M)
+
+    print("\n=== STEP 7: TIMING PATTERNS ===")
+    place_timing_patterns(M)
 
     for row in M:
         print(row)
