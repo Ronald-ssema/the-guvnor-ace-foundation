@@ -277,6 +277,19 @@ def place_data_bits(matrix, full_bitstream):
 
     return matrix
 
+# ===============================================================
+# STEP 10: PLACE DARK MODULE (Version 1-L)
+# ===============================================================
+
+def place_dark_module(matrix):
+    """
+    Places the required dark module for Version 1-L.
+    Location is fixed at (8, 13) in the 21×21 matrix.
+    """
+    matrix[8][13] = 1
+    return matrix
+
+
 # ============================================================
 # DEMO WHEN RUN DIRECTLY (MAIN EXECUTION)
 # ============================================================
@@ -309,6 +322,9 @@ if __name__ == "__main__":
 
     print("\n=== STEP 9: PLACE DATA + ECC BITS ===")
     M = place_data_bits(M, full_bits)
+
+    print("\n=== STEP 10: DARK MODULE ===")
+    place_dark_module(M)
 
 
     for row in M:
