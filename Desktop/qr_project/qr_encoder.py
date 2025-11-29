@@ -150,3 +150,23 @@ if __name__ == "__main__":
     print("\n=== STEP 4: ECC CODEWORDS (7 bytes) ===")
     print(ecc)
 
+# =============================================================
+# STEP 5: INITIALIZE 21x21 QR MATRIX (Version 1-L)
+# =============================================================
+
+def create_empty_matrix() -> list:
+    """
+    Creates an empty 21×21 QR matrix for Version 1-L.
+    Each cell is initialized to None (unassigned).
+    """
+    size = 21  # Version 1 size
+    matrix = [[None for _ in range(size)] for _ in range(size)]
+    return matrix
+
+
+# Debug print (optional)
+if __name__ == "__main__":
+    print("\n=== STEP 5: EMPTY 21×21 MATRIX ===")
+    M = create_empty_matrix()
+    for row in M:
+        print(row)
