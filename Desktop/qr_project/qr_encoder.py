@@ -128,28 +128,6 @@ def qr_encode(input_string: str):
     return raw_bits, full_bits, data_codewords, ecc_codewords
 
 
-# ------------------------------------------------------------
-# DEMO WHEN RUN DIRECTLY
-# ------------------------------------------------------------
-
-if __name__ == "__main__":
-    user_input = "HELLO WORLD"
-
-    raw_bits, full_bits, data, ecc = qr_encode(user_input)
-
-    print("\n=== STEP 1: RAW BITSTREAM ===")
-    print(raw_bits)
-
-    print("\n=== STEP 2: 152-BIT PADDED BITSTREAM ===")
-    print(full_bits)
-    print("Length:", len(full_bits))
-
-    print("\n=== STEP 3: DATA CODEWORDS (19 bytes) ===")
-    print(data)
-
-    print("\n=== STEP 4: ECC CODEWORDS (7 bytes) ===")
-    print(ecc)
-
 # =============================================================
 # STEP 5: INITIALIZE 21x21 QR MATRIX (Version 1-L)
 # =============================================================
@@ -170,3 +148,80 @@ if __name__ == "__main__":
     M = create_empty_matrix()
     for row in M:
         print(row)
+
+# STEP 6: PLACE FINDER PATTERNS + SEPARATORS
+def place_finder_patterns(matrix):
+    """
+    Places the three 7x7 Finder Patterns for Version 1-L.
+    Also adds the required 1-module white separators.
+    """
+
+    # 7×7 finder pattern (1 = black, 0 = white)
+    FP = [
+        [1,1,1,1,1,1,1],
+        [1,0,0,0,0,0,1],
+        [1,0,1,1,1,0,1],
+        [1,0,1,1,1,0,1],
+        [1,0,1,1,1,0,1],
+        [1,0,0,0,0,0,1],
+        [1,1,1,1,1,1,1],
+    ]
+
+    size = len(matrix)
+
+    # Helper function to place a single finder pattern
+    def place_fp(top, left):
+        # Place 7×7 pattern
+        for r in range(7):
+            for c in range(7):
+                matrix[top + r][left + c] = FP[r][c]
+
+        # Add white separator around it (1 cell thick)
+        for r in range(-1, 8):
+            for c in range(-1, 8):
+                rr, cc = top + r, left + c
+                # ensure within bounds
+                if 0 <= rr < size and 0 <= cc < size:
+                    # if cell is outside finder pattern, make separator (0)
+                    if not (0 <= r <= 6 and 0 <= c <= 6):
+                        if matrix[rr][cc] is None:
+                            matrix[rr][cc] = 0
+
+    # Place Top-Left FP
+    place_fp(0, 0)
+
+    # Place Top-Right FP
+    place_fp(0, size - 7)
+
+    # Place Bottom-Left FP
+    place_fp(size - 7, 0)
+
+    return matrix
+
+# ============================================================
+# DEMO WHEN RUN DIRECTLY (MAIN EXECUTION)
+# ============================================================
+if __name__ == "__main__":
+    user_input = "HELLO WORLD"
+    raw_bits, full_bits, data, ecc = qr_encode(user_input)
+
+    print("\n=== STEP 1: RAW BITSTREAM ===")
+    print(raw_bits)
+
+    print("\n=== STEP 2: 152-BIT PADDED BITSTREAM ===")
+    print(full_bits)
+    print("Length:", len(full_bits))
+
+    print("\n=== STEP 3: DATA CODEWORDS (19 bytes) ===")
+    print(data)
+
+    print("\n=== STEP 4: ECC CODEWORDS (7 bytes) ===")
+    print(ecc)
+
+    print("\n=== STEP 6: FINDER PATTERNS + SEPARATORS ===")
+    M = create_empty_matrix()
+    place_finder_patterns(M)
+
+    for row in M:
+        print(row)
+
