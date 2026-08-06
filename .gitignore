@@ -59,3 +59,11 @@ node_modules/
 .next/
 node_modules/
 .DS_Store
+
+# Temporary editor and manual backup files
+*.backup
+*.backup-*
+*.bak
+*.tmp
+*~
+.DS_Store
