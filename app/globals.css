@@ -1,6 +1,6 @@
+@import "tailwindcss";
 @import "../styles/tokens.css";
 @import "../styles/components/buttons.css";
-@import "tailwindcss";
 
 :root {
   /* Brand colours */
