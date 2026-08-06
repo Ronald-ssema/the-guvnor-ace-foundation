@@ -1,9 +1,6 @@
 import {
-  FaEnvelope,
   FaFacebookF,
   FaInstagram,
-  FaMapMarkerAlt,
-  FaPhoneAlt,
   FaTiktok,
   FaYoutube,
 } from "react-icons/fa";
@@ -14,7 +11,7 @@ import { PageHero } from "@/components/ui/PageHero";
 export const metadata = {
   title: "Contact Us",
   description:
-    "Contact The Guvnor Ace Foundation and follow our official online channels.",
+    "Contact The Guvnor Ace Foundation and follow our official social media channels.",
 };
 
 const contactMethods = [
@@ -25,7 +22,6 @@ const contactMethods = [
       "Contact us about donations, volunteering, partnerships and programmes.",
     value: "guvnorace@gmail.com",
     href: "mailto:guvnorace@gmail.com",
-    icon: <FaEnvelope aria-hidden="true" />,
   },
   {
     label: "Telephone and WhatsApp",
@@ -34,7 +30,6 @@ const contactMethods = [
       "Contact The Guvnor Ace Foundation during normal working hours.",
     value: "+256 752 462 740",
     href: "tel:+256752462740",
-    icon: <FaPhoneAlt aria-hidden="true" />,
   },
   {
     label: "Location",
@@ -43,7 +38,6 @@ const contactMethods = [
       "Bunamwaya–Lubowa area, along Entebbe Road, Wakiso District.",
     value: "Learn more about us",
     href: "/about",
-    icon: <FaMapMarkerAlt aria-hidden="true" />,
   },
 ];
 
@@ -54,7 +48,7 @@ const socialLinks = [
     username: "Guvnor Ace Foundation",
     href: "https://www.facebook.com/guvnoracefoundation",
     icon: <FaFacebookF aria-hidden="true" />,
-    className: "contact-social-facebook",
+    className: "social-platform-facebook",
   },
   {
     number: "02",
@@ -62,7 +56,7 @@ const socialLinks = [
     username: "@guvnoracefoundation",
     href: "https://www.instagram.com/guvnoracefoundation",
     icon: <FaInstagram aria-hidden="true" />,
-    className: "contact-social-instagram",
+    className: "social-platform-instagram",
   },
   {
     number: "03",
@@ -70,7 +64,7 @@ const socialLinks = [
     username: "@guvnoracefoundation",
     href: "https://www.tiktok.com/@guvnoracefoundation",
     icon: <FaTiktok aria-hidden="true" />,
-    className: "contact-social-tiktok",
+    className: "social-platform-tiktok",
   },
   {
     number: "04",
@@ -78,7 +72,7 @@ const socialLinks = [
     username: "@guvnoracefoundation",
     href: "https://www.youtube.com/@guvnoracefoundation",
     icon: <FaYoutube aria-hidden="true" />,
-    className: "contact-social-youtube",
+    className: "social-platform-youtube",
   },
   {
     number: "05",
@@ -86,7 +80,7 @@ const socialLinks = [
     username: "All official Foundation links",
     href: "https://linktr.ee/guvnoracefoundation",
     icon: <SiLinktree aria-hidden="true" />,
-    className: "contact-social-linktree",
+    className: "social-platform-linktree",
   },
 ];
 
@@ -111,50 +105,51 @@ export default function ContactPage() {
       />
 
       <section
-        className="contact-details-section"
+        className="page-section page-section-soft"
         aria-labelledby="contact-details-heading"
       >
         <div className="site-container">
-          <div className="contact-details-grid">
+          <div className="page-section-header">
+            <div>
+              <p className="section-eyebrow">Official contact details</p>
+
+              <h2 id="contact-details-heading">
+                Choose the best way to reach us.
+              </h2>
+            </div>
+
+            <p>
+              We aim to respond to genuine enquiries as soon as operationally
+              possible.
+            </p>
+          </div>
+
+          <div className="feature-grid">
             {contactMethods.map((method) => (
-              <a
-                key={method.label}
-                href={method.href}
-                className="contact-detail-card"
-              >
-                <span className="contact-detail-icon">
-                  {method.icon}
-                </span>
+              <article className="contact-card" key={method.label}>
+                <span className="contact-card-label">{method.label}</span>
 
-                <div className="contact-detail-content">
-                  <span className="contact-detail-label">
-                    {method.label}
-                  </span>
+                <h3>{method.title}</h3>
 
-                  <h2>{method.title}</h2>
-                  <p>{method.description}</p>
+                <p>{method.description}</p>
 
-                  <span className="contact-detail-link">
-                    {method.value}
-                    <span aria-hidden="true">→</span>
-                  </span>
-                </div>
-              </a>
+                <a href={method.href}>{method.value}</a>
+              </article>
             ))}
           </div>
         </div>
       </section>
 
       <section
-        className="contact-social-section"
-        aria-labelledby="contact-social-heading"
+        className="page-section social-section"
+        aria-labelledby="social-heading"
       >
         <div className="site-container">
-          <div className="contact-social-header">
+          <div className="page-section-header">
             <div>
               <p className="section-eyebrow">Follow our work</p>
 
-              <h2 id="contact-social-heading">
+              <h2 id="social-heading">
                 Connect with the Foundation online.
               </h2>
             </div>
@@ -165,30 +160,34 @@ export default function ContactPage() {
             </p>
           </div>
 
-          <div className="contact-social-grid">
+          <div className="social-platform-grid">
             {socialLinks.map((social) => (
               <a
                 key={social.name}
                 href={social.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={`contact-social-card ${social.className}`}
+                className={`social-platform-card ${social.className}`}
                 aria-label={`Visit The Guvnor Ace Foundation on ${social.name}`}
               >
-                <span className="contact-social-number">
-                  {social.number}
-                </span>
+                <div className="social-platform-top">
+                  <span className="social-platform-number">
+                    {social.number}
+                  </span>
 
-                <span className="contact-social-icon">
-                  {social.icon}
-                </span>
+                  <span className="social-platform-icon">
+                    {social.icon}
+                  </span>
+                </div>
 
-                <h3>{social.name}</h3>
-                <p>{social.username}</p>
+                <div className="social-platform-content">
+                  <h3>{social.name}</h3>
+                  <p>{social.username}</p>
+                </div>
 
-                <span className="contact-social-action">
+                <span className="social-platform-action">
                   Visit channel
-                  <span aria-hidden="true">→</span>
+                  <span aria-hidden="true">↗</span>
                 </span>
               </a>
             ))}

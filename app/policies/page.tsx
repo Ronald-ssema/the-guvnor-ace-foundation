@@ -1,73 +1,184 @@
 import Link from "next/link";
+import {
+  FaChild,
+  FaComments,
+  FaFileContract,
+  FaHandHoldingHeart,
+  FaShieldAlt,
+  FaUserLock,
+} from "react-icons/fa";
+
+import { PageHero } from "@/components/ui/PageHero";
+
+export const metadata = {
+  title: "Policies",
+  description:
+    "Read The Guvnor Ace Foundation policies covering safeguarding, child protection, privacy, complaints, donations and website use.",
+};
 
 const policies = [
   {
-    href: "/safeguarding",
+    number: "01",
     title: "Safeguarding Policy",
     description:
-      "Our commitment to protecting children and vulnerable people from harm, abuse, neglect and exploitation.",
+      "How we protect children, vulnerable people, volunteers and community members from harm.",
+    href: "/safeguarding",
+    icon: <FaShieldAlt aria-hidden="true" />,
+    className: "policy-safeguarding",
+    updated: "August 2026",
   },
   {
-    href: "/child-protection",
+    number: "02",
     title: "Child Protection Policy",
     description:
-      "The standards, responsibilities and reporting expectations that guide our work involving children.",
+      "Our standards for protecting children, responding to concerns and promoting their wellbeing.",
+    href: "/child-protection",
+    icon: <FaChild aria-hidden="true" />,
+    className: "policy-child-protection",
+    updated: "August 2026",
   },
   {
-    href: "/privacy",
+    number: "03",
     title: "Privacy Policy",
     description:
-      "How we collect, use, retain and protect personal information.",
+      "How we collect, use, store and protect personal information responsibly.",
+    href: "/privacy",
+    icon: <FaUserLock aria-hidden="true" />,
+    className: "policy-privacy",
+    updated: "August 2026",
   },
   {
-    href: "/terms",
+    number: "04",
     title: "Terms and Conditions",
     description:
-      "The conditions governing the use of this website and its information.",
+      "The terms governing the use of our website, information and online services.",
+    href: "/terms",
+    icon: <FaFileContract aria-hidden="true" />,
+    className: "policy-terms",
+    updated: "August 2026",
   },
   {
-    href: "/donation-refund",
-    title: "Donation and Refund Policy",
-    description:
-      "How donations are processed and how mistaken or disputed payments are handled.",
-  },
-  {
-    href: "/complaints",
+    number: "05",
     title: "Complaints Policy",
     description:
-      "How concerns and complaints can be raised, reviewed and responded to fairly.",
+      "How supporters, beneficiaries and community members can raise concerns or complaints.",
+    href: "/complaints",
+    icon: <FaComments aria-hidden="true" />,
+    className: "policy-complaints",
+    updated: "August 2026",
+  },
+  {
+    number: "06",
+    title: "Donation and Refund Policy",
+    description:
+      "Important information about donations, payment methods, mistakes and refund requests.",
+    href: "/donation-refund",
+    icon: <FaHandHoldingHeart aria-hidden="true" />,
+    className: "policy-donations",
+    updated: "August 2026",
   },
 ];
 
 export default function PoliciesPage() {
   return (
-    <main>
-      <section className="page-header">
-        <div className="site-container page-header-content">
-          <p className="eyebrow">Governance and trust</p>
+    <>
+      <PageHero
+        eyebrow="Governance and accountability"
+        title="Our policies protect people and build trust."
+        description="Our policies explain the standards that guide our safeguarding, data protection, donations, complaints and responsible programme delivery."
+        actions={[
+          {
+            label: "Read Safeguarding",
+            href: "/safeguarding",
+          },
+          {
+            label: "Contact the Foundation",
+            href: "/contact",
+            variant: "secondary",
+          },
+        ]}
+      />
 
-          <h1>Our policies and commitments.</h1>
+      <section
+        className="policies-section"
+        aria-labelledby="policies-heading"
+      >
+        <div className="site-container">
+          <div className="policies-header">
+            <div>
+              <p className="section-eyebrow">Foundation policies</p>
 
-          <p>
-            These policies explain the standards we aim to follow when working
-            with children, communities, donors, volunteers and website
-            visitors.
-          </p>
+              <h2 id="policies-heading">
+                Clear standards for responsible action.
+              </h2>
+            </div>
+
+            <p>
+              Select a policy below to read how The Guvnor Ace Foundation
+              approaches safeguarding, accountability, privacy and public
+              engagement.
+            </p>
+          </div>
+
+          <div className="policies-grid">
+            {policies.map((policy) => (
+              <Link
+                key={policy.title}
+                href={policy.href}
+                className={`policy-card ${policy.className}`}
+              >
+                <div className="policy-card-top">
+                  <span className="policy-number">{policy.number}</span>
+
+                  <span className="policy-icon">
+                    {policy.icon}
+                  </span>
+                </div>
+
+                <div className="policy-card-content">
+                  <h3>{policy.title}</h3>
+                  <p>{policy.description}</p>
+                </div>
+
+                <div className="policy-card-footer">
+                  <span>Updated {policy.updated}</span>
+
+                  <strong>
+                    Read policy
+                    <span aria-hidden="true">→</span>
+                  </strong>
+                </div>
+              </Link>
+            ))}
+          </div>
         </div>
       </section>
 
-      <section className="section">
-        <div className="site-container policy-card-grid">
-          {policies.map((policy) => (
-            <Link href={policy.href} className="policy-card" key={policy.href}>
-              <span>Foundation policy</span>
-              <h2>{policy.title}</h2>
-              <p>{policy.description}</p>
-              <strong>Read policy →</strong>
-            </Link>
-          ))}
+      <section className="policy-support-section">
+        <div className="site-container">
+          <div className="cta-panel">
+            <div>
+              <h2>Do you have a policy or safeguarding enquiry?</h2>
+
+              <p>
+                Contact the Foundation if you need clarification, wish to raise
+                a concern or require further information about our standards.
+              </p>
+            </div>
+
+            <div className="cta-panel-actions">
+              <Link href="/contact" className="primary-button">
+                Contact Our Team
+                <span aria-hidden="true">→</span>
+              </Link>
+
+              <Link href="/reports" className="secondary-button">
+                View Transparency
+              </Link>
+            </div>
+          </div>
         </div>
       </section>
-    </main>
+    </>
   );
 }

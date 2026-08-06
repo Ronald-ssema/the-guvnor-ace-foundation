@@ -1,34 +1,13 @@
 import Link from "next/link";
 
+import DonationOptions from "@/components/donations/DonationOptions";
 import { PageHero } from "@/components/ui/PageHero";
 
 export const metadata = {
   title: "Donate",
+  description:
+    "Support The Guvnor Ace Foundation through GoFundMe, PayPal or other official support options.",
 };
-
-const supportOptions = [
-  {
-    title: "Donate through GoFundMe",
-    description:
-      "Support the Foundation through our official fundraising campaign.",
-    href: "#",
-    action: "Donate securely",
-  },
-  {
-    title: "Partner with us",
-    description:
-      "Businesses and organisations can support programmes through responsible partnerships.",
-    href: "/contact",
-    action: "Discuss a partnership",
-  },
-  {
-    title: "Volunteer your skills",
-    description:
-      "Contribute time, expertise or professional services to support programme delivery.",
-    href: "/volunteer",
-    action: "Volunteer with us",
-  },
-];
 
 export default function DonatePage() {
   return (
@@ -36,47 +15,80 @@ export default function DonatePage() {
       <PageHero
         eyebrow="Support our mission"
         title="Help us give children food, education and hope."
-        description="Your contribution supports practical programmes for vulnerable children, families and communities in Uganda."
+        description="Choose a secure and convenient way to support practical programmes for vulnerable children, families and communities in Uganda."
         actions={[
           {
-            label: "Donate Through GoFundMe",
-            href: "#",
+            label: "Choose a Donation Method",
+            href: "#donation-options",
           },
           {
-            label: "View Our Work",
+            label: "See Our Work",
             href: "/programmes",
             variant: "secondary",
           },
         ]}
       />
 
-      <section className="page-section page-section-soft">
+      <section
+        className="page-section page-section-soft"
+        id="donation-options"
+        aria-labelledby="donation-options-heading"
+      >
         <div className="site-container">
           <div className="page-section-header">
             <div>
-              <p className="section-eyebrow">Ways to help</p>
-              <h2>Choose how you would like to support.</h2>
+              <p className="section-eyebrow">Official support options</p>
+
+              <h2 id="donation-options-heading">
+                Choose how you would like to give.
+              </h2>
             </div>
 
             <p>
-              Every form of responsible support can contribute to safer and
-              brighter opportunities for vulnerable children.
+              Our official donation and support links are listed below. Each
+              external service opens securely in a new browser tab.
             </p>
           </div>
 
-          <div className="feature-grid">
-            {supportOptions.map((option, index) => (
-              <Link className="feature-card" href={option.href} key={option.title}>
-                <span className="feature-card-number">0{index + 1}</span>
-                <h3>{option.title}</h3>
-                <p>{option.description}</p>
+          <DonationOptions />
+        </div>
+      </section>
 
-                <span className="feature-card-link">
-                  {option.action}
-                  <span aria-hidden="true">→</span>
-                </span>
-              </Link>
-            ))}
+      <section className="page-section donation-trust-section">
+        <div className="site-container">
+          <div className="donation-trust-grid">
+            <article>
+              <span aria-hidden="true">✓</span>
+              <div>
+                <h3>Official links</h3>
+                <p>
+                  Use only the donation links published on this website and our
+                  verified Foundation channels.
+                </p>
+              </div>
+            </article>
+
+            <article>
+              <span aria-hidden="true">✓</span>
+              <div>
+                <h3>Questions and receipts</h3>
+                <p>
+                  Contact our team if you need confirmation, further
+                  information or assistance with a donation.
+                </p>
+              </div>
+            </article>
+
+            <article>
+              <span aria-hidden="true">✓</span>
+              <div>
+                <h3>Transparent reporting</h3>
+                <p>
+                  We are committed to responsible programme delivery and clear
+                  reporting as verified information becomes available.
+                </p>
+              </div>
+            </article>
           </div>
         </div>
       </section>
@@ -85,16 +97,17 @@ export default function DonatePage() {
         <div className="site-container">
           <div className="cta-panel">
             <div>
-              <h2>Questions before donating?</h2>
+              <h2>Would you like to discuss your support?</h2>
               <p>
-                Contact the Foundation for clarification about campaigns,
-                receipts, programme support and available donation methods.
+                Contact the Foundation about donations, partnerships,
+                fundraising or practical support for our programmes.
               </p>
             </div>
 
             <div className="cta-panel-actions">
               <Link href="/contact" className="primary-button">
                 Contact Our Team
+                <span aria-hidden="true">→</span>
               </Link>
 
               <Link href="/reports" className="secondary-button">
