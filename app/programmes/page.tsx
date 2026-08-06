@@ -1,120 +1,146 @@
 import Image from "next/image";
 import Link from "next/link";
 
+import { PageHero } from "@/components/ui/PageHero";
+
+export const metadata = {
+  title: "Our Work",
+};
+
 const programmes = [
   {
+    id: "food-and-nutrition",
     title: "Food and Nutrition",
-    image: "/images/food-drive.jpg",
     description:
-      "We provide meals and essential food support to vulnerable children and families facing food insecurity.",
+      "Providing meals and essential food assistance to vulnerable children and families.",
+    image: "/images/food-drive.jpg",
     activities: [
-      "Community food distributions",
-      "Emergency household food assistance",
+      "Community food distribution",
+      "Emergency household food support",
       "Nutrition awareness and referrals",
-      "Support for children at risk of hunger",
+      "Assistance for children facing hunger",
     ],
   },
   {
+    id: "education",
     title: "Education Support",
-    image: "/images/education.jpg",
     description:
-      "We help children access learning opportunities, school materials and practical educational support.",
+      "Helping children access learning materials, school support and educational opportunities.",
+    image: "/images/education.jpg",
     activities: [
       "School materials and learning supplies",
-      "Education access support",
+      "Education-related family support",
       "Mentoring and encouragement",
-      "Community learning activities",
+      "Community learning initiatives",
     ],
   },
   {
-    title: "Child Protection",
-    image: "/images/child-1.jpg",
+    id: "community-outreach",
+    title: "Community Outreach",
     description:
-      "We promote the safety, dignity and wellbeing of children through safeguarding-focused community support.",
-    activities: [
-      "Safeguarding awareness",
-      "Referral to appropriate services",
-      "Family and community engagement",
-      "Confidential and respectful support",
-    ],
-  },
-  {
-    title: "Community Development",
+      "Working with communities to identify practical needs and deliver responsible assistance.",
     image: "/images/about.jpg",
-    description:
-      "We work alongside local communities to identify needs and develop practical, sustainable responses.",
     activities: [
-      "Community consultations",
-      "Support for vulnerable families",
-      "Volunteer mobilisation",
-      "Partnerships with local organisations",
+      "Community needs assessment",
+      "Family support referrals",
+      "Safeguarding-led outreach",
+      "Partnership and volunteer engagement",
     ],
   },
 ];
 
 export default function ProgrammesPage() {
   return (
-    <main>
-      <section className="page-header">
-        <div className="site-container page-header-content">
-          <p className="eyebrow">Our work</p>
-          <h1>Practical programmes designed around community needs.</h1>
-          <p>
-            Our programmes focus on food security, education, child protection
-            and community development for vulnerable children and families in
-            Uganda.
-          </p>
-        </div>
-      </section>
+    <>
+      <PageHero
+        eyebrow="Our programmes"
+        title="Practical support designed around real needs."
+        description="Our programmes focus on food security, education, child protection and community support for vulnerable children and families in Uganda."
+        actions={[
+          {
+            label: "Support Our Work",
+            href: "/donate",
+          },
+          {
+            label: "Contact Our Team",
+            href: "/contact",
+            variant: "secondary",
+          },
+        ]}
+      />
 
-      <section className="section">
-        <div className="site-container detailed-programme-grid">
-          {programmes.map((programme) => (
-            <article className="detailed-programme-card" key={programme.title}>
-              <div className="detailed-programme-image">
-                <Image
-                  src={programme.image}
-                  alt={programme.title}
-                  fill
-                  className="content-image"
-                  sizes="(max-width: 920px) 100vw, 50vw"
-                />
-              </div>
+      {programmes.map((programme, index) => (
+        <section
+          className={`page-section ${
+            index % 2 === 1 ? "page-section-soft" : ""
+          }`}
+          id={programme.id}
+          key={programme.id}
+        >
+          <div className="site-container content-grid">
+            <div
+              className="content-image"
+              style={{ order: index % 2 === 1 ? 2 : 1 }}
+            >
+              <Image
+                src={programme.image}
+                alt={`${programme.title} programme by The Guvnor Ace Foundation`}
+                fill
+                sizes="(max-width: 950px) 100vw, 50vw"
+                style={{ objectFit: "cover" }}
+              />
+            </div>
 
-              <div className="detailed-programme-content">
-                <h2>{programme.title}</h2>
-                <p>{programme.description}</p>
+            <div
+              className="content-copy"
+              style={{ order: index % 2 === 1 ? 1 : 2 }}
+            >
+              <p className="section-eyebrow">
+                Programme {String(index + 1).padStart(2, "0")}
+              </p>
 
-                <h3>Key activities</h3>
-                <ul>
-                  {programme.activities.map((activity) => (
-                    <li key={activity}>{activity}</li>
-                  ))}
-                </ul>
-              </div>
-            </article>
-          ))}
-        </div>
-      </section>
+              <h2>{programme.title}</h2>
 
-      <section className="section donation-section">
-        <div className="site-container donation-grid">
-          <div>
-            <p className="eyebrow">Support our programmes</p>
-            <h2>Help us reach more children and families.</h2>
+              <p>{programme.description}</p>
+
+              <ul className="info-list">
+                {programme.activities.map((activity) => (
+                  <li key={activity}>
+                    <span className="info-list-icon" aria-hidden="true">
+                      ✓
+                    </span>
+                    <span>{activity}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
+        </section>
+      ))}
 
-          <div className="hero-actions">
-            <Link href="/donate" className="primary-button">
-              Donate Today
-            </Link>
+      <section className="page-section">
+        <div className="site-container">
+          <div className="cta-panel">
+            <div>
+              <h2>Help us deliver practical support.</h2>
+              <p>
+                Donations, partnerships and responsible volunteers help us
+                extend support to more children and families.
+              </p>
+            </div>
 
-            <Link href="/get-involved" className="secondary-button">
-              Get Involved
-            </Link>
+            <div className="cta-panel-actions">
+              <Link href="/donate" className="primary-button">
+                Donate Today
+              </Link>
+
+              <Link href="/volunteer" className="secondary-button">
+                Volunteer
+              </Link>
+            </div>
           </div>
         </div>
       </section>
-    </main>
+    </>
   );
 }

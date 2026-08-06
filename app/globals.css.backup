@@ -628,6 +628,33 @@ html {
   gap: 27px;
 }
 
+.navbar-link {
+  position: relative;
+  padding: 10px 0;
+  color: var(--colour-navy-950);
+  font-size: 0.92rem;
+  font-weight: 750;
+}
+
+.navbar-link::after {
+  position: absolute;
+  right: 0;
+  bottom: 3px;
+  left: 0;
+  height: 2px;
+  border-radius: 20px;
+  background: var(--colour-gold-500);
+  content: "";
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--transition-fast);
+}
+
+.navbar-link:hover::after,
+.navbar-link.active::after {
+  transform: scaleX(1);
+}
+
 .navbar-link:focus-visible,
 .navbar-brand:focus-visible,
 .navbar-donate-button:focus-visible {
@@ -1164,35 +1191,6 @@ html {
 
 .about-section {
   background: var(--colour-white);
-}
-
-.about-intro {
-  max-width: 1100px;
-  display: grid;
-  gap: 12px;
-  color: var(--colour-text);
-  font-size: clamp(1.05rem, 1.5vw, 1.3rem);
-  line-height: 1.65;
-}
-
-.about-intro p {
-  margin: 0;
-}
-
-.about-intro-label {
-  font-weight: 850;
-}
-
-.about-intro-label-gold {
-  color: var(--colour-gold-600);
-}
-
-.about-intro-label-navy {
-  color: var(--colour-navy-950);
-}
-
-.about-intro-label-green {
-  color: var(--colour-green-600);
 }
 
 .about-grid {
@@ -2484,72 +2482,5 @@ html {
 
   .story-feature-image {
     min-height: 340px;
-  }
-}
-
-/* =========================================================
-   PROFESSIONAL ACTIVE NAVIGATION STATES
-   ========================================================= */
-
-.navbar-link {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  padding: 12px 15px;
-  border-radius: 12px;
-  color: var(--colour-navy-950);
-  font-size: 0.94rem;
-  font-weight: 750;
-  transition:
-    color var(--transition-fast),
-    background-color var(--transition-fast),
-    transform var(--transition-fast);
-}
-
-.navbar-link:hover {
-  background: rgba(232, 177, 31, 0.09);
-  color: var(--colour-navy-950);
-}
-
-.navbar-link-active {
-  background: rgba(232, 177, 31, 0.12);
-  color: var(--colour-navy-950);
-}
-
-.navbar-link-active::after {
-  position: absolute;
-  right: 15px;
-  bottom: 5px;
-  left: 15px;
-  height: 3px;
-  border-radius: 999px;
-  background: var(--colour-gold-500);
-  content: "";
-}
-
-.navbar-link-active:hover {
-  background: rgba(232, 177, 31, 0.16);
-}
-
-.navbar-donate-active {
-  outline: 3px solid rgba(232, 177, 31, 0.28);
-  outline-offset: 4px;
-  box-shadow: 0 12px 28px rgba(204, 148, 0, 0.28);
-}
-
-@media (max-width: 980px) {
-  .navbar-link {
-    justify-content: space-between;
-    padding: 16px 14px;
-  }
-
-  .navbar-link-active {
-    border-left: 4px solid var(--colour-gold-500);
-    border-radius: 8px;
-    background: rgba(232, 177, 31, 0.12);
-  }
-
-  .navbar-link-active::after {
-    display: none;
   }
 }

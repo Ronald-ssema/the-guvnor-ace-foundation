@@ -2,20 +2,37 @@ export default function AboutPage() {
   return (
     <main className="section">
       <div className="site-container">
-        <p className="eyebrow">About us</p>
+        <div className="about-intro">
+          <p>
+            <span className="about-intro-label about-intro-label-gold">
+              About us
+            </span>
+          </p>
 
-        <h1>Building safer and brighter futures across Uganda.</h1>
+          <p>
+            <span className="about-intro-label about-intro-label-navy">
+              Building safer and brighter futures
+            </span>{" "}
+            across Uganda.
+          </p>
 
-        <p>
-          The Guvnor Ace Foundation supports vulnerable children, families and
-          communities through food assistance, education, healthcare, child
-          protection and sustainable community programmes.
-        </p>
+          <p>
+            <span className="about-intro-label about-intro-label-green">
+              The Guvnor Ace Foundation
+            </span>{" "}
+            supports vulnerable children, families and communities through food
+            assistance, education, healthcare, child protection and sustainable
+            community programmes.
+          </p>
 
-        <p>
-          We are based in the Seguku, Bunamwaya and Lubowa area along Entebbe
-          Road in Wakiso District, Uganda.
-        </p>
+          <p>
+            <span className="about-intro-label about-intro-label-gold">
+              Based in Wakiso District
+            </span>
+            , we serve communities around Seguku, Bunamwaya and Lubowa along Entebbe
+            Road, Uganda.
+          </p>
+        </div>
       </div>
     </main>
   );

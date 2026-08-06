@@ -1,5 +1,6 @@
 import Image from "next/image";
 
+
 export default function HomeSections() {
   return (
     <section className="about-section section" aria-labelledby="about-heading">
