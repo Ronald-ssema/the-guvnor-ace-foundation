@@ -1,77 +1,110 @@
 import Image from "next/image";
+import Link from "next/link";
+
+import { PageHero } from "@/components/ui/PageHero";
+
+export const metadata = {
+  title: "Our Impact",
+};
+
+const principles = [
+  {
+    title: "Community-led planning",
+    description:
+      "We listen to children, families and community representatives before designing support.",
+  },
+  {
+    title: "Responsible delivery",
+    description:
+      "Assistance should be distributed fairly, respectfully and according to identified needs.",
+  },
+  {
+    title: "Evidence and records",
+    description:
+      "Programme activities should be supported by records, photographs, receipts and reporting.",
+  },
+  {
+    title: "Continuous improvement",
+    description:
+      "Feedback helps us improve programmes and respond effectively to community needs.",
+  },
+];
 
 export default function ImpactPage() {
   return (
-    <main>
-      <section className="page-header">
-        <div className="site-container page-header-content">
-          <p className="eyebrow">Our impact</p>
-          <h1>Transparent action. Meaningful community change.</h1>
-          <p>
-            We believe supporters deserve clear information about what we do,
-            how assistance is delivered and how community needs are identified.
-          </p>
-        </div>
-      </section>
+    <>
+      <PageHero
+        eyebrow="Our impact"
+        title="Transparent action. Meaningful community change."
+        description="Supporters deserve clear information about what we do, how assistance is delivered and how programme results are documented."
+        actions={[
+          {
+            label: "View Reports",
+            href: "/reports",
+          },
+          {
+            label: "Support Our Mission",
+            href: "/donate",
+            variant: "secondary",
+          },
+        ]}
+      />
 
-      <section className="section">
-        <div className="site-container impact-layout">
-          <div className="section-image">
+      <section className="page-section">
+        <div className="site-container content-grid">
+          <div className="content-image">
             <Image
               src="/images/child-2.jpg"
-              alt="Children supported through community outreach"
+              alt="Children participating in a community programme in Uganda"
               fill
-              className="content-image"
-              sizes="(max-width: 920px) 100vw, 50vw"
+              sizes="(max-width: 950px) 100vw, 50vw"
+              style={{ objectFit: "cover" }}
             />
           </div>
 
-          <div>
-            <p className="eyebrow">How we measure progress</p>
+          <div className="content-copy">
+            <p className="section-eyebrow">How we measure progress</p>
             <h2>Accountability is central to our mission.</h2>
 
-            <p className="about-copy">
-              Our impact reporting should be based on verified programme
-              records, beneficiary safeguarding, responsible financial
-              management and honest communication with supporters.
+            <p>
+              Our reporting is based on verified programme records,
+              beneficiary safeguarding, responsible financial management and
+              honest communication with supporters.
             </p>
 
-            <div className="impact-principles">
-              <article>
-                <h3>Community-led planning</h3>
-                <p>
-                  We listen to children, families and community representatives
-                  before designing support activities.
-                </p>
-              </article>
-
-              <article>
-                <h3>Responsible delivery</h3>
-                <p>
-                  Assistance should be distributed fairly, respectfully and
-                  according to clearly identified needs.
-                </p>
-              </article>
-
-              <article>
-                <h3>Evidence and records</h3>
-                <p>
-                  Programme activities should be supported by appropriate
-                  records, photographs, receipts and internal reporting.
-                </p>
-              </article>
-
-              <article>
-                <h3>Continuous improvement</h3>
-                <p>
-                  Feedback helps us improve our programmes and respond more
-                  effectively to community needs.
-                </p>
-              </article>
-            </div>
+            <Link href="/reports" className="secondary-button">
+              Read Our Reports
+              <span aria-hidden="true">→</span>
+            </Link>
           </div>
         </div>
       </section>
-    </main>
+
+      <section className="page-section page-section-soft">
+        <div className="site-container">
+          <div className="page-section-header">
+            <div>
+              <p className="section-eyebrow">Our approach</p>
+              <h2>How responsible impact is created.</h2>
+            </div>
+
+            <p>
+              We prioritise dignity, evidence, clear communication and
+              continuous programme improvement.
+            </p>
+          </div>
+
+          <div className="feature-grid">
+            {principles.map((principle, index) => (
+              <article className="feature-card" key={principle.title}>
+                <span className="feature-card-number">0{index + 1}</span>
+                <h3>{principle.title}</h3>
+                <p>{principle.description}</p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+    </>
   );
 }

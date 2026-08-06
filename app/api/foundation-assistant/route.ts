@@ -144,40 +144,32 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ answer });
   } catch (error: unknown) {
-    console.error("OPENAI FOUNDATION ASSISTANT ERROR:", error);
+    console.error("Foundation assistant error:", error);
 
-    const possibleError = error as {
-      status?: number;
+    const apiError = error as {
       code?: string;
+      status?: number;
       message?: string;
     };
 
-    if (possibleError.status === 401) {
-      return NextResponse.json(
+    if (
+      apiError.code === "insufficient_quota" ||
+      apiError.code === "credit_balance_exhausted" ||
+      apiError.status === 429
+    ) {
+      return Response.json(
         {
           error:
-            "The OpenAI API key is invalid. The website administrator must replace it.",
-        },
-        { status: 500 },
-      );
-    }
-
-    if (possibleError.status === 429) {
-      return NextResponse.json(
-        {
-          error:
-            "The AI account has reached its usage or billing limit. Please try again later.",
+            "Our Foundation Assistant is temporarily unavailable. Please contact us at guvnorace@gmail.com or +256 752 462 740.",
         },
         { status: 503 },
       );
     }
 
-    return NextResponse.json(
+    return Response.json(
       {
         error:
-          process.env.NODE_ENV === "development"
-            ? possibleError.message || "The AI request failed."
-            : "The AI assistant is temporarily unavailable.",
+          "The Foundation Assistant is temporarily unavailable. Please try again later.",
       },
       { status: 500 },
     );

@@ -1,88 +1,200 @@
+import {
+  FaEnvelope,
+  FaFacebookF,
+  FaInstagram,
+  FaMapMarkerAlt,
+  FaPhoneAlt,
+  FaTiktok,
+  FaYoutube,
+} from "react-icons/fa";
+import { SiLinktree } from "react-icons/si";
+
+import { PageHero } from "@/components/ui/PageHero";
+
+export const metadata = {
+  title: "Contact Us",
+  description:
+    "Contact The Guvnor Ace Foundation and follow our official online channels.",
+};
+
+const contactMethods = [
+  {
+    label: "Email",
+    title: "Foundation enquiries",
+    description:
+      "Contact us about donations, volunteering, partnerships and programmes.",
+    value: "guvnorace@gmail.com",
+    href: "mailto:guvnorace@gmail.com",
+    icon: <FaEnvelope aria-hidden="true" />,
+  },
+  {
+    label: "Telephone and WhatsApp",
+    title: "Speak with our team",
+    description:
+      "Contact The Guvnor Ace Foundation during normal working hours.",
+    value: "+256 752 462 740",
+    href: "tel:+256752462740",
+    icon: <FaPhoneAlt aria-hidden="true" />,
+  },
+  {
+    label: "Location",
+    title: "Wakiso District, Uganda",
+    description:
+      "Bunamwaya–Lubowa area, along Entebbe Road, Wakiso District.",
+    value: "Learn more about us",
+    href: "/about",
+    icon: <FaMapMarkerAlt aria-hidden="true" />,
+  },
+];
+
+const socialLinks = [
+  {
+    number: "01",
+    name: "Facebook",
+    username: "Guvnor Ace Foundation",
+    href: "https://www.facebook.com/guvnoracefoundation",
+    icon: <FaFacebookF aria-hidden="true" />,
+    className: "contact-social-facebook",
+  },
+  {
+    number: "02",
+    name: "Instagram",
+    username: "@guvnoracefoundation",
+    href: "https://www.instagram.com/guvnoracefoundation",
+    icon: <FaInstagram aria-hidden="true" />,
+    className: "contact-social-instagram",
+  },
+  {
+    number: "03",
+    name: "TikTok",
+    username: "@guvnoracefoundation",
+    href: "https://www.tiktok.com/@guvnoracefoundation",
+    icon: <FaTiktok aria-hidden="true" />,
+    className: "contact-social-tiktok",
+  },
+  {
+    number: "04",
+    name: "YouTube",
+    username: "@guvnoracefoundation",
+    href: "https://www.youtube.com/@guvnoracefoundation",
+    icon: <FaYoutube aria-hidden="true" />,
+    className: "contact-social-youtube",
+  },
+  {
+    number: "05",
+    name: "Linktree",
+    username: "All official Foundation links",
+    href: "https://linktr.ee/guvnoracefoundation",
+    icon: <SiLinktree aria-hidden="true" />,
+    className: "contact-social-linktree",
+  },
+];
+
 export default function ContactPage() {
   return (
-    <main>
-      <section className="page-header">
-        <div className="site-container page-header-content">
-          <p className="eyebrow">Contact us</p>
-          <h1>Connect with The Guvnor Ace Foundation.</h1>
-          <p>
-            Contact us about donations, volunteering, partnerships, programme
-            enquiries or community support.
-          </p>
+    <>
+      <PageHero
+        eyebrow="Contact us"
+        title="We would be pleased to hear from you."
+        description="Contact The Guvnor Ace Foundation about donations, volunteering, partnerships, programme enquiries or responsible community support."
+        actions={[
+          {
+            label: "Support Our Mission",
+            href: "/donate",
+          },
+          {
+            label: "Volunteer With Us",
+            href: "/volunteer",
+            variant: "secondary",
+          },
+        ]}
+      />
+
+      <section
+        className="contact-details-section"
+        aria-labelledby="contact-details-heading"
+      >
+        <div className="site-container">
+          <div className="contact-details-grid">
+            {contactMethods.map((method) => (
+              <a
+                key={method.label}
+                href={method.href}
+                className="contact-detail-card"
+              >
+                <span className="contact-detail-icon">
+                  {method.icon}
+                </span>
+
+                <div className="contact-detail-content">
+                  <span className="contact-detail-label">
+                    {method.label}
+                  </span>
+
+                  <h2>{method.title}</h2>
+                  <p>{method.description}</p>
+
+                  <span className="contact-detail-link">
+                    {method.value}
+                    <span aria-hidden="true">→</span>
+                  </span>
+                </div>
+              </a>
+            ))}
+          </div>
         </div>
       </section>
 
-      <section className="section">
-        <div className="site-container contact-grid">
-          <div>
-            <p className="eyebrow">Official contact details</p>
-            <h2>We would be pleased to hear from you.</h2>
+      <section
+        className="contact-social-section"
+        aria-labelledby="contact-social-heading"
+      >
+        <div className="site-container">
+          <div className="contact-social-header">
+            <div>
+              <p className="section-eyebrow">Follow our work</p>
 
-            <div className="contact-details">
-              <article>
-                <h3>Location</h3>
-                <p>Bunamwaya–Lubowa, Entebbe Road, Wakiso District, Uganda</p>
-              </article>
-
-              <article>
-                <h3>Email</h3>
-                <a href="mailto:guvnorace@gmail.com">
-                  guvnorace@gmail.com
-                </a>
-              </article>
-
-              <article>
-                <h3>Telephone and WhatsApp</h3>
-                <a href="tel:+256752462740">+256 752 462 740</a>
-              </article>
+              <h2 id="contact-social-heading">
+                Connect with the Foundation online.
+              </h2>
             </div>
+
+            <p>
+              Follow our official channels for programme updates, stories,
+              fundraising campaigns and Foundation news.
+            </p>
           </div>
 
-          <div className="contact-social-card">
-            <h2>Follow our work</h2>
+          <div className="contact-social-grid">
+            {socialLinks.map((social) => (
+              <a
+                key={social.name}
+                href={social.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`contact-social-card ${social.className}`}
+                aria-label={`Visit The Guvnor Ace Foundation on ${social.name}`}
+              >
+                <span className="contact-social-number">
+                  {social.number}
+                </span>
 
-            <a
-              href="https://www.facebook.com/profile.php?id=61592290623772"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Facebook
-            </a>
+                <span className="contact-social-icon">
+                  {social.icon}
+                </span>
 
-            <a
-              href="https://instagram.com/guvnoracefoundation"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Instagram
-            </a>
+                <h3>{social.name}</h3>
+                <p>{social.username}</p>
 
-            <a
-              href="https://www.tiktok.com/@guvnoracefoundation"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              TikTok
-            </a>
-
-            <a
-              href="https://www.youtube.com/@guvnoracefoundation"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              YouTube
-            </a>
-
-            <a
-              href="https://linktr.ee/guvnoracefoundation"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Linktree
-            </a>
+                <span className="contact-social-action">
+                  Visit channel
+                  <span aria-hidden="true">→</span>
+                </span>
+              </a>
+            ))}
           </div>
         </div>
       </section>
-    </main>
+    </>
   );
 }

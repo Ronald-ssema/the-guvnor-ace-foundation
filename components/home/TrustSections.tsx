@@ -5,20 +5,23 @@ const programmes = [
   {
     title: "Food and Nutrition",
     description:
-      "Providing practical food assistance and nutrition support to vulnerable children and families.",
-    image: "/images/food-drive.jpg",
+      "Providing meals and essential food supplies to vulnerable children and families.",
+    image: "/images/food-support.jpg",
+    href: "/programmes#food-and-nutrition",
   },
   {
     title: "Education Support",
     description:
-      "Helping children access learning materials, school support and opportunities to continue their education.",
-    image: "/images/education.jpg",
+      "Helping children access learning materials, school support and brighter opportunities.",
+    image: "/images/education-support.jpg",
+    href: "/programmes#education",
   },
   {
     title: "Child and Family Support",
     description:
-      "Working alongside families and communities to respond to urgent needs with dignity and care.",
-    image: "/images/child-1.jpg",
+      "Supporting children and families facing hardship through practical and compassionate assistance.",
+    image: "/images/community-support.jpg",
+    href: "/programmes#family-support",
   },
 ];
 
@@ -65,9 +68,9 @@ export default function TrustSections() {
                   <Image
                     src={programme.image}
                     alt={programme.title}
-                    fill
-                    className="content-image"
-                    sizes="(max-width: 920px) 100vw, 33vw"
+                    width={700}
+                    height={500}
+                    className="programme-image"
                   />
                 </div>
 
