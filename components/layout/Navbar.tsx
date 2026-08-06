@@ -1,42 +1,122 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
+
+const navigationLinks = [
+  { label: "About", href: "/about" },
+  { label: "Our Work", href: "/programmes" },
+  { label: "Impact", href: "/impact" },
+  { label: "Reports", href: "/reports" },
+  { label: "Get Involved", href: "/volunteer" },
+  { label: "Contact", href: "/contact" },
+];
 
 export default function Navbar() {
-  return (
-    <header className="site-header">
-      <div className="site-container navbar">
+  const pathname = usePathname();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
 
-        {/* Logo */}
-        <Link href="/" className="brand">
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 12);
+    };
+
+    handleScroll();
+    window.addEventListener("scroll", handleScroll);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
+
+  useEffect(() => {
+    document.body.style.overflow = menuOpen ? "hidden" : "";
+
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [menuOpen]);
+
+  const closeMenu = () => {
+    setMenuOpen(false);
+  };
+
+  return (
+    <header
+      className={`site-header ${scrolled ? "site-header-scrolled" : ""}`}
+    >
+      <div className="site-container navbar">
+        <Link
+          href="/"
+          className="navbar-brand"
+          aria-label="The Guvnor Ace Foundation homepage"
+          onClick={closeMenu}
+        >
           <Image
             src="/images/logo.png"
-            alt="The Guvnor Ace Foundation"
-            width={60}
-            height={60}
+            alt=""
+            width={62}
+            height={62}
             priority
-            className="brand-logo"
           />
 
-          <span className="brand-name">
+          <span className="navbar-brand-text">
             <strong>The Guvnor Ace</strong>
-            <small>Foundation</small>
+            <span>Foundation</span>
           </span>
         </Link>
 
-        {/* Navigation */}
-        <nav className="desktop-navigation">
-          <Link href="/about">About</Link>
-          <Link href="/programmes">Our Work</Link>
-          <Link href="/impact">Impact</Link>
-          <Link href="/stories">Stories</Link>
-          <Link href="/get-involved">Get Involved</Link>
-          <Link href="/contact">Contact</Link>
+        <button
+          type="button"
+          className="mobile-menu-button"
+          aria-label={menuOpen ? "Close navigation menu" : "Open navigation menu"}
+          aria-expanded={menuOpen}
+          aria-controls="primary-navigation"
+          onClick={() => setMenuOpen((current) => !current)}
+        >
+          <span />
+          <span />
+          <span />
+        </button>
 
-          <Link href="/donate" className="donate-button">
+        <nav
+          id="primary-navigation"
+          className={`navbar-navigation ${
+            menuOpen ? "navbar-navigation-open" : ""
+          }`}
+          aria-label="Primary navigation"
+        >
+          <div className="navbar-links">
+            {navigationLinks.map((link) => {
+              const active =
+                pathname === link.href ||
+                (link.href !== "/" && pathname.startsWith(`${link.href}/`));
+
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={active ? "navbar-link active" : "navbar-link"}
+                  aria-current={active ? "page" : undefined}
+                  onClick={closeMenu}
+                >
+                  {link.label}
+                </Link>
+              );
+            })}
+          </div>
+
+          <Link
+            href="/donate"
+            className="navbar-donate-button"
+            onClick={closeMenu}
+          >
             Donate
           </Link>
         </nav>
-
       </div>
     </header>
   );
