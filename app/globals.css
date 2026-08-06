@@ -1,4 +1,5 @@
 @import "../styles/tokens.css";
+@import "../styles/components/buttons.css";
 @import "tailwindcss";
 
 :root {
@@ -18,7 +19,8 @@
   --colour-background: #f7f9fb;
   --colour-surface: #ffffff;
   --colour-text: #10233f;
-  --colour-muted: #5f6f86;
+  --colour-
+  muted: #5f6f86;
   --colour-border: #dce3ea;
 
   /* Layout */
@@ -995,6 +997,17 @@ html {
   flex-wrap: wrap;
   gap: 16px;
   margin-top: 34px;
+}
+
+.hero-actions .primary-button,
+.hero-actions .secondary-button {
+  min-height: 56px;
+  padding: 14px 22px;
+  border-radius: 999px;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .hero-trust-list {
