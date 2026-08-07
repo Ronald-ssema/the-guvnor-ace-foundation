@@ -82,6 +82,10 @@ export const metadata: Metadata = {
       "Supporting vulnerable children, families and communities across Uganda.",
   },
 
+  verification: {
+    google: "b19s01xfRpkm9jLUyy5JsY74iAepQmcaUcE07BZXpWc",
+  },
+
   category: "charity",
 };
 
