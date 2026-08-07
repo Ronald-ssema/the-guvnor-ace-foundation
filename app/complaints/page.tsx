@@ -1,73 +1,158 @@
-import PolicyPage from "@/components/policies/PolicyPage";
+import PolicyPageLayout from "@/components/policies/PolicyPageLayout";
+
+const navigation = [
+  { label: "Our commitment", href: "#commitment" },
+  { label: "What you can complain about", href: "#scope" },
+  { label: "How to complain", href: "#how" },
+  { label: "How we respond", href: "#response" },
+  { label: "Confidentiality", href: "#confidentiality" },
+  { label: "Further review", href: "#review" },
+  { label: "Learning from complaints", href: "#learning" },
+];
 
 export default function ComplaintsPage() {
   return (
-    <PolicyPage
+    <PolicyPageLayout
       eyebrow="Accountability"
       title="Complaints Policy"
-      summary="How supporters, beneficiaries, partners and members of the public can raise a concern about our conduct or services."
+      description="How concerns and complaints about The Guvnor Ace Foundation can be raised, reviewed and responded to fairly."
       lastReviewed="5 August 2026"
-      urgentNotice={{
-        title: "Safeguarding complaints",
-        text: "A complaint involving immediate danger, abuse or exploitation should be treated as a safeguarding concern and referred urgently to appropriate authorities.",
-      }}
-      sections={[
-        {
-          heading: "Our commitment",
-          paragraphs: [
-            "The Guvnor Ace Foundation aims to receive complaints respectfully, review them fairly and use appropriate feedback to improve its work.",
-            "Raising a genuine complaint should not result in unfair treatment.",
-          ],
-        },
-        {
-          heading: "What you may complain about",
-          points: [
-            "The conduct of a staff member, volunteer or representative",
-            "The quality or safety of a programme or activity",
-            "Misleading information or fundraising communication",
-            "Failure to respond appropriately to an enquiry",
-            "Privacy or data-handling concerns",
-            "Discrimination, harassment or inappropriate behaviour",
-          ],
-        },
-        {
-          heading: "How to complain",
-          paragraphs: [
-            "Send your complaint to guvnorace@gmail.com or contact +256 752 462 740.",
-            "Include your name and contact information, what happened, when and where it happened, who was involved, and what outcome you are seeking.",
-            "Anonymous complaints may be considered, although limited information can make investigation more difficult.",
-          ],
-        },
-        {
-          heading: "How we aim to respond",
-          points: [
-            "Acknowledge the complaint where contact information is available.",
-            "Assess whether urgent safety or safeguarding action is required.",
-            "Assign the matter to an appropriate person who is not directly involved where reasonably possible.",
-            "Review available evidence fairly.",
-            "Provide an outcome or progress update within a reasonable period.",
-          ],
-        },
-        {
-          heading: "Confidentiality",
-          paragraphs: [
-            "Complaint information should be shared only with people who reasonably need it to review the matter, protect people or meet legal responsibilities.",
-          ],
-        },
-        {
-          heading: "Appeal or further review",
-          paragraphs: [
-            "If you believe a complaint was not handled fairly, you may request a further internal review and explain the reasons.",
-            "Serious matters may also be raised with an appropriate regulator, law-enforcement body, child-protection authority or payment provider.",
-          ],
-        },
-        {
-          heading: "Learning from complaints",
-          paragraphs: [
-            "The foundation aims to record significant complaints, identify recurring issues and make reasonable improvements where needed.",
-          ],
-        },
-      ]}
-    />
+      navigation={navigation}
+    >
+      <section id="commitment">
+        <h2>Our commitment</h2>
+
+        <p>
+          The Guvnor Ace Foundation welcomes constructive feedback and takes
+          reasonable complaints seriously.
+        </p>
+
+        <p>
+          Complaints can help us identify problems, improve our work and
+          strengthen the trust of the communities, supporters and partners who
+          engage with the Foundation.
+        </p>
+
+        <p>
+          No person should be disadvantaged simply because they raise a genuine
+          concern in good faith.
+        </p>
+      </section>
+
+      <section id="scope">
+        <h2>What you can complain about</h2>
+
+        <p>A complaint may relate to matters such as:</p>
+
+        <ul>
+          <li>The conduct of a Foundation representative.</li>
+          <li>The delivery of a programme or activity.</li>
+          <li>The handling of a donation or supporter enquiry.</li>
+          <li>Communication or customer-service concerns.</li>
+          <li>Privacy, confidentiality or safeguarding concerns.</li>
+          <li>
+            A decision or action that you believe was handled unfairly or
+            irresponsibly.
+          </li>
+        </ul>
+      </section>
+
+      <section id="how">
+        <h2>How to make a complaint</h2>
+
+        <p>
+          Complaints may be sent to the Foundation by email or through our
+          official telephone contact.
+        </p>
+
+        <p>Where possible, please include:</p>
+
+        <ul>
+          <li>Your name and preferred contact details.</li>
+          <li>A clear description of what happened.</li>
+          <li>When and where the matter occurred.</li>
+          <li>The people or programme involved, where known.</li>
+          <li>Any relevant supporting information.</li>
+          <li>The outcome you are seeking.</li>
+        </ul>
+
+        <p>
+          Anonymous complaints may be considered, although limited information
+          may make it more difficult to review the matter properly.
+        </p>
+      </section>
+
+      <section id="response">
+        <h2>How we aim to respond</h2>
+
+        <p>Where reasonably possible, the Foundation aims to:</p>
+
+        <ul>
+          <li>Acknowledge a complaint where contact details are available.</li>
+          <li>
+            Assess whether urgent safety, safeguarding or financial action is
+            required.
+          </li>
+          <li>
+            Assign the matter to an appropriate person who is not directly
+            involved where reasonably possible.
+          </li>
+          <li>Review available information fairly.</li>
+          <li>
+            Provide an outcome or progress update within a reasonable period.
+          </li>
+        </ul>
+
+        <p>
+          Complex matters may require additional time, particularly where
+          safeguarding, financial records, third parties or external
+          authorities are involved.
+        </p>
+      </section>
+
+      <section id="confidentiality">
+        <h2>Confidentiality</h2>
+
+        <p>
+          Complaint information should be shared only with people who
+          reasonably need it to assess the concern, protect individuals, meet
+          safeguarding responsibilities or comply with applicable law.
+        </p>
+      </section>
+
+      <section id="review">
+        <h2>Further review</h2>
+
+        <p>
+          If you believe a complaint was not handled fairly, you may request a
+          further internal review and explain the reasons for your request.
+        </p>
+
+        <p>
+          Serious matters may also be raised with an appropriate regulator,
+          law-enforcement body, child-protection authority or payment provider
+          where applicable.
+        </p>
+      </section>
+
+      <section id="learning">
+        <h2>Learning from complaints</h2>
+
+        <p>
+          The Foundation aims to record significant complaints, identify
+          recurring issues and make reasonable improvements where experience
+          shows that policies, procedures or controls need strengthening.
+        </p>
+      </section>
+
+      <div className="policy-contact">
+        <h2>Make a complaint</h2>
+        <p>
+          Email: guvnorace@gmail.com
+          <br />
+          Phone: +256 752 462 740
+        </p>
+      </div>
+    </PolicyPageLayout>
   );
 }
