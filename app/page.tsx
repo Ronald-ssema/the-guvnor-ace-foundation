@@ -1,13 +1,13 @@
 import Hero from "@/components/home/Hero";
 import HomeSections from "@/components/home/HomeSections";
+import TrustSections from "@/components/home/TrustSections";
 
 export default function HomePage() {
   return (
     <>
-      <main>
-        <Hero />
-        <HomeSections />
-      </main>
+      <Hero />
+      <HomeSections />
+      <TrustSections />
     </>
   );
 }

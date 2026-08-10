@@ -40,6 +40,10 @@ export default function Navbar() {
     };
   }, [menuOpen]);
 
+  useEffect(() => {
+    setMenuOpen(false);
+  }, [pathname]);
+
   const closeMenu = () => {
     setMenuOpen(false);
   };
@@ -48,18 +52,13 @@ export default function Navbar() {
     <header
       className={`site-header ${scrolled ? "site-header-scrolled" : ""}`}
     >
-      <div className="site-container navbar">
-        <Link
-          href="/"
-          className="navbar-brand"
-          aria-label="The Guvnor Ace Foundation homepage"
-          onClick={closeMenu}
-        >
+      <div className="navbar container">
+        <Link href="/" className="navbar-brand" onClick={closeMenu}>
           <Image
             src="/images/logo.png"
-            alt=""
-            width={62}
-            height={62}
+            alt="The Guvnor Ace Foundation"
+            width={58}
+            height={58}
             priority
           />
 
@@ -71,7 +70,9 @@ export default function Navbar() {
 
         <button
           type="button"
-          className="mobile-menu-button"
+          className={`mobile-menu-button ${
+            menuOpen ? "mobile-menu-button-open" : ""
+          }`}
           aria-label={menuOpen ? "Close navigation menu" : "Open navigation menu"}
           aria-expanded={menuOpen}
           aria-controls="primary-navigation"
@@ -99,7 +100,11 @@ export default function Navbar() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={active ? "navbar-link active" : "navbar-link"}
+                  className={
+                    active
+                      ? "navbar-link navbar-link-active"
+                      : "navbar-link"
+                  }
                   aria-current={active ? "page" : undefined}
                   onClick={closeMenu}
                 >
