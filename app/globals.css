@@ -821,9 +821,7 @@ select {
 .site-header {
   position: sticky;
   top: 0;
-html {
-  scroll-behavior: smooth;
-}  z-index: 1000;
+  z-index: 1000;
   border-bottom: 1px solid transparent;
   background: rgba(255, 255, 255, 0.96);
   transition:
@@ -3532,5 +3530,318 @@ html {
     flex-direction: column;
     padding-top: 24px;
     padding-bottom: 24px;
+  }
+}
+
+/* =========================================================
+   MOBILE RESPONSIVE FIXES
+   Prevents overlap on small screens
+   ========================================================= */
+
+@media (max-width: 767px) {
+  /* Hero safety net (legacy class names) */
+  .hero-section,
+  .hero-content,
+  .hero-copy,
+  .hero-links {
+    position: relative !important;
+    height: auto !important;
+    min-height: 0 !important;
+    transform: none !important;
+  }
+
+  .hero-content,
+  .hero-links {
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  .hero-title {
+    font-size: clamp(2.2rem, 10vw, 3.2rem) !important;
+    line-height: 1.05 !important;
+    max-width: 100% !important;
+    overflow-wrap: normal;
+  }
+
+  /* =========================================================
+     SECTION HEADING FIX
+     .section-heading is used BOTH as a heading (HomeSections)
+     and as a flex container (TrustSections). On mobile,
+     reset the container font-size so it doesn't inherit
+     the oversized heading size.
+     ========================================================= */
+
+  .section-heading {
+    display: block !important;
+    align-items: initial !important;
+    justify-content: initial !important;
+    gap: 0 !important;
+    margin-bottom: 28px !important;
+    font-size: 1rem !important;
+    font-family: inherit !important;
+    font-weight: inherit !important;
+    line-height: inherit !important;
+    letter-spacing: normal !important;
+    max-width: none !important;
+  }
+
+  .section-heading h2 {
+    font-size: clamp(2rem, 8vw, 2.8rem) !important;
+    line-height: 1.08 !important;
+    letter-spacing: -0.03em !important;
+  }
+
+  .section-heading > p {
+    margin-top: 14px !important;
+    font-size: 1rem !important;
+    line-height: 1.65 !important;
+  }
+
+  /* =========================================================
+     ABOUT SECTION FIX
+     Reduce fixed min-heights and make the badge flow
+     in normal document flow instead of absolute positioning.
+     ========================================================= */
+
+  .about-image-card,
+  .about-image {
+    min-height: 0 !important;
+    height: auto !important;
+  }
+
+  .about-image {
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+  }
+
+  .about-image-badge {
+    position: relative !important;
+    right: auto !important;
+    bottom: auto !important;
+    left: auto !important;
+    margin-top: -1px;
+    border-radius: 0 0 var(--radius-medium) var(--radius-medium);
+  }
+
+  .about-grid {
+    gap: 32px !important;
+  }
+
+  .about-highlights {
+    grid-template-columns: 1fr !important;
+    gap: 14px !important;
+    margin: 24px 0 !important;
+  }
+
+  .about-highlights > div {
+    padding: 18px !important;
+  }
+
+  /* =========================================================
+     STORY FEATURE FIX
+     Reduce fixed min-height on mobile.
+     ========================================================= */
+
+  .story-feature-image {
+    min-height: 0 !important;
+    height: auto !important;
+    aspect-ratio: 4 / 3;
+  }
+
+  .story-feature-grid {
+    gap: 32px !important;
+  }
+
+  /* =========================================================
+     CONTENT IMAGE FIX
+     Reduce fixed min-height on mobile.
+     ========================================================= */
+
+  .content-image,
+  .content-image img {
+    min-height: 0 !important;
+    height: auto !important;
+  }
+
+  /* =========================================================
+     HERO IMAGE FIX
+     Reduce fixed min-height on mobile.
+     ========================================================= */
+
+  .hero-image-wrapper {
+    min-height: 0 !important;
+    height: auto !important;
+    aspect-ratio: 4 / 3;
+  }
+
+  .hero-message {
+    position: relative !important;
+    right: auto !important;
+    bottom: auto !important;
+    left: auto !important;
+    margin-top: -1px;
+    border-radius: 0 0 var(--radius-medium) var(--radius-medium);
+  }
+
+  /* =========================================================
+     GRID LAYOUT FIX
+     Collapse multi-column grids to single column on mobile.
+     ========================================================= */
+
+  .transparency-panel {
+    grid-template-columns: 1fr !important;
+    gap: 20px !important;
+    padding: 24px !important;
+  }
+
+  .compact-footer-grid {
+    grid-template-columns: 1fr !important;
+    gap: 20px !important;
+    min-height: 0 !important;
+    padding-top: 32px !important;
+    padding-bottom: 32px !important;
+  }
+
+  .page-section-header {
+    grid-template-columns: 1fr !important;
+    gap: 20px !important;
+    margin-bottom: 32px !important;
+  }
+
+  .cta-panel {
+    grid-template-columns: 1fr !important;
+    gap: 24px !important;
+    padding: 28px 20px !important;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+
+  .donation-options-grid,
+  .donation-trust-grid,
+  .contact-details-grid,
+  .contact-social-grid,
+  .social-platform-grid,
+  .reports-grid,
+  .partnership-grid,
+  .programmes-grid,
+  .impact-strip-grid,
+  .stats-grid,
+  .story-grid,
+  .involvement-grid,
+  .detailed-programme-card,
+  .impact-layout,
+  .contact-grid,
+  .donation-grid,
+  .hero-grid,
+  .about-grid,
+  .footer-grid,
+  .feature-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* =========================================================
+     TYPOGRAPHY FIX
+     Reduce oversized clamp() minimums on mobile.
+     ========================================================= */
+
+  .page-hero h1 {
+    font-size: clamp(2.2rem, 9vw, 3.2rem) !important;
+    line-height: 1.05 !important;
+  }
+
+  .hero-content h1 {
+    font-size: clamp(2.2rem, 9vw, 3.2rem) !important;
+    line-height: 1.05 !important;
+  }
+
+  .stats-grid strong {
+    font-size: 2.2rem !important;
+  }
+
+  .page-hero {
+    padding: 64px 0 60px !important;
+  }
+
+  .page-section {
+    padding: 64px 0 !important;
+  }
+
+  .impact-strip-item,
+  .impact-strip-item:not(:first-child) {
+    padding: 20px 0 !important;
+  }
+
+  .involvement-card {
+    padding: 28px 22px !important;
+  }
+
+  .donation-option-card {
+    min-height: 0 !important;
+    padding: 26px 20px !important;
+  }
+
+  .contact-social-card {
+    min-height: 0 !important;
+    padding: 22px 18px !important;
+  }
+
+  .contact-detail-card {
+    min-height: 0 !important;
+  }
+
+  /* =========================================================
+     FLOATING AI BUTTON FIX
+     Keep the AI button from covering important content.
+     ========================================================= */
+
+  .foundation-ai {
+    right: 12px !important;
+    bottom: 12px !important;
+  }
+
+  .foundation-ai-launcher {
+    min-height: 50px !important;
+    padding: 0 16px !important;
+    font-size: 0.9rem !important;
+  }
+
+  .foundation-ai-panel {
+    width: calc(100vw - 24px) !important;
+    margin-bottom: 10px !important;
+  }
+
+  /* Add bottom padding to main so the AI button doesn't cover content */
+  main {
+    padding-bottom: 64px;
+  }
+}
+
+/* =========================================================
+   SMALL PHONE FIXES (max-width: 480px)
+   ========================================================= */
+
+@media (max-width: 480px) {
+  .section-heading h2 {
+    font-size: clamp(1.8rem, 7vw, 2.4rem) !important;
+  }
+
+  .page-hero h1,
+  .hero-content h1 {
+    font-size: clamp(2rem, 8vw, 2.6rem) !important;
+  }
+
+  .site-container {
+    width: min(calc(100% - 20px), var(--container-width)) !important;
+  }
+
+  .about-image-badge {
+    padding: 16px !important;
+  }
+
+  .hero-message {
+    padding: 16px !important;
   }
 }
