@@ -10,6 +10,10 @@ import { siteConfig } from "@/lib/site";
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
 
+  alternates: {
+    canonical: "/",
+  },
+
   title: {
     default:
       "The Guvnor Ace Foundation | Supporting Vulnerable Children in Uganda",
