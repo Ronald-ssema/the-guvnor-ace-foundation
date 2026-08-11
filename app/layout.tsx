@@ -5,13 +5,10 @@ import "./globals.css";
 import FoundationAssistant from "@/components/ai/FoundationAssistant";
 import Footer from "@/components/layout/Footer";
 import Navbar from "@/components/layout/Navbar";
-
-const siteUrl =
-  process.env.NEXT_PUBLIC_SITE_URL ||
-  "https://the-guvnor-ace-foundation.vercel.app";
+import { siteConfig } from "@/lib/site";
 
 export const metadata: Metadata = {
-  metadataBase: new URL(siteUrl),
+  metadataBase: new URL(siteConfig.url),
 
   title: {
     default:
@@ -19,8 +16,18 @@ export const metadata: Metadata = {
     template: "%s | The Guvnor Ace Foundation",
   },
 
-  description:
-    "The Guvnor Ace Foundation supports vulnerable children, families and communities across Uganda through education, food assistance, healthcare, safeguarding and sustainable community programmes.",
+  description: siteConfig.description,
+
+  applicationName: siteConfig.name,
+
+  authors: [
+    {
+      name: siteConfig.name,
+    },
+  ],
+
+  creator: siteConfig.name,
+  publisher: siteConfig.name,
 
   keywords: [
     "The Guvnor Ace Foundation",
@@ -31,29 +38,15 @@ export const metadata: Metadata = {
     "education support Uganda",
     "child safeguarding Uganda",
     "community support Uganda",
-    "donate to children Uganda",
     "Wakiso charity",
     "charity in Uganda",
-    "support children Uganda",
     "community development Uganda",
   ],
-
-  authors: [
-    {
-      name: "The Guvnor Ace Foundation",
-    },
-  ],
-
-  creator: "The Guvnor Ace Foundation",
-  publisher: "The Guvnor Ace Foundation",
-
-  alternates: {
-    canonical: "/",
-  },
 
   robots: {
     index: true,
     follow: true,
+
     googleBot: {
       index: true,
       follow: true,
@@ -65,21 +58,41 @@ export const metadata: Metadata = {
 
   openGraph: {
     type: "website",
-    url: siteUrl,
-    siteName: "The Guvnor Ace Foundation",
+    url: siteConfig.url,
+    siteName: siteConfig.name,
+
     title:
       "The Guvnor Ace Foundation | Supporting Vulnerable Children in Uganda",
-    description:
-      "Supporting vulnerable children, families and communities across Uganda through education, food assistance, healthcare, safeguarding and sustainable community programmes.",
+
+    description: siteConfig.description,
+
     locale: "en_GB",
+
+    images: [
+      {
+        url: siteConfig.socialImage,
+        width: 1000,
+        height: 664,
+        alt: "The Guvnor Ace Foundation supporting children and communities in Uganda",
+      },
+    ],
   },
 
   twitter: {
     card: "summary_large_image",
+
     title:
       "The Guvnor Ace Foundation | Supporting Vulnerable Children in Uganda",
+
     description:
       "Supporting vulnerable children, families and communities across Uganda.",
+
+    images: [siteConfig.socialImage],
+  },
+
+  icons: {
+    icon: "/images/logo.png",
+    apple: "/images/logo.png",
   },
 
   verification: {
