@@ -1,4 +1,12 @@
+import { createPageMetadata } from "@/lib/seo";
 import PolicyPageLayout from "@/components/policies/PolicyPageLayout";
+
+export const metadata = createPageMetadata({
+  title: "Child Protection Policy",
+  description:
+    "Our standards for protecting the dignity, safety, privacy and wellbeing of children connected with Foundation activities.",
+  path: "/child-protection",
+});
 
 const navigation = [
   { label: "Our commitment", href: "#commitment" },

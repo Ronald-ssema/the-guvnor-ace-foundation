@@ -1,4 +1,12 @@
+import { createPageMetadata } from "@/lib/seo";
 import PolicyPageLayout from "@/components/policies/PolicyPageLayout";
+
+export const metadata = createPageMetadata({
+  title: "Donation & Refund Policy",
+  description:
+    "How donations to The Guvnor Ace Foundation are received, processed and reviewed when a correction or refund is requested.",
+  path: "/donation-refund",
+});
 
 const navigation = [
   { label: "Donating to the Foundation", href: "#donations" },

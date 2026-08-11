@@ -1,4 +1,12 @@
+import { createPageMetadata } from "@/lib/seo";
 import PolicyPageLayout from "@/components/policies/PolicyPageLayout";
+
+export const metadata = createPageMetadata({
+  title: "Website Terms & Conditions",
+  description:
+    "The terms that apply when accessing and using The Guvnor Ace Foundation website and its online services.",
+  path: "/terms",
+});
 
 const navigation = [
   { label: "Using this website", href: "#use" },

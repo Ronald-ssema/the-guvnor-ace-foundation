@@ -1,4 +1,12 @@
+import { createPageMetadata } from "@/lib/seo";
 import PolicyPageLayout from "@/components/policies/PolicyPageLayout";
+
+export const metadata = createPageMetadata({
+  title: "Complaints Policy",
+  description:
+    "How concerns and complaints about The Guvnor Ace Foundation can be raised, reviewed and responded to fairly.",
+  path: "/complaints",
+});
 
 const navigation = [
   { label: "Our commitment", href: "#commitment" },

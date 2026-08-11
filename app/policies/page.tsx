@@ -1,3 +1,4 @@
+import { createPageMetadata } from "@/lib/seo";
 import Link from "next/link";
 import {
   FaChild,
@@ -10,11 +11,13 @@ import {
 
 import { PageHero } from "@/components/ui/PageHero";
 
-export const metadata = {
+
+export const metadata = createPageMetadata({
   title: "Policies",
   description:
     "Read The Guvnor Ace Foundation policies covering safeguarding, child protection, privacy, complaints, donations and website use.",
-};
+  path: "/policies",
+});
 
 const policies = [
   {

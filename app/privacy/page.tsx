@@ -1,4 +1,12 @@
+import { createPageMetadata } from "@/lib/seo";
 import PolicyPageLayout from "@/components/policies/PolicyPageLayout";
+
+export const metadata = createPageMetadata({
+  title: "Privacy Policy",
+  description:
+    "How The Guvnor Ace Foundation may collect, use, protect and responsibly manage personal information.",
+  path: "/privacy",
+});
 
 const navigation = [
   { label: "Information we collect", href: "#information" },
