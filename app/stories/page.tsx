@@ -1,3 +1,5 @@
+import { createPageMetadata } from "@/lib/seo";
+
 import Image from "next/image";
 
 const stories = [
@@ -26,6 +28,13 @@ const stories = [
       "Learning support gives children the tools, confidence and encouragement they need to build brighter futures.",
   },
 ];
+
+export const metadata = createPageMetadata({
+  title: "Stories of Hope",
+  description:
+    "Read responsible stories about community support, education, food assistance and the work of The Guvnor Ace Foundation in Uganda.",
+  path: "/stories",
+});
 
 export default function StoriesPage() {
   return (

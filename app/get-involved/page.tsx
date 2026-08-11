@@ -1,3 +1,5 @@
+import { createPageMetadata } from "@/lib/seo";
+
 const opportunities = [
   {
     title: "Donate",
@@ -28,6 +30,13 @@ const opportunities = [
     label: "View our official links",
   },
 ];
+
+export const metadata = createPageMetadata({
+  title: "Get Involved",
+  description:
+    "Support The Guvnor Ace Foundation by donating, volunteering, partnering with us or helping raise awareness for vulnerable children and communities in Uganda.",
+  path: "/get-involved",
+});
 
 export default function GetInvolvedPage() {
   return (

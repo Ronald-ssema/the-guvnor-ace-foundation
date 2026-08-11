@@ -1,4 +1,13 @@
+import { createPageMetadata } from "@/lib/seo";
+
 import Link from "next/link";
+
+export const metadata = createPageMetadata({
+  title: "Partner With Us",
+  description:
+    "Partner with The Guvnor Ace Foundation through responsible corporate, charitable, educational and community partnerships supporting vulnerable communities in Uganda.",
+  path: "/partnerships",
+});
 
 export default function PartnershipsPage() {
   return (

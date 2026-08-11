@@ -1,3 +1,5 @@
+import { createPageMetadata } from "@/lib/seo";
+
 import Link from "next/link";
 
 const programmeAreas = [
@@ -32,6 +34,13 @@ const programmeAreas = [
       "We support opportunities that can help individuals and families strengthen their independence, resilience and ability to build better futures.",
   },
 ];
+
+export const metadata = createPageMetadata({
+  title: "About Us",
+  description:
+    "Learn about The Guvnor Ace Foundation, our mission and our work supporting vulnerable children, families and communities in Uganda.",
+  path: "/about",
+});
 
 export default function AboutPage() {
   return (

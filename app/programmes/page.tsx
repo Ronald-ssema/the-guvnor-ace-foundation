@@ -3,9 +3,13 @@ import Link from "next/link";
 
 import { PageHero } from "@/components/ui/PageHero";
 
-export const metadata = {
-  title: "Our Work",
-};
+import { createPageMetadata } from "@/lib/seo";
+export const metadata = createPageMetadata({
+  title: "Our Programmes",
+  description:
+    "Explore The Guvnor Ace Foundation programmes supporting vulnerable children and families in Uganda through food assistance, education, child protection and community outreach.",
+  path: "/programmes",
+});
 
 const programmes = [
   {

@@ -10,12 +10,15 @@ import {
 import { SiLinktree } from "react-icons/si";
 
 import { PageHero } from "@/components/ui/PageHero";
+import { createPageMetadata } from "@/lib/seo";
 
-export const metadata = {
+
+export const metadata = createPageMetadata({
   title: "Contact Us",
   description:
-    "Contact The Guvnor Ace Foundation and follow our official online channels.",
-};
+    "Contact The Guvnor Ace Foundation in Uganda about donations, volunteering, partnerships, programmes and official Foundation enquiries.",
+  path: "/contact",
+});
 
 const contactMethods = [
   {

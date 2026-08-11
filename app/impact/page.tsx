@@ -3,9 +3,13 @@ import Link from "next/link";
 
 import { PageHero } from "@/components/ui/PageHero";
 
-export const metadata = {
-  title: "Our Impact",
-};
+import { createPageMetadata } from "@/lib/seo";
+export const metadata = createPageMetadata({
+  title: "Impact & Accountability",
+  description:
+    "Learn how The Guvnor Ace Foundation documents programme delivery, community impact, safeguarding and responsible use of resources in Uganda.",
+  path: "/impact",
+});
 
 const principles = [
   {

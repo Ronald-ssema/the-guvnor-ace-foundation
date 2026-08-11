@@ -2,9 +2,13 @@ import Link from "next/link";
 
 import { PageHero } from "@/components/ui/PageHero";
 
-export const metadata = {
-  title: "Reports and Transparency",
-};
+import { createPageMetadata } from "@/lib/seo";
+export const metadata = createPageMetadata({
+  title: "Reports & Transparency",
+  description:
+    "View programme reports, financial transparency updates and verified impact information from The Guvnor Ace Foundation.",
+  path: "/reports",
+});
 
 const reports = [
   {

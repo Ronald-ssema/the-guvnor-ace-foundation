@@ -3,11 +3,13 @@ import Link from "next/link";
 import DonationOptions from "@/components/donations/DonationOptions";
 import { PageHero } from "@/components/ui/PageHero";
 
-export const metadata = {
-  title: "Donate",
+import { createPageMetadata } from "@/lib/seo";
+export const metadata = createPageMetadata({
+  title: "Donate | Support Children in Uganda",
   description:
-    "Support The Guvnor Ace Foundation through GoFundMe, PayPal or other official support options.",
-};
+    "Support The Guvnor Ace Foundation and help vulnerable children and families in Uganda through food assistance, education, safeguarding and community programmes.",
+  path: "/donate",
+});
 
 export default function DonatePage() {
   return (

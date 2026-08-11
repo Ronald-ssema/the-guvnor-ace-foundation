@@ -1,3 +1,5 @@
+import { createPageMetadata } from "@/lib/seo";
+
 import PolicyPageLayout from "@/components/policies/PolicyPageLayout";
 
 const navigation = [
@@ -8,6 +10,13 @@ const navigation = [
   { label: "Responding to concerns", href: "#responding" },
   { label: "Review and accountability", href: "#review" },
 ];
+
+export const metadata = createPageMetadata({
+  title: "Safeguarding",
+  description:
+    "Read The Guvnor Ace Foundation safeguarding policy and our commitment to protecting children and vulnerable people from abuse, exploitation and avoidable harm.",
+  path: "/safeguarding",
+});
 
 export default function SafeguardingPage() {
   return (

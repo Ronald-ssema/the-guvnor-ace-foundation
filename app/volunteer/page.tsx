@@ -1,8 +1,12 @@
 import { PageHero } from "@/components/ui/PageHero";
 
-export const metadata = {
-  title: "Volunteer",
-};
+import { createPageMetadata } from "@/lib/seo";
+export const metadata = createPageMetadata({
+  title: "Volunteer With Us",
+  description:
+    "Volunteer with The Guvnor Ace Foundation and use your time, skills and experience to support responsible community programmes in Uganda.",
+  path: "/volunteer",
+});
 
 const opportunities = [
   "Community outreach support",
