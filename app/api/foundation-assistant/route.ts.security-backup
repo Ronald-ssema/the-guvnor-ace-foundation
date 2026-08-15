@@ -3,10 +3,6 @@ import { NextRequest, NextResponse } from "next/server";
 
 export const runtime = "nodejs";
 
-const MAX_BODY_BYTES = 24_000;
-const MAX_MESSAGES = 10;
-const MAX_MESSAGE_LENGTH = 1200;
-
 type ChatMessage = {
   role: "user" | "assistant";
   content: string;
@@ -65,19 +61,6 @@ SAFETY AND TRUST RULES
 - Clearly identify yourself as an AI assistant when relevant.
 `;
 
-function jsonResponse(
-  body: Record<string, string>,
-  status = 200,
-) {
-  return NextResponse.json(body, {
-    status,
-    headers: {
-      "Cache-Control": "no-store, max-age=0",
-      "X-Content-Type-Options": "nosniff",
-    },
-  });
-}
-
 function validateMessages(value: unknown): ChatMessage[] {
   if (!Array.isArray(value)) {
     return [];
@@ -92,17 +75,15 @@ function validateMessages(value: unknown): ChatMessage[] {
       const candidate = item as Partial<ChatMessage>;
 
       return (
-        (candidate.role === "user" ||
-          candidate.role === "assistant") &&
+        (candidate.role === "user" || candidate.role === "assistant") &&
         typeof candidate.content === "string" &&
-        candidate.content.trim().length > 0 &&
-        candidate.content.length <= MAX_MESSAGE_LENGTH
+        candidate.content.trim().length > 0
       );
     })
-    .slice(-MAX_MESSAGES)
+    .slice(-12)
     .map((message) => ({
       role: message.role,
-      content: message.content.trim(),
+      content: message.content.trim().slice(0, 1500),
     }));
 }
 
@@ -111,89 +92,28 @@ export async function POST(request: NextRequest) {
     const apiKey = process.env.OPENAI_API_KEY;
 
     if (!apiKey) {
-      console.error(
-        "Foundation Assistant configuration error: API key missing",
-      );
+      console.error("OPENAI_API_KEY is missing from .env.local");
 
-      return jsonResponse(
+      return NextResponse.json(
         {
           error:
-            "The Foundation Assistant is temporarily unavailable.",
+            "The AI service has not been configured. The website administrator must add an OpenAI API key.",
         },
-        503,
+        { status: 500 },
       );
     }
 
-    const contentType = request.headers.get("content-type") || "";
-
-    if (!contentType.includes("application/json")) {
-      return jsonResponse(
-        { error: "Only JSON requests are accepted." },
-        415,
-      );
-    }
-
-    const contentLength = Number(
-      request.headers.get("content-length") || "0",
-    );
-
-    if (
-      Number.isFinite(contentLength) &&
-      contentLength > MAX_BODY_BYTES
-    ) {
-      return jsonResponse(
-        { error: "Request is too large." },
-        413,
-      );
-    }
-
-    const rawBody = await request.text();
-
-    if (new TextEncoder().encode(rawBody).length > MAX_BODY_BYTES) {
-      return jsonResponse(
-        { error: "Request is too large." },
-        413,
-      );
-    }
-
-    let body: unknown;
-
-    try {
-      body = JSON.parse(rawBody);
-    } catch {
-      return jsonResponse(
-        { error: "Invalid JSON request." },
-        400,
-      );
-    }
-
-    if (
-      !body ||
-      typeof body !== "object" ||
-      !("messages" in body)
-    ) {
-      return jsonResponse(
-        { error: "Please enter a valid question." },
-        400,
-      );
-    }
-
-    const messages = validateMessages(
-      (body as { messages?: unknown }).messages,
-    );
+    const body = await request.json();
+    const messages = validateMessages(body.messages);
 
     if (messages.length === 0) {
-      return jsonResponse(
+      return NextResponse.json(
         { error: "Please enter a valid question." },
-        400,
+        { status: 400 },
       );
     }
 
-    const openai = new OpenAI({
-      apiKey,
-      timeout: 20_000,
-      maxRetries: 1,
-    });
+    const openai = new OpenAI({ apiKey });
 
     const response = await openai.responses.create({
       model: "gpt-5-mini",
@@ -202,60 +122,56 @@ export async function POST(request: NextRequest) {
         role: message.role,
         content: message.content,
       })),
-      max_output_tokens: 900,
+      max_output_tokens: 1200,
       text: {
-        verbosity: "medium",
+        verbosity: "high",
       },
     });
 
     const answer = response.output_text?.trim();
 
     if (!answer) {
-      console.error(
-        "Foundation Assistant returned empty output",
-      );
+      console.error("OpenAI returned no output text.", response);
 
-      return jsonResponse(
+      return NextResponse.json(
         {
           error:
             "The assistant could not prepare an answer. Please try again.",
         },
-        502,
+        { status: 502 },
       );
     }
 
-    return jsonResponse({ answer });
+    return NextResponse.json({ answer });
   } catch (error: unknown) {
+    console.error("Foundation assistant error:", error);
+
     const apiError = error as {
       code?: string;
       status?: number;
+      message?: string;
     };
-
-    console.error("Foundation Assistant request failed", {
-      code: apiError.code,
-      status: apiError.status,
-    });
 
     if (
       apiError.code === "insufficient_quota" ||
       apiError.code === "credit_balance_exhausted" ||
       apiError.status === 429
     ) {
-      return jsonResponse(
+      return Response.json(
         {
           error:
             "Our Foundation Assistant is temporarily unavailable. Please contact us at guvnorace@gmail.com or +256 752 462 740.",
         },
-        503,
+        { status: 503 },
       );
     }
 
-    return jsonResponse(
+    return Response.json(
       {
         error:
           "The Foundation Assistant is temporarily unavailable. Please try again later.",
       },
-      500,
+      { status: 500 },
     );
   }
 }

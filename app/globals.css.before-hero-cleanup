@@ -5237,7 +5237,7 @@ select {
 
 
 /* =========================================================
-   GAF PREMIUM HEADER + HERO — CONSOLIDATED
+   GAF PREMIUM HEADER + HERO REFINEMENT
    ========================================================= */
 
 @media (min-width: 981px) {
@@ -5245,7 +5245,6 @@ select {
   .site-header {
     background: rgba(255, 255, 255, 0.96) !important;
     backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
     border-bottom: 1px solid rgba(7, 26, 52, 0.07);
     box-shadow: 0 8px 30px rgba(7, 26, 52, 0.035);
   }
@@ -5261,7 +5260,6 @@ select {
   .navbar-brand img {
     width: 62px !important;
     height: 62px !important;
-    object-fit: contain !important;
   }
 
   .navbar-brand-text strong {
@@ -5294,12 +5292,8 @@ select {
   }
 
   .gaf-hero-grid {
-    grid-template-columns:
-      minmax(0, 0.92fr)
-      minmax(0, 1.08fr) !important;
-
+    grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr) !important;
     gap: 72px !important;
-    align-items: center !important;
   }
 
   .gaf-hero h1 {
@@ -5324,18 +5318,12 @@ select {
   .gaf-secondary-cta {
     min-height: 56px !important;
     padding: 14px 26px !important;
-
-    transition:
-      transform 180ms ease,
-      box-shadow 180ms ease,
-      background-color 180ms ease,
-      border-color 180ms ease !important;
   }
 
   .gaf-primary-cta {
     box-shadow:
       0 16px 34px rgba(213, 157, 10, 0.22),
-      inset 0 1px 0 rgba(255, 255, 255, 0.3);
+      inset 0 1px 0 rgba(255,255,255,0.3);
   }
 
   .gaf-secondary-cta {
@@ -5345,9 +5333,7 @@ select {
 
   .gaf-hero-image-shell {
     min-height: 690px !important;
-
     border-radius: 34px 34px 90px 34px !important;
-
     box-shadow:
       0 32px 70px rgba(7, 26, 52, 0.16),
       0 0 0 1px rgba(7, 26, 52, 0.05) !important;
@@ -5361,26 +5347,11 @@ select {
     right: 26px !important;
     bottom: 24px !important;
     left: auto !important;
-
     width: min(76%, 470px) !important;
-
     padding: 20px 22px !important;
-
-    border: 1px solid rgba(255, 255, 255, 0.13) !important;
     border-radius: 18px !important;
-
-    background:
-      linear-gradient(
-        135deg,
-        rgba(5, 25, 51, 0.94),
-        rgba(10, 35, 66, 0.90)
-      ) !important;
-
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
-
-    box-shadow:
-      0 18px 45px rgba(3, 18, 38, 0.24) !important;
+    background: rgba(7, 26, 52, 0.78) !important;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.16);
   }
 
   .gaf-hero-quote p {
@@ -5397,76 +5368,12 @@ select {
   }
 }
 
-
-/* Large desktop refinement */
-
-@media (min-width: 1100px) {
-
-  .gaf-hero {
-    padding-top: 54px !important;
-    padding-bottom: 26px !important;
-  }
-
-  .gaf-hero-grid {
-    gap: 68px !important;
-  }
-
-  .gaf-hero h1 {
-    max-width: 650px !important;
-    font-size: clamp(3.4rem, 5vw, 5.55rem) !important;
-    line-height: 0.96 !important;
-    letter-spacing: -0.045em !important;
-  }
-
-  .gaf-hero-description {
-    max-width: 590px !important;
-    margin-top: 24px !important;
-    line-height: 1.7 !important;
-  }
-
-  .gaf-hero-actions {
-    margin-top: 26px !important;
-  }
-
-  .gaf-hero-trust {
-    margin-top: 26px !important;
-    padding-top: 18px !important;
-  }
-
-  .gaf-hero-image-shell {
-    min-height: 625px !important;
-    max-height: 650px !important;
-    border-radius: 30px 30px 72px 30px !important;
-  }
-
-  .gaf-hero-quote {
-    right: 24px !important;
-    bottom: 22px !important;
-
-    width: min(72%, 430px) !important;
-
-    padding: 17px 20px !important;
-  }
-
-  .gaf-hero-quote p {
-    font-size: 0.96rem !important;
-  }
-
-  .navbar-brand img {
-    width: 66px !important;
-    height: 66px !important;
-  }
-}
-
-
-/* Desktop hover interactions */
-
+/* Refined hover behaviour */
 @media (hover: hover) {
-
   .navbar-link {
     transition:
-      color 180ms ease,
-      transform 180ms ease;
+      color 0.2s ease,
+      transform 0.2s ease;
   }
 
   .navbar-link:hover {
@@ -5474,24 +5381,11 @@ select {
     transform: translateY(-1px);
   }
 
-  .navbar-donate-button,
-  .gaf-primary-cta,
-  .gaf-secondary-cta {
-    transition:
-      transform 180ms ease,
-      box-shadow 180ms ease,
-      background-color 180ms ease,
-      border-color 180ms ease !important;
-  }
-
   .navbar-donate-button:hover,
   .gaf-primary-cta:hover {
-    transform: translateY(-2px) !important;
-
-    box-shadow:
-      0 16px 34px rgba(213, 157, 10, 0.28) !important;
+    transform: translateY(-2px) scale(1.01);
   }
-r
+
   .gaf-secondary-cta:hover {
     background: #f7f8fa !important;
     border-color: #cbd3de !important;
@@ -5500,170 +5394,104 @@ r
 
 
 /* =========================================================
-   PREMIUM IMAGE SYSTEM — GUVNOR ACE FOUNDATION
+   GAF HERO — FINAL DESKTOP POLISH
    ========================================================= */
 
-/* HERO */
-.gaf-hero-image-shell {
-  position: relative;
-  overflow: hidden;
-  border-radius: 32px;
-  min-height: 620px;
-  box-shadow:
-    0 30px 70px rgba(15, 35, 65, 0.16),
-    0 8px 24px rgba(15, 35, 65, 0.08);
-  background: #eef2f5;
-}
+@media (min-width: 1100px) {
 
-.gaf-hero-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: 55% center;
-  transition: transform 700ms ease;
-}
+  /* Keep the hero elegant without making it oversized */
+  .gaf-hero {
+    padding-top: 54px !important;
+    padding-bottom: 26px !important;
+  }
 
-.gaf-hero-image-shell:hover .gaf-hero-image {
-  transform: scale(1.025);
-}
+  .gaf-hero-grid {
+    gap: 68px !important;
+    align-items: center !important;
+  }
 
+  /* More editorial headline proportions */
+  .gaf-hero h1 {
+    max-width: 650px !important;
+    font-size: clamp(3.4rem, 5vw, 5.55rem) !important;
+    line-height: 0.96 !important;
+    letter-spacing: -0.045em !important;
+  }
 
-/* ABOUT / HOME IMAGE */
-.about-image-card,
-.about-image-wrapper {
-  position: relative;
-  overflow: hidden;
-  border-radius: 30px;
-  box-shadow:
-    0 24px 60px rgba(15, 35, 65, 0.13),
-    0 6px 20px rgba(15, 35, 65, 0.06);
-  background: #f4f6f8;
-}
+  /* Improve paragraph readability */
+  .gaf-hero-description {
+    max-width: 590px !important;
+    margin-top: 24px !important;
+    line-height: 1.7 !important;
+  }
 
-.about-image,
-.about-image-card img,
-.about-image-wrapper img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center center;
-}
+  /* Slightly tighter CTAs */
+  .gaf-hero-actions {
+    margin-top: 26px !important;
+  }
 
+  /* Bring trust signals into the first screen */
+  .gaf-hero-trust {
+    margin-top: 26px !important;
+    padding-top: 18px !important;
+  }
 
-/* PROGRAMME GRID */
-.gaf-programme-grid {
-  gap: 30px;
-}
-
-.gaf-programme-card {
-  overflow: hidden;
-  border-radius: 26px;
-  background: #ffffff;
-  box-shadow:
-    0 18px 45px rgba(15, 35, 65, 0.08),
-    0 4px 14px rgba(15, 35, 65, 0.05);
-  transition:
-    transform 300ms ease,
-    box-shadow 300ms ease;
-}
-
-.gaf-programme-card:hover {
-  transform: translateY(-6px);
-  box-shadow:
-    0 28px 60px rgba(15, 35, 65, 0.13),
-    0 8px 20px rgba(15, 35, 65, 0.07);
-}
-
-.gaf-programme-image {
-  position: relative;
-  width: 100%;
-  aspect-ratio: 4 / 3;
-  overflow: hidden;
-  background: #eef2f5;
-}
-
-.gaf-programme-image img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center center;
-  transition: transform 650ms ease;
-}
-
-.gaf-programme-card:hover .gaf-programme-image img {
-  transform: scale(1.035);
-}
-
-
-/* STORY IMAGE */
-.gaf-story-image {
-  position: relative;
-  overflow: hidden;
-  border-radius: 30px;
-  min-height: 560px;
-  box-shadow:
-    0 24px 60px rgba(15, 35, 65, 0.12),
-    0 6px 18px rgba(15, 35, 65, 0.06);
-  background: #eef2f5;
-}
-
-.gaf-story-image img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center center;
-}
-
-
-/* TABLET */
-@media (max-width: 980px) {
+  /* Image remains prominent but no longer overwhelms */
   .gaf-hero-image-shell {
-    min-height: 520px;
-    border-radius: 28px;
+    min-height: 625px !important;
+    max-height: 650px !important;
+    border-radius: 30px 30px 72px 30px !important;
   }
 
-  .gaf-programme-grid {
-    gap: 24px;
+  /* More refined quote card */
+  .gaf-hero-quote {
+    right: 24px !important;
+    bottom: 22px !important;
+    width: min(72%, 430px) !important;
+    padding: 17px 20px !important;
+
+    background:
+      linear-gradient(
+        135deg,
+        rgba(5, 25, 51, 0.94),
+        rgba(10, 35, 66, 0.90)
+      ) !important;
+
+    border: 1px solid rgba(255,255,255,0.13) !important;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+
+    box-shadow:
+      0 18px 45px rgba(3, 18, 38, 0.24) !important;
   }
 
-  .gaf-story-image {
-    min-height: 480px;
-    border-radius: 26px;
-  }
-}
-
-
-/* MOBILE */
-@media (max-width: 640px) {
-  .gaf-hero-image-shell {
-    min-height: 440px;
-    border-radius: 24px;
+  .gaf-hero-quote p {
+    font-size: 0.96rem !important;
+    line-height: 1.5 !important;
   }
 
-  .gaf-hero-image {
-    object-position: 58% center;
+  /* Slightly stronger logo presence */
+  .navbar-brand img {
+    width: 66px !important;
+    height: 66px !important;
   }
 
-  .about-image-card,
-  .about-image-wrapper {
-    border-radius: 22px;
+  /* Sophisticated button animation */
+  .gaf-primary-cta,
+  .gaf-secondary-cta,
+  .navbar-donate-button {
+    transition:
+      transform 180ms ease,
+      box-shadow 180ms ease,
+      background-color 180ms ease,
+      border-color 180ms ease !important;
   }
 
-  .gaf-programme-grid {
-    gap: 20px;
-  }
-
-  .gaf-programme-card {
-    border-radius: 22px;
-  }
-
-  .gaf-programme-image {
-    aspect-ratio: 4 / 3;
-  }
-
-  .gaf-story-image {
-    min-height: 420px;
-    border-radius: 22px;
+  .gaf-primary-cta:hover,
+  .navbar-donate-button:hover {
+    transform: translateY(-2px) !important;
+    box-shadow:
+      0 16px 34px rgba(213, 157, 10, 0.28) !important;
   }
 }
 
