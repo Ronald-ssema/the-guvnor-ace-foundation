@@ -4,6 +4,7 @@ type HeroAction = {
   label: string;
   href: string;
   variant?: "primary" | "secondary";
+  external?: boolean;
 };
 
 type PageHeroProps = {
@@ -30,20 +31,38 @@ export function PageHero({
 
         {actions.length > 0 && (
           <div className="page-hero-actions">
-            {actions.map((action) => (
-              <Link
-                key={`${action.href}-${action.label}`}
-                href={action.href}
-                className={
-                  action.variant === "secondary"
-                    ? "secondary-button"
-                    : "primary-button"
-                }
-              >
-                {action.label}
-                <span aria-hidden="true">→</span>
-              </Link>
-            ))}
+            {actions.map((action) => {
+              const className =
+                action.variant === "secondary"
+                  ? "secondary-button"
+                  : "primary-button";
+              const content = (
+                <>
+                  {action.label}
+                  <span aria-hidden="true">{action.external ? "↗" : "→"}</span>
+                </>
+              );
+
+              return action.external ? (
+                <a
+                  key={`${action.href}-${action.label}`}
+                  href={action.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={className}
+                >
+                  {content}
+                </a>
+              ) : (
+                <Link
+                  key={`${action.href}-${action.label}`}
+                  href={action.href}
+                  className={className}
+                >
+                  {content}
+                </Link>
+              );
+            })}
           </div>
         )}
       </div>
