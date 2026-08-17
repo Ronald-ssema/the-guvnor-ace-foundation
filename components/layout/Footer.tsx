@@ -108,6 +108,9 @@ export default function Footer() {
           </span>
 
           <nav aria-label="Legal and policy links">
+            <Link href="/donate" className="compact-footer-donate-link">
+              Donate
+            </Link>
             <Link href="/policies">Policies</Link>
             <Link href="/safeguarding">Safeguarding</Link>
             <Link href="/privacy">Privacy</Link>

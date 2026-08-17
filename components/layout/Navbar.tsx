@@ -113,10 +113,13 @@ export default function Navbar() {
 
           <Link
             href="/donate"
-            className="navbar-donate-button"
+            className={`navbar-donate-button ${
+              pathname === "/donate" ? "navbar-donate-active" : ""
+            }`}
+            aria-current={pathname === "/donate" ? "page" : undefined}
             onClick={closeMenu}
           >
-            Donate
+            Donate now
           </Link>
         </nav>
       </div>
