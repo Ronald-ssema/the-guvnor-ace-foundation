@@ -14,7 +14,7 @@
 .admin-main { width: min(100%, 1180px); padding: 46px clamp(24px, 5vw, 72px) 80px; }
 .admin-page-header { margin-bottom: 28px; }
 .admin-page-header p, .admin-card-heading p, .admin-section-heading p { margin: 0 0 5px; color: #8b6400; font-size: .74rem; font-weight: 850; letter-spacing: .12em; text-transform: uppercase; }
-.admin-page-header h1 { margin: 0; font: 500 clamp(2.3rem, 5vw, 4rem)/1 Georgia,serif; color: #071c3a; }
+.admin-page-header h1 { margin: 0; font: 500 clamp(2.3rem, 5vw, 4rem)/1 var(--font-display), var(--font-display), Georgia, serif; color: #071c3a; }
 .admin-page-header span { display: block; max-width: 700px; margin-top: 12px; color: #5f6f86; }
 .admin-card { padding: clamp(24px, 4vw, 42px); border: 1px solid #dbe3e9; border-radius: 22px; background: #fff; box-shadow: 0 14px 40px rgba(7,28,58,.07); }
 .admin-card-heading, .admin-section-heading, .admin-media-meta { display: flex; align-items: center; justify-content: space-between; gap: 20px; }

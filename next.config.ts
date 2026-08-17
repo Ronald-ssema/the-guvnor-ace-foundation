@@ -10,9 +10,11 @@ const csp = `
   font-src 'self' data:;
   connect-src 'self' https://api.openai.com https://*.supabase.co wss://*.supabase.co;
   media-src 'self';
+  worker-src 'self' blob:;
+  manifest-src 'self';
   object-src 'none';
   base-uri 'self';
-  form-action 'self' https:;
+  form-action 'self';
   frame-ancestors 'none';
   ${isDev ? "" : "upgrade-insecure-requests;"}
 `;
@@ -43,6 +45,18 @@ const securityHeaders = [
     key: "Strict-Transport-Security",
     value: "max-age=63072000; includeSubDomains; preload",
   },
+  {
+    key: "Cross-Origin-Opener-Policy",
+    value: "same-origin",
+  },
+  {
+    key: "Cross-Origin-Resource-Policy",
+    value: "same-origin",
+  },
+  {
+    key: "X-Permitted-Cross-Domain-Policies",
+    value: "none",
+  },
 ];
 
 const nextConfig: NextConfig = {
@@ -53,7 +67,7 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "*.supabase.co",
-        pathname: "/storage/v1/object/public/**",
+        pathname: "/storage/v1/object/**",
       },
     ],
   },

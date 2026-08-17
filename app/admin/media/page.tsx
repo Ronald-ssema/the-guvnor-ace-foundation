@@ -7,13 +7,23 @@ export const dynamic = "force-dynamic";
 
 export default async function AdminMediaPage() {
   const admin = await getAdminContext();
-  if (!admin) redirect("/admin/login");
+  if (!admin) redirect("/admin/mfa");
 
   const { data: media } = await admin.supabase
     .from("media_assets")
     .select("id, storage_path, original_name, alt_text, caption, is_published")
     .eq("media_kind", "image")
     .order("created_at", { ascending: false });
+
+  const mediaWithUrls = await Promise.all(
+    (media ?? []).map(async (item) => {
+      const { data } = await admin.supabase.storage
+        .from("site-media")
+        .createSignedUrl(item.storage_path, 900);
+
+      return { ...item, image_url: data?.signedUrl ?? null };
+    }),
+  );
 
   return (
     <AdminShell
@@ -26,11 +36,11 @@ export default async function AdminMediaPage() {
       <section className="admin-library" aria-labelledby="library-heading">
         <div className="admin-section-heading">
           <div><p>Library</p><h2 id="library-heading">Uploaded photographs</h2></div>
-          <span>{media?.length ?? 0} items</span>
+          <span>{mediaWithUrls.length} items</span>
         </div>
-        {media?.length ? (
+        {mediaWithUrls.length ? (
           <div className="admin-media-grid">
-            {media.map((item) => <MediaCard key={item.id} item={item} />)}
+            {mediaWithUrls.map((item) => <MediaCard key={item.id} item={item} />)}
           </div>
         ) : (
           <div className="admin-empty-state">No photographs have been uploaded yet.</div>

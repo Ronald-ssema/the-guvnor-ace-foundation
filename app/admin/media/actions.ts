@@ -2,6 +2,7 @@
 
 import { randomUUID } from "node:crypto";
 import { revalidatePath } from "next/cache";
+import sharp from "sharp";
 import { getAdminContext } from "@/lib/admin/auth";
 
 export type MediaActionState = {
@@ -62,13 +63,29 @@ export async function uploadImage(
     return { status: "error", message: "The file content does not match its image type." };
   }
 
-  const extension = ALLOWED_TYPES.get(file.type)!;
-  const storagePath = `images/${new Date().getUTCFullYear()}/${randomUUID()}.${extension}`;
+  let safeImage: Buffer;
+
+  try {
+    safeImage = await sharp(bytes, { failOn: "warning" })
+      .rotate()
+      .resize({
+        width: 2400,
+        height: 2400,
+        fit: "inside",
+        withoutEnlargement: true,
+      })
+      .webp({ quality: 84, effort: 5 })
+      .toBuffer();
+  } catch {
+    return { status: "error", message: "The image could not be safely processed." };
+  }
+
+  const storagePath = `images/${new Date().getUTCFullYear()}/${randomUUID()}.webp`;
 
   const { error: uploadError } = await admin.supabase.storage
     .from("site-media")
-    .upload(storagePath, bytes, {
-      contentType: file.type,
+    .upload(storagePath, safeImage, {
+      contentType: "image/webp",
       cacheControl: "31536000",
       upsert: false,
     });
@@ -80,8 +97,8 @@ export async function uploadImage(
     .insert({
       storage_path: storagePath,
       original_name: file.name.slice(0, 255),
-      mime_type: file.type,
-      file_size: file.size,
+      mime_type: "image/webp",
+      file_size: safeImage.byteLength,
       media_kind: "image",
       alt_text: altText,
       caption: caption || null,
@@ -104,7 +121,12 @@ export async function uploadImage(
     action: "create",
     entity_type: "media_asset",
     entity_id: data.id,
-    details: { storage_path: storagePath, published: publish },
+    details: {
+      storage_path: storagePath,
+      published: publish,
+      metadata_removed: true,
+      original_mime_type: file.type,
+    },
   });
 
   revalidatePath("/admin/media");

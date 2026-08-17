@@ -35,6 +35,18 @@ export async function getAdminContext(): Promise<AdminContext | null> {
     return null;
   }
 
+  const [{ data: factors }, { data: assurance }] = await Promise.all([
+    supabase.auth.mfa.listFactors(),
+    supabase.auth.mfa.getAuthenticatorAssuranceLevel(),
+  ]);
+
+  const hasVerifiedTotp =
+    factors?.totp.some((factor) => factor.status === "verified") ?? false;
+
+  if (!hasVerifiedTotp || assurance?.currentLevel !== "aal2") {
+    return null;
+  }
+
   return {
     supabase,
     userId: user.id,

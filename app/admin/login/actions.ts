@@ -1,7 +1,9 @@
 'use server'
 
 import { redirect } from 'next/navigation'
+import { headers } from 'next/headers'
 import { createClient } from '@/lib/supabase/server'
+import { clientAddress, consumeRateLimit } from '@/lib/security/rateLimit'
 
 export type LoginState = {
   error: string | null
@@ -17,6 +19,20 @@ export async function login(
   if (!email || !password) {
     return {
       error: 'Enter your email address and password.',
+    }
+  }
+
+  const requestHeaders = await headers()
+  const allowed = await consumeRateLimit({
+    scope: 'admin-login',
+    subject: `${clientAddress(requestHeaders)}:${email.toLowerCase()}`,
+    limit: 5,
+    windowSeconds: 15 * 60,
+  })
+
+  if (!allowed) {
+    return {
+      error: 'Too many sign-in attempts. Wait 15 minutes and try again.',
     }
   }
 
@@ -42,5 +58,5 @@ export async function login(
     }
   }
 
-  redirect('/admin')
+  redirect('/admin/mfa')
 }

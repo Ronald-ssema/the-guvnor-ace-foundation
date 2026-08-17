@@ -1,10 +1,9 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { HomeHeroContent } from "@/lib/cms/home";
-import { publicMediaUrl } from "@/lib/cms/home";
 
 export default function Hero({ content }: { content: HomeHeroContent }) {
-  const imageUrl = publicMediaUrl(content.imagePath) ?? "/images/hero.jpg";
+  const imageUrl = content.imageUrl ?? "/images/hero.jpg";
 
   return (
     <section className="gaf-hero" aria-labelledby="hero-heading">

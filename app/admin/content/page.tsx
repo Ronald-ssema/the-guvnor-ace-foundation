@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic";
 
 export default async function AdminContentPage() {
   const admin = await getAdminContext();
-  if (!admin) redirect("/admin/login");
+  if (!admin) redirect("/admin/mfa");
 
   const [{ data: storedHero }, { data: media }] = await Promise.all([
     admin.supabase
@@ -33,6 +33,7 @@ export default async function AdminContentPage() {
       title: storedHero.title || fallbackHomeHero.title,
       description: storedHero.body || fallbackHomeHero.description,
       imagePath: typeof content.imagePath === "string" ? content.imagePath : null,
+      imageUrl: null,
       imageAlt: typeof content.imageAlt === "string" ? content.imageAlt : fallbackHomeHero.imageAlt,
     };
   }

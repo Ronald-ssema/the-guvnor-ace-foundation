@@ -2,7 +2,6 @@ import { afterEach, describe, expect, it } from "vitest";
 import {
   fallbackHomeHero,
   getHomeHeroContent,
-  publicMediaUrl,
 } from "@/lib/cms/home";
 
 const originalUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -24,11 +23,8 @@ describe("homepage CMS fallback", () => {
     await expect(getHomeHeroContent()).resolves.toEqual(fallbackHomeHero);
   });
 
-  it("builds an encoded public media URL", () => {
-    process.env.NEXT_PUBLIC_SUPABASE_URL = "https://example.supabase.co";
-
-    expect(publicMediaUrl("images/2026/community day.jpg")).toBe(
-      "https://example.supabase.co/storage/v1/object/public/site-media/images/2026/community%20day.jpg",
-    );
+  it("does not expose a media URL when the fallback image is used", () => {
+    expect(fallbackHomeHero.imagePath).toBeNull();
+    expect(fallbackHomeHero.imageUrl).toBeNull();
   });
 });

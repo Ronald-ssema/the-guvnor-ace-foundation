@@ -4,9 +4,10 @@ Public charity website and protected content-management portal built with Next.j
 
 ## What administrators can manage
 
-- Sign in at `/admin/login` using Supabase Auth.
+- Sign in at `/admin/login` using Supabase Auth and mandatory authenticator-app MFA.
 - Edit and publish the homepage hero message.
-- Upload JPG, PNG and WebP photographs up to 5 MB.
+- Upload JPG, PNG and WebP photographs up to 5 MB. Files are decoded,
+  resized, converted to WebP and stripped of embedded metadata before storage.
 - Record publication permission, accessible image descriptions and captions.
 - Publish or unpublish media and select a published homepage photograph.
 
@@ -27,6 +28,7 @@ Required environment variables:
 - `OPENAI_API_KEY`
 - `NEXT_PUBLIC_SITE_URL`
 - `NEXT_SERVER_ACTIONS_ENCRYPTION_KEY` in production
+- `RATE_LIMIT_SECRET` (a random server-only value of at least 32 bytes)
 
 Only variables prefixed with `NEXT_PUBLIC_` are exposed to browsers. Never use or expose a Supabase service-role key in this application.
 
@@ -60,6 +62,15 @@ where lower(email) = lower('EDITOR_EMAIL@example.org');
 
 Owners and editors can manage website content. Keep the owner role limited to the person accountable for the website.
 
+On the first successful password sign-in, the administrator is sent to
+`/admin/mfa`. They must scan the QR code with an authenticator app and verify a
+six-digit code. Database policies require an `aal2` session, so a stolen
+password-only session cannot read or change protected content.
+
+Store MFA recovery procedures securely outside the repository. Removing or
+resetting a lost factor is an accountable owner operation in the Supabase
+Authentication dashboard.
+
 ## Deployment order
 
 1. Create separate Supabase projects for development/staging and production.
@@ -68,6 +79,8 @@ Owners and editors can manage website content. Keep the owner role limited to th
 4. Apply the same migrations to production.
 5. Provision the production owner using the documented SQL step.
 6. Deploy the application, verify `/`, `/admin/login`, an authenticated edit and an image upload.
+7. Configure uptime monitoring against `/api/health`, production error alerts,
+   Supabase backup retention and a documented restore test.
 
 ## Quality checks
 
@@ -80,3 +93,8 @@ npm run build
 ```
 
 Uploaded images should only be published when the Foundation holds suitable individual or parental permission. Avoid identifying vulnerable children unnecessarily and keep supporting consent records outside the public website.
+
+The `site-media` bucket is private. Public pages receive short-lived signed URLs
+only for media records that are published, consent-confirmed and safeguarding
+reviewed. Unpublishing the database record prevents new signed URLs from being
+issued.

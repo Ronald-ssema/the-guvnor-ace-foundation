@@ -81,8 +81,8 @@ export default function UpdatePasswordPage() {
       return
     }
 
-    if (password.length < 8) {
-      setError('Your password must be at least 8 characters.')
+    if (password.length < 12) {
+      setError('Your password must be at least 12 characters.')
       return
     }
 
@@ -141,7 +141,8 @@ export default function UpdatePasswordPage() {
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
                 required
-                minLength={8}
+                minLength={12}
+                autoComplete="new-password"
                 className="mt-2 w-full rounded-lg border border-slate-300 px-4 py-3 outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100"
               />
             </div>
@@ -160,7 +161,8 @@ export default function UpdatePasswordPage() {
                 value={confirmation}
                 onChange={(event) => setConfirmation(event.target.value)}
                 required
-                minLength={8}
+                minLength={12}
+                autoComplete="new-password"
                 className="mt-2 w-full rounded-lg border border-slate-300 px-4 py-3 outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100"
               />
             </div>
