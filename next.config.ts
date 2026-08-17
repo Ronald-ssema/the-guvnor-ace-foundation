@@ -8,7 +8,7 @@ const csp = `
   style-src 'self' 'unsafe-inline';
   img-src 'self' blob: data: https:;
   font-src 'self' data:;
-  connect-src 'self' https://api.openai.com;
+  connect-src 'self' https://api.openai.com https://*.supabase.co wss://*.supabase.co;
   media-src 'self';
   object-src 'none';
   base-uri 'self';
@@ -48,7 +48,23 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   poweredByHeader: false,
 
-  allowedDevOrigins: ["192.168.0.173"],
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "*.supabase.co",
+        pathname: "/storage/v1/object/public/**",
+      },
+    ],
+  },
+
+  experimental: {
+    serverActions: {
+      bodySizeLimit: "6mb",
+    },
+  },
+
+  allowedDevOrigins: ["127.0.0.1", "192.168.0.173"],
 
   async headers() {
     return [

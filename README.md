@@ -1,36 +1,82 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# The Guvnor Ace Foundation website
 
-## Getting Started
+Public charity website and protected content-management portal built with Next.js and Supabase.
 
-First, run the development server:
+## What administrators can manage
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- Sign in at `/admin/login` using Supabase Auth.
+- Edit and publish the homepage hero message.
+- Upload JPG, PNG and WebP photographs up to 5 MB.
+- Record publication permission, accessible image descriptions and captions.
+- Publish or unpublish media and select a published homepage photograph.
+
+The original hard-coded homepage content remains the public fallback until a published database record exists.
+
+## Local setup
+
+1. Install Node.js 20 and run `npm ci`.
+2. Copy `.env.example` to `.env.local` and fill in the values. Never commit `.env.local`.
+3. Link the repository to the intended Supabase project with the Supabase CLI.
+4. Apply the migrations in `supabase/migrations`.
+5. Run `npm run dev` and open `http://localhost:3000`.
+
+Required environment variables:
+
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
+- `OPENAI_API_KEY`
+- `NEXT_PUBLIC_SITE_URL`
+- `NEXT_SERVER_ACTIONS_ENCRYPTION_KEY` in production
+
+Only variables prefixed with `NEXT_PUBLIC_` are exposed to browsers. Never use or expose a Supabase service-role key in this application.
+
+## Provision the first owner
+
+Create the person in Supabase Authentication first. Then run the following in the Supabase SQL editor, replacing only the placeholder email:
+
+```sql
+insert into public.admin_users (user_id, email, role)
+select id, email, 'owner'
+from auth.users
+where lower(email) = lower('OWNER_EMAIL@example.org')
+on conflict (user_id) do update
+set user_id = excluded.user_id,
+    email = excluded.email,
+    updated_at = now();
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The query must affect exactly one row. Do not commit a real email address or Auth UUID to a migration.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Add an editor
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Create the editor in Supabase Authentication, then run:
 
-## Learn More
+```sql
+insert into public.admin_users (user_id, email, role)
+select id, email, 'editor'
+from auth.users
+where lower(email) = lower('EDITOR_EMAIL@example.org');
+```
 
-To learn more about Next.js, take a look at the following resources:
+Owners and editors can manage website content. Keep the owner role limited to the person accountable for the website.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Deployment order
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+1. Create separate Supabase projects for development/staging and production.
+2. Apply migrations to staging and run all checks.
+3. Configure production environment variables in the hosting platform.
+4. Apply the same migrations to production.
+5. Provision the production owner using the documented SQL step.
+6. Deploy the application, verify `/`, `/admin/login`, an authenticated edit and an image upload.
 
-## Deploy on Vercel
+## Quality checks
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+npm run lint
+npx tsc --noEmit
+npm run test:run
+npx playwright test
+npm run build
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Uploaded images should only be published when the Foundation holds suitable individual or parental permission. Avoid identifying vulnerable children unnecessarily and keep supporting consent records outside the public website.

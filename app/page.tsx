@@ -3,6 +3,7 @@ import HomeSections from "@/components/home/HomeSections";
 import TrustSections from "@/components/home/TrustSections";
 import { organizationJsonLd } from "@/lib/structured-data";
 import { createPageMetadata } from "@/lib/seo";
+import { getHomeHeroContent } from "@/lib/cms/home";
 
 
 export const metadata = createPageMetadata({
@@ -12,7 +13,11 @@ export const metadata = createPageMetadata({
   path: "/",
 });
 
-export default function HomePage() {
+export const revalidate = 300;
+
+export default async function HomePage() {
+  const hero = await getHomeHeroContent();
+
   return (
     <>
       <script
@@ -22,7 +27,7 @@ export default function HomePage() {
         }}
       />
 
-      <Hero />
+      <Hero content={hero} />
       <HomeSections />
       <TrustSections />
     </>
