@@ -1,23 +1,25 @@
 import Image from "next/image";
 import Link from "next/link";
+import type { HomeHeroContent } from "@/lib/cms/home";
+import { publicMediaUrl } from "@/lib/cms/home";
 
-export default function Hero() {
+export default function Hero({ content }: { content: HomeHeroContent }) {
+  const imageUrl = publicMediaUrl(content.imagePath) ?? "/images/hero.jpg";
+
   return (
     <section className="gaf-hero" aria-labelledby="hero-heading">
       <div className="site-container gaf-hero-grid">
         <div className="gaf-hero-copy">
           <p className="gaf-hero-kicker">
-            Empowering children. Strengthening communities.
+            {content.kicker}
           </p>
 
           <h1 id="hero-heading">
-            Building brighter futures for children and families.
+            {content.title}
           </h1>
 
           <p className="gaf-hero-description">
-            The Guvnor Ace Foundation supports vulnerable children, families
-            and communities in Uganda through food support, education,
-            safeguarding, healthcare and practical community-led programmes.
+            {content.description}
           </p>
 
           <div className="gaf-hero-actions">
@@ -53,8 +55,8 @@ export default function Hero() {
         <div className="gaf-hero-media">
           <div className="gaf-hero-image-shell">
             <Image
-              src="/images/hero.jpg"
-              alt="Children supported by The Guvnor Ace Foundation"
+              src={imageUrl}
+              alt={content.imageAlt}
               fill
               priority
               className="gaf-hero-image"

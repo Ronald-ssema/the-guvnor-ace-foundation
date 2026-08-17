@@ -19,6 +19,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/child-protection",
     "/policies",
     "/privacy",
+    "/cookies",
+    "/accessibility",
     "/complaints",
     "/terms",
     "/donation-refund",

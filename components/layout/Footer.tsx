@@ -111,6 +111,8 @@ export default function Footer() {
             <Link href="/policies">Policies</Link>
             <Link href="/safeguarding">Safeguarding</Link>
             <Link href="/privacy">Privacy</Link>
+            <Link href="/cookies">Cookies</Link>
+            <Link href="/accessibility">Accessibility</Link>
             <Link href="/terms">Terms</Link>
             <Link href="/complaints">Complaints</Link>
           </nav>

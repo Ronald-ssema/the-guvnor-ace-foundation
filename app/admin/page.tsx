@@ -1,77 +1,30 @@
 import { redirect } from 'next/navigation'
-import { createClient } from '@/lib/supabase/server'
-import { signOut } from './actions'
+import Link from 'next/link'
+import AdminShell from '@/components/admin/AdminShell'
+import { getAdminContext } from '@/lib/admin/auth'
+
+export const dynamic = 'force-dynamic'
 
 export default async function AdminDashboardPage() {
-  const supabase = await createClient()
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  if (!user) {
-    redirect('/admin/login')
-  }
-
-  const { data: adminUser } = await supabase
-    .from('admin_users')
-    .select('email, role')
-    .eq('user_id', user.id)
-    .maybeSingle()
-
-  if (!adminUser || adminUser.role !== 'owner') {
+  const admin = await getAdminContext()
+  if (!admin) {
     redirect('/admin/login?error=not-authorised')
   }
 
   return (
-    <main className="min-h-screen bg-slate-100 px-6 py-10 text-slate-900">
-      <div className="mx-auto max-w-6xl">
-        <header className="flex flex-col justify-between gap-6 rounded-2xl bg-slate-950 p-8 text-white sm:flex-row sm:items-center">
-          <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-emerald-400">
-              The Guvnor Ace Foundation
-            </p>
-
-            <h1 className="mt-3 text-3xl font-bold">Admin portal</h1>
-
-            <p className="mt-2 text-slate-300">
-              Manage the Foundation website securely.
-            </p>
-          </div>
-
-          <form action={signOut}>
-            <button
-              type="submit"
-              className="rounded-lg border border-slate-600 px-5 py-3 font-semibold text-white transition hover:bg-slate-800"
-            >
-              Sign out
-            </button>
-          </form>
-        </header>
-
-        <section className="mt-8 rounded-2xl bg-white p-8 shadow-sm">
-          <p className="text-sm text-slate-500">Signed in as</p>
-          <p className="mt-1 font-semibold">{adminUser.email}</p>
-
-          <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {[
-              'Website content',
-              'Stories and news',
-              'Projects and programmes',
-              'Photos and videos',
-              'Reports and statistics',
-              'Volunteers and partnerships',
-            ].map((item) => (
-              <div key={item} className="rounded-xl border border-slate-200 p-5">
-                <h2 className="font-semibold">{item}</h2>
-                <p className="mt-2 text-sm text-slate-600">
-                  Management tools will be added here.
-                </p>
-              </div>
-            ))}
-          </div>
-        </section>
+    <AdminShell email={admin.email} role={admin.role} title="Overview" description="Manage public content with safeguarding and accessibility built into the workflow.">
+      <div className="admin-media-grid">
+        <Link className="admin-card" href="/admin/content">
+          <p className="section-eyebrow">Content</p>
+          <h2>Homepage content</h2>
+          <p>Update the main message and hero photograph.</p>
+        </Link>
+        <Link className="admin-card" href="/admin/media">
+          <p className="section-eyebrow">Media</p>
+          <h2>Photos and media</h2>
+          <p>Upload consent-cleared images, descriptions and captions.</p>
+        </Link>
       </div>
-    </main>
+    </AdminShell>
   )
 }

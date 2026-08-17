@@ -1,12 +1,13 @@
 'use client'
 
-import { useEffect, useState, type FormEvent } from 'react'
+import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
+import type { SupabaseClient } from '@supabase/supabase-js'
 import { createClient } from '@/lib/supabase/client'
 
 export default function UpdatePasswordPage() {
   const router = useRouter()
-  const [supabase] = useState(() => createClient())
+  const supabaseRef = useRef<SupabaseClient | null>(null)
   const [ready, setReady] = useState(false)
   const [checking, setChecking] = useState(true)
   const [password, setPassword] = useState('')
@@ -17,7 +18,24 @@ export default function UpdatePasswordPage() {
   useEffect(() => {
     let active = true
 
-    const { data } = supabase.auth.onAuthStateChange(
+    let client: SupabaseClient
+
+    try {
+      client = createClient()
+      supabaseRef.current = client
+    } catch {
+      queueMicrotask(() => {
+        if (!active) return
+        setError('Password recovery is temporarily unavailable.')
+        setChecking(false)
+      })
+
+      return () => {
+        active = false
+      }
+    }
+
+    const { data } = client.auth.onAuthStateChange(
       (_event, session) => {
         if (!active) return
 
@@ -32,7 +50,7 @@ export default function UpdatePasswordPage() {
     const checkSession = async () => {
       const {
         data: { session },
-      } = await supabase.auth.getSession()
+      } = await client.auth.getSession()
 
       if (!active) return
 
@@ -50,11 +68,18 @@ export default function UpdatePasswordPage() {
       active = false
       data.subscription.unsubscribe()
     }
-  }, [supabase])
+  }, [])
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     setError('')
+
+    const supabase = supabaseRef.current
+
+    if (!supabase) {
+      setError('Password recovery is temporarily unavailable.')
+      return
+    }
 
     if (password.length < 8) {
       setError('Your password must be at least 8 characters.')

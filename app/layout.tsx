@@ -1,10 +1,8 @@
 import type { Metadata } from "next";
 
 import "./globals.css";
-
-import FoundationAssistant from "@/components/ai/FoundationAssistant";
-import Footer from "@/components/layout/Footer";
-import Navbar from "@/components/layout/Navbar";
+import "../styles/admin.css";
+import SiteChrome from "@/components/layout/SiteChrome";
 import { siteConfig } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -110,13 +108,7 @@ export default function RootLayout({
   return (
     <html lang="en" data-scroll-behavior="smooth">
       <body>
-        <Navbar />
-
-        <main id="main-content">{children}</main>
-
-        <Footer />
-
-        <FoundationAssistant />
+        <SiteChrome>{children}</SiteChrome>
       </body>
     </html>
   );
