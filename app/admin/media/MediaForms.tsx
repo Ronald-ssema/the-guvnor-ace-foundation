@@ -2,7 +2,6 @@
 
 import { useActionState } from "react";
 import Image from "next/image";
-import { publicMediaUrl } from "@/lib/cms/home";
 import { uploadImage, updateImage, type MediaActionState } from "./actions";
 
 const initialState: MediaActionState = { status: "idle", message: "" };
@@ -56,12 +55,13 @@ type MediaItem = {
   alt_text: string;
   caption: string | null;
   is_published: boolean;
+  image_url: string | null;
 };
 
 export function MediaCard({ item }: { item: MediaItem }) {
   const actionWithId = updateImage.bind(null, item.id);
   const [state, action, pending] = useActionState(actionWithId, initialState);
-  const imageUrl = publicMediaUrl(item.storage_path);
+  const imageUrl = item.image_url;
 
   return (
     <article className="admin-media-card">

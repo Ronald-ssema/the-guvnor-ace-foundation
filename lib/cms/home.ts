@@ -5,6 +5,7 @@ export type HomeHeroContent = {
   title: string;
   description: string;
   imagePath: string | null;
+  imageUrl: string | null;
   imageAlt: string;
 };
 
@@ -14,6 +15,7 @@ export const fallbackHomeHero: HomeHeroContent = {
   description:
     "The Guvnor Ace Foundation supports vulnerable children, families and communities in Uganda through food support, education, safeguarding, healthcare and practical community-led programmes.",
   imagePath: null,
+  imageUrl: null,
   imageAlt: "Children supported by The Guvnor Ace Foundation",
 };
 
@@ -25,19 +27,6 @@ type SiteContentRow = {
 
 function textValue(value: unknown, fallback: string) {
   return typeof value === "string" && value.trim() ? value.trim() : fallback;
-}
-
-export function publicMediaUrl(storagePath: string | null) {
-  const baseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-
-  if (!baseUrl || !storagePath) return null;
-
-  const safePath = storagePath
-    .split("/")
-    .map((segment) => encodeURIComponent(segment))
-    .join("/");
-
-  return `${baseUrl}/storage/v1/object/public/site-media/${safePath}`;
 }
 
 export async function getHomeHeroContent(): Promise<HomeHeroContent> {
@@ -66,14 +55,36 @@ export async function getHomeHeroContent(): Promise<HomeHeroContent> {
         ? (data.content as Record<string, unknown>)
         : {};
 
+    const imagePath =
+      typeof content.imagePath === "string" && content.imagePath.trim()
+        ? content.imagePath.trim()
+        : null;
+    let imageUrl: string | null = null;
+
+    if (imagePath) {
+      const { data: media } = await supabase
+        .from("media_assets")
+        .select("storage_path")
+        .eq("storage_path", imagePath)
+        .eq("is_published", true)
+        .eq("consent_confirmed", true)
+        .not("safeguarding_reviewed_at", "is", null)
+        .maybeSingle();
+
+      if (media) {
+        const { data: signed } = await supabase.storage
+          .from("site-media")
+          .createSignedUrl(imagePath, 3600);
+        imageUrl = signed?.signedUrl ?? null;
+      }
+    }
+
     return {
       kicker: textValue(content.kicker, fallbackHomeHero.kicker),
       title: textValue(data.title, fallbackHomeHero.title),
       description: textValue(data.body, fallbackHomeHero.description),
-      imagePath:
-        typeof content.imagePath === "string" && content.imagePath.trim()
-          ? content.imagePath.trim()
-          : null,
+      imagePath,
+      imageUrl,
       imageAlt: textValue(content.imageAlt, fallbackHomeHero.imageAlt),
     };
   } catch {

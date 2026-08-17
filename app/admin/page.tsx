@@ -8,7 +8,7 @@ export const dynamic = 'force-dynamic'
 export default async function AdminDashboardPage() {
   const admin = await getAdminContext()
   if (!admin) {
-    redirect('/admin/login?error=not-authorised')
+    redirect('/admin/mfa')
   }
 
   return (

@@ -58,6 +58,7 @@ body {
   line-height: 1.6;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
+  font-family: var(--font-body), Arial, Helvetica, sans-serif;
 }
 
 img {
@@ -138,7 +139,7 @@ select {
   max-width: 780px;
   margin: 0;
   color: var(--colour-navy-950);
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-display), Georgia, "Times New Roman", serif;
   font-size: clamp(2.4rem, 5vw, 4.6rem);
   font-weight: 500;
   line-height: 1.04;
@@ -214,7 +215,7 @@ select {
   max-width: 920px;
   margin: 0;
   color: var(--colour-navy-950);
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-display), Georgia, "Times New Roman", serif;
   font-size: clamp(3.2rem, 6vw, 6rem);
   font-weight: 500;
   line-height: 0.99;
@@ -262,7 +263,7 @@ select {
   max-width: 760px;
   margin: 0;
   color: var(--colour-navy-950);
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-display), Georgia, "Times New Roman", serif;
   font-size: clamp(2.5rem, 5vw, 4.6rem);
   font-weight: 500;
   line-height: 1.04;
@@ -302,7 +303,7 @@ select {
 .content-copy h2 {
   margin: 0;
   color: var(--colour-navy-950);
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-display), Georgia, "Times New Roman", serif;
   font-size: clamp(2.6rem, 5vw, 4.5rem);
   font-weight: 500;
   line-height: 1.03;
@@ -417,7 +418,7 @@ select {
 .cta-panel h2 {
   margin: 0;
   color: var(--colour-white);
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-display), Georgia, "Times New Roman", serif;
   font-size: clamp(2.2rem, 4vw, 3.8rem);
   font-weight: 500;
   line-height: 1.06;
@@ -763,7 +764,7 @@ select {
 .donation-option-card h3 {
   margin: 0;
   color: var(--colour-navy-950);
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-display), Georgia, "Times New Roman", serif;
   font-size: clamp(1.8rem, 3vw, 2.4rem);
   font-weight: 500;
   line-height: 1.08;
@@ -1116,7 +1117,7 @@ select {
   max-width: 720px;
   margin: 0;
   color: var(--colour-navy-950);
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-display), Georgia, "Times New Roman", serif;
   font-size: clamp(3.4rem, 5.5vw, 5.65rem);
   font-weight: 500;
   line-height: 0.99;
@@ -1363,7 +1364,7 @@ select {
 .impact-strip-header h2 {
   max-width: 640px;
   margin: 0;
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-display), Georgia, "Times New Roman", serif;
   font-size: clamp(2rem, 4vw, 3.2rem);
   font-weight: 500;
   line-height: 1.1;
@@ -1470,7 +1471,7 @@ select {
 .about-grid h2 {
   margin: 0;
   color: var(--charity-navy);
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-display), Georgia, "Times New Roman", serif;
   font-size: clamp(2.3rem, 4vw, 4rem);
   line-height: 1.08;
 }
@@ -2022,7 +2023,7 @@ select {
 .contact-grid h2 {
   margin-top: 0;
   color: var(--charity-navy);
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-display), Georgia, "Times New Roman", serif;
   font-size: clamp(2rem, 4vw, 3.4rem);
   line-height: 1.1;
 }
@@ -2199,7 +2200,7 @@ select {
   right: 24px;
   bottom: 24px;
   z-index: 200;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-body), Arial, Helvetica, sans-serif;
 }
 
 .foundation-ai-launcher {
@@ -2540,7 +2541,7 @@ select {
   max-width: 820px;
   margin: 0;
   color: #071c3a;
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-display), Georgia, "Times New Roman", serif;
   font-size: clamp(2.8rem, 5vw, 5rem);
   font-weight: 500;
   line-height: 1;
@@ -2999,7 +3000,7 @@ select {
 .partnership-cta h2 {
   margin: 0 0 18px;
   color: var(--charity-navy);
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-display), Georgia, "Times New Roman", serif;
   font-size: clamp(2.2rem, 4vw, 3.6rem);
   line-height: 1.08;
 }
@@ -3116,7 +3117,7 @@ select {
 .policy-content h2 {
   margin-top: 42px;
   color: var(--charity-navy);
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-display), Georgia, "Times New Roman", serif;
   font-size: 2rem;
 }
 
@@ -3168,7 +3169,7 @@ select {
 .not-found-content h1 {
   margin: 0;
   color: var(--charity-navy);
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-display), Georgia, "Times New Roman", serif;
   font-size: clamp(3.2rem, 7vw, 6rem);
   line-height: 1;
 }
@@ -3415,7 +3416,7 @@ select {
 .social-platform-content h3 {
   margin: 0;
   color: var(--colour-navy-950);
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-display), Georgia, "Times New Roman", serif;
   font-size: 2rem;
   font-weight: 500;
   line-height: 1.1;
@@ -4189,7 +4190,7 @@ select {
   max-width: 760px;
   margin: 0;
   color: var(--colour-navy-950);
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-display), Georgia, "Times New Roman", serif;
   font-size: clamp(3.6rem, 6vw, 6.6rem);
   line-height: 0.93;
   letter-spacing: -0.045em;
@@ -4335,14 +4336,14 @@ select {
 
 .gaf-hero-quote > span {
   color: var(--colour-gold-500);
-  font-family: Georgia, serif;
+  font-family: var(--font-display), Georgia, serif;
   font-size: 3.3rem;
   line-height: 0.7;
 }
 
 .gaf-hero-quote p {
   margin: 0;
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-display), Georgia, "Times New Roman", serif;
   font-size: 1.12rem;
   line-height: 1.55;
 }
@@ -4535,7 +4536,7 @@ select {
 .gaf-action-panel h2 {
   margin: 0;
   color: var(--colour-navy-950);
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-display), Georgia, "Times New Roman", serif;
   font-size: clamp(3rem, 5.3vw, 5.3rem);
   line-height: 0.98;
   letter-spacing: -0.045em;

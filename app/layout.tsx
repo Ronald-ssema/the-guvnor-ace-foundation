@@ -4,6 +4,7 @@ import "./globals.css";
 import "../styles/admin.css";
 import SiteChrome from "@/components/layout/SiteChrome";
 import { siteConfig } from "@/lib/site";
+import { bodyFont, displayFont } from "./fonts";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
@@ -106,7 +107,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" data-scroll-behavior="smooth">
+    <html
+      lang="en"
+      data-scroll-behavior="smooth"
+      className={`${bodyFont.variable} ${displayFont.variable}`}
+    >
       <body>
         <SiteChrome>{children}</SiteChrome>
       </body>

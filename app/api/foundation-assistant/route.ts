@@ -1,5 +1,6 @@
 import OpenAI from "openai";
 import { NextRequest, NextResponse } from "next/server";
+import { clientAddress, consumeRateLimit } from "@/lib/security/rateLimit";
 
 export const runtime = "nodejs";
 
@@ -8,16 +9,6 @@ const MAX_MESSAGES = 10;
 const MAX_MESSAGE_LENGTH = 1200;
 const RATE_LIMIT_REQUESTS = 8;
 const RATE_LIMIT_WINDOW_MS = 60_000;
-
-type RateBucket = { count: number; resetAt: number };
-
-const rateLimitStore = globalThis as typeof globalThis & {
-  foundationAssistantRateLimits?: Map<string, RateBucket>;
-};
-
-const rateLimits =
-  rateLimitStore.foundationAssistantRateLimits ?? new Map<string, RateBucket>();
-rateLimitStore.foundationAssistantRateLimits = rateLimits;
 
 type ChatMessage = {
   role: "user" | "assistant";
@@ -92,28 +83,6 @@ function jsonResponse(
   });
 }
 
-function requestKey(request: NextRequest) {
-  return (
-    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
-    request.headers.get("x-real-ip") ||
-    "unknown"
-  );
-}
-
-function isRateLimited(request: NextRequest) {
-  const now = Date.now();
-  const key = requestKey(request);
-  const current = rateLimits.get(key);
-
-  if (!current || current.resetAt <= now) {
-    rateLimits.set(key, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS });
-    return false;
-  }
-
-  current.count += 1;
-  return current.count > RATE_LIMIT_REQUESTS;
-}
-
 function isCrossSiteRequest(request: NextRequest) {
   const fetchSite = request.headers.get("sec-fetch-site");
   if (fetchSite === "cross-site") return true;
@@ -162,7 +131,14 @@ export async function POST(request: NextRequest) {
       return jsonResponse({ error: "Cross-site requests are not accepted." }, 403);
     }
 
-    if (isRateLimited(request)) {
+    const allowed = await consumeRateLimit({
+      scope: "foundation-assistant",
+      subject: clientAddress(request.headers),
+      limit: RATE_LIMIT_REQUESTS,
+      windowSeconds: RATE_LIMIT_WINDOW_MS / 1000,
+    });
+
+    if (!allowed) {
       return jsonResponse(
         { error: "Too many requests. Please wait a minute and try again." },
         429,
