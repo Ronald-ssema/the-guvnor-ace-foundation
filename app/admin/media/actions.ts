@@ -8,7 +8,9 @@ import { containsStoragePath } from "@/lib/admin/mediaReferences";
 import { fallbackHomeHero } from "@/lib/cms/home";
 import { parseSiteEditorSettings } from "@/lib/cms/siteEditor";
 import {
+  parseWebsiteImageSettings,
   websiteImageSlotKeys,
+  type WebsiteImageSlotKey,
   type WebsiteImageSettings,
 } from "@/lib/cms/websiteImages";
 
@@ -16,6 +18,8 @@ export type MediaActionState = {
   status: "idle" | "success" | "error";
   message: string;
 };
+
+export type QuickImageTarget = "hero" | "story" | WebsiteImageSlotKey;
 
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
 const ALLOWED_TYPES = new Map([
@@ -75,6 +79,186 @@ async function processImage(file: File) {
 
 function revalidateMediaPages() {
   for (const path of MEDIA_REVALIDATION_PATHS) revalidatePath(path);
+}
+
+function isQuickImageTarget(value: string): value is QuickImageTarget {
+  return value === "hero" || value === "story" || websiteImageSlotKeys.includes(value as WebsiteImageSlotKey);
+}
+
+async function assignUploadedImage(
+  admin: NonNullable<Awaited<ReturnType<typeof getAdminContext>>>,
+  target: QuickImageTarget,
+  storagePath: string,
+  altText: string,
+) {
+  if (target === "hero") {
+    const { data: storedHero } = await admin.supabase
+      .from("site_content")
+      .select("title, body, content")
+      .eq("page_slug", "home")
+      .eq("section_key", "hero")
+      .maybeSingle();
+    const content =
+      storedHero?.content && typeof storedHero.content === "object"
+        ? (storedHero.content as Record<string, unknown>)
+        : {};
+    const { error } = await admin.supabase.from("site_content").upsert(
+      {
+        page_slug: "home",
+        section_key: "hero",
+        title: storedHero?.title || fallbackHomeHero.title,
+        body: storedHero?.body || fallbackHomeHero.description,
+        content: {
+          ...content,
+          kicker: typeof content.kicker === "string" ? content.kicker : fallbackHomeHero.kicker,
+          imagePath: storagePath,
+          imageAlt: altText,
+        },
+        is_published: true,
+        updated_by: admin.userId,
+      },
+      { onConflict: "page_slug,section_key" },
+    );
+    if (error) throw error;
+    return;
+  }
+
+  if (target === "story") {
+    const { data: storedEditor } = await admin.supabase
+      .from("site_settings")
+      .select("value")
+      .eq("setting_key", "visual_editor")
+      .maybeSingle();
+    const editor = parseSiteEditorSettings(storedEditor?.value);
+    editor.homeSections.story.imagePath = storagePath;
+    editor.homeSections.story.imageUrl = null;
+    editor.homeSections.story.imageAlt = altText;
+    const { error } = await admin.supabase.from("site_settings").upsert(
+      {
+        setting_key: "visual_editor",
+        label: "Safe visual website editor",
+        value: editor,
+        is_public: true,
+        updated_by: admin.userId,
+      },
+      { onConflict: "setting_key" },
+    );
+    if (error) throw error;
+    return;
+  }
+
+  const { data: storedImages } = await admin.supabase
+    .from("site_settings")
+    .select("value")
+    .eq("setting_key", "website_images")
+    .maybeSingle();
+  const settings = parseWebsiteImageSettings(storedImages?.value);
+  settings.slots[target] = {
+    mediaPath: storagePath,
+    visible: true,
+    alt: altText,
+  };
+  const { error } = await admin.supabase.from("site_settings").upsert(
+    {
+      setting_key: "website_images",
+      label: "Website image placements and gallery",
+      value: settings,
+      is_public: true,
+      updated_by: admin.userId,
+    },
+    { onConflict: "setting_key" },
+  );
+  if (error) throw error;
+}
+
+export async function quickReplaceWebsiteImage(
+  targetValue: string,
+  _previousState: MediaActionState,
+  formData: FormData,
+): Promise<MediaActionState> {
+  const admin = await getAdminContext();
+  if (!admin) return { status: "error", message: "Your session has expired. Sign in again." };
+  if (!isQuickImageTarget(targetValue)) {
+    return { status: "error", message: "This website image position is not valid." };
+  }
+
+  const file = formData.get("quickFile");
+  const altText = String(formData.get("quickAltText") ?? "").trim();
+  const consentConfirmed = formData.get("quickConsent") === "on";
+  if (!(file instanceof File) || file.size === 0) {
+    return { status: "error", message: "Choose the replacement photograph." };
+  }
+  if (!altText || altText.length > 180) {
+    return { status: "error", message: "Add an image description of no more than 180 characters." };
+  }
+  if (!consentConfirmed) {
+    return { status: "error", message: "Confirm that the Foundation has permission to use this photograph." };
+  }
+
+  let safeImage: Buffer;
+  try {
+    safeImage = await processImage(file);
+  } catch (error) {
+    return { status: "error", message: error instanceof Error ? error.message : "The image could not be processed." };
+  }
+
+  const storagePath = `images/${new Date().getUTCFullYear()}/${randomUUID()}.webp`;
+  const { error: uploadError } = await admin.supabase.storage
+    .from("site-media")
+    .upload(storagePath, safeImage, {
+      contentType: "image/webp",
+      cacheControl: "31536000",
+      upsert: false,
+    });
+  if (uploadError) return { status: "error", message: "The replacement photograph could not be uploaded." };
+
+  const { data: media, error: recordError } = await admin.supabase
+    .from("media_assets")
+    .insert({
+      storage_path: storagePath,
+      original_name: file.name.slice(0, 255),
+      mime_type: "image/webp",
+      file_size: safeImage.byteLength,
+      media_kind: "image",
+      alt_text: altText,
+      caption: null,
+      is_published: true,
+      consent_confirmed: true,
+      safeguarding_reviewed_at: new Date().toISOString(),
+      created_by: admin.userId,
+      updated_by: admin.userId,
+    })
+    .select("id")
+    .single();
+
+  if (recordError || !media) {
+    await admin.supabase.storage.from("site-media").remove([storagePath]);
+    return { status: "error", message: "The replacement photograph could not be saved." };
+  }
+
+  try {
+    await assignUploadedImage(admin, targetValue, storagePath, altText);
+  } catch {
+    await admin.supabase.from("media_assets").delete().eq("id", media.id);
+    await admin.supabase.storage.from("site-media").remove([storagePath]);
+    return { status: "error", message: "The photograph uploaded, but the website position could not be updated safely." };
+  }
+
+  await admin.supabase.from("admin_audit_log").insert({
+    actor_id: admin.userId,
+    action: "update",
+    entity_type: "website_image",
+    entity_id: media.id,
+    details: {
+      target: targetValue,
+      storage_path: storagePath,
+      direct_replacement: true,
+      metadata_removed: true,
+    },
+  });
+
+  revalidateMediaPages();
+  return { status: "success", message: "Photograph replaced and published successfully." };
 }
 
 function mediaPath(formData: FormData, name: string) {
