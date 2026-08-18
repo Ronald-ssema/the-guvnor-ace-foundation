@@ -2,7 +2,13 @@
 
 import { useActionState } from "react";
 import Image from "next/image";
-import { uploadImage, updateImage, type MediaActionState } from "./actions";
+import {
+  deleteImage,
+  replaceImage,
+  uploadImage,
+  updateImage,
+  type MediaActionState,
+} from "./actions";
 
 const initialState: MediaActionState = { status: "idle", message: "" };
 
@@ -98,6 +104,61 @@ export function MediaCard({ item }: { item: MediaItem }) {
           {pending ? "Saving…" : "Save details"}
         </button>
       </form>
+      <MediaFileControls item={item} />
     </article>
+  );
+}
+
+function MediaFileControls({ item }: { item: MediaItem }) {
+  const replaceWithId = replaceImage.bind(null, item.id);
+  const deleteWithId = deleteImage.bind(null, item.id);
+  const [replaceState, replaceAction, replacing] = useActionState(replaceWithId, initialState);
+  const [deleteState, deleteAction, deleting] = useActionState(deleteWithId, initialState);
+
+  return (
+    <div className="admin-media-file-controls">
+      <details className="admin-media-tool">
+        <summary>Change this photograph</summary>
+        <form action={replaceAction} className="admin-media-action-form" encType="multipart/form-data">
+          <p>The new file will replace this photograph everywhere it is currently used.</p>
+          <label>
+            Replacement image
+            <input name="replacementFile" type="file" accept="image/jpeg,image/png,image/webp" required />
+            <small>JPG, PNG or WebP. Maximum file size 5 MB.</small>
+          </label>
+          <label className="admin-check">
+            <input name="replacementConsent" type="checkbox" required />
+            <span>I confirm the Foundation has permission to use this replacement image.</span>
+          </label>
+          {replaceState.message && (
+            <p className={`admin-message admin-message-${replaceState.status}`} role="status">
+              {replaceState.message}
+            </p>
+          )}
+          <button className="admin-secondary-button" type="submit" disabled={replacing}>
+            {replacing ? "Replacing…" : "Replace photograph"}
+          </button>
+        </form>
+      </details>
+
+      <details className="admin-media-tool admin-danger-zone">
+        <summary>Delete this photograph</summary>
+        <form action={deleteAction} className="admin-media-action-form">
+          <p>Deletion is permanent and will be blocked if the photograph is still used on a page.</p>
+          <label className="admin-check">
+            <input name="confirmDelete" type="checkbox" required />
+            <span>I understand that this permanently deletes the photograph.</span>
+          </label>
+          {deleteState.message && (
+            <p className={`admin-message admin-message-${deleteState.status}`} role="status">
+              {deleteState.message}
+            </p>
+          )}
+          <button className="admin-danger-button" type="submit" disabled={deleting}>
+            {deleting ? "Deleting…" : "Delete permanently"}
+          </button>
+        </form>
+      </details>
+    </div>
   );
 }

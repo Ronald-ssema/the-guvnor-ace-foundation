@@ -30,7 +30,7 @@ export default async function AdminMediaPage() {
       email={admin.email}
       role={admin.role}
       title="Photos and media"
-      description="Upload consent-cleared images and control what appears publicly."
+      description="Upload, replace and safely delete consent-cleared photographs used across the website."
     >
       <MediaUploadForm />
       <section className="admin-library" aria-labelledby="library-heading">
