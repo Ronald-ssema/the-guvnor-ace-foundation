@@ -30,7 +30,7 @@ export default function AdminShell({
 
         <nav className="admin-nav" aria-label="Administration">
           <Link href="/admin">Overview</Link>
-          <Link href="/admin/content">Homepage content</Link>
+          <Link href="/admin/content">Visual website editor</Link>
           <Link href="/admin/media">Photos and media</Link>
           <Link href="/" target="_blank">View public website ↗</Link>
         </nav>

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { PageHero } from "@/components/ui/PageHero";
 
 import { createPageMetadata } from "@/lib/seo";
+import { getSiteEditorSettings, isExternalHref } from "@/lib/cms/siteEditor";
 export const metadata = createPageMetadata({
   title: "Impact & Accountability",
   description:
@@ -34,22 +35,27 @@ const principles = [
   },
 ];
 
-export default function ImpactPage() {
+export default async function ImpactPage() {
+  const settings = await getSiteEditorSettings();
+  const hero = settings.pages.impact;
+
   return (
     <>
       <PageHero
-        eyebrow="Our impact"
-        title="Transparent action. Meaningful community change."
-        description="Supporters deserve clear information about what we do, how assistance is delivered and how programme results are documented."
+        eyebrow={hero.eyebrow}
+        title={hero.title}
+        description={hero.description}
         actions={[
           {
-            label: "View Reports",
-            href: "/reports",
+            label: hero.primaryLabel,
+            href: hero.primaryHref,
+            external: isExternalHref(hero.primaryHref),
           },
           {
-            label: "Support Our Mission",
-            href: "/donate",
+            label: hero.secondaryLabel,
+            href: hero.secondaryHref,
             variant: "secondary",
+            external: isExternalHref(hero.secondaryHref),
           },
         ]}
       />

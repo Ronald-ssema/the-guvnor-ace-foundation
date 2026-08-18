@@ -9,6 +9,7 @@ import {
   FaYoutube,
 } from "react-icons/fa";
 import { SiLinktree } from "react-icons/si";
+import type { SiteEditorSettings } from "@/lib/cms/siteEditor";
 
 const socialLinks = [
   {
@@ -43,7 +44,11 @@ const socialLinks = [
   },
 ];
 
-export default function Footer() {
+export default function Footer({
+  contact,
+}: {
+  contact: SiteEditorSettings["contact"];
+}) {
   return (
     <footer className="compact-footer">
       <div className="site-container compact-footer-grid">
@@ -59,26 +64,24 @@ export default function Footer() {
         </div>
 
         <a
-          href="mailto:guvnorace@gmail.com"
+          href={`mailto:${contact.email}`}
           className="compact-footer-item"
         >
           <FaEnvelope aria-hidden="true" />
-          <span>guvnorace@gmail.com</span>
+          <span>{contact.email}</span>
         </a>
 
         <a
-          href="tel:+256752462740"
+          href={`tel:${contact.phoneHref}`}
           className="compact-footer-item"
         >
           <FaPhoneAlt aria-hidden="true" />
-          <span>+256 752 462 740</span>
+          <span>{contact.phoneDisplay}</span>
         </a>
 
         <div className="compact-footer-item">
           <FaMapMarkerAlt aria-hidden="true" />
-          <span>
-            Bunamwaya–Lubowa, Entebbe Road, Wakiso District, Uganda.
-          </span>
+          <span>{contact.location}</span>
         </div>
 
         <div className="compact-footer-social-wrapper">

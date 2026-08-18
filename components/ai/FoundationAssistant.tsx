@@ -13,13 +13,18 @@ type ChatMessage = {
   content: string;
 };
 
+type ContactDetails = {
+  email: string;
+  phoneDisplay: string;
+};
+
 const STARTER_QUESTIONS = [
   "How can I donate?",
   "What programmes do you run?",
   "How can I volunteer?",
 ];
 
-export default function FoundationAssistant() {
+export default function FoundationAssistant({ contact }: { contact: ContactDetails }) {
   const [isOpen, setIsOpen] = useState(false);
   const [input, setInput] = useState("");
   const [isSending, setIsSending] = useState(false);
@@ -89,7 +94,7 @@ export default function FoundationAssistant() {
         ...current,
         {
           role: "assistant",
-          content: `${message} You can contact us at guvnorace@gmail.com or +256 752 462 740.`,
+          content: `${message} You can contact us at ${contact.email} or ${contact.phoneDisplay}.`,
         },
       ]);
     } finally {

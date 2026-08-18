@@ -48,5 +48,16 @@
 .admin-media-card-form { display: grid; gap: 16px; padding: 20px; }
 .admin-media-meta strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .admin-empty-state { padding: 48px; border: 1px dashed #c9d4dc; border-radius: 18px; background: #fff; color: #68798c; text-align: center; }
+.admin-editor-stack { display: grid; gap: 28px; }
+.admin-editor-intro { margin: 0; padding: 15px 17px; border-left: 4px solid #1d7b57; border-radius: 8px; background: #eef8f3; color: #315947; }
+.admin-editor-group { overflow: hidden; border: 1px solid #dbe3e9; border-radius: 14px; background: #f8fafb; }
+.admin-editor-group summary { padding: 17px 20px; color: #071c3a; font-weight: 850; cursor: pointer; }
+.admin-editor-group[open] summary { border-bottom: 1px solid #dbe3e9; background: #f1f5f7; }
+.admin-editor-group-content { display: grid; gap: 22px; padding: 22px; }
+.admin-editor-list { gap: 20px; }
+.admin-editor-fieldset { display: grid; gap: 18px; margin: 0; padding: 20px; border: 1px solid #d5dfe6; border-radius: 13px; background: #fff; }
+.admin-editor-fieldset legend { padding: 0 8px; color: #8b6400; font-size: .82rem; font-weight: 850; }
+.admin-editor-controls { align-items: end; }
+.admin-sticky-actions { position: sticky; z-index: 4; bottom: 12px; margin: 0 -10px -10px; padding: 14px; border: 1px solid #dbe3e9; border-radius: 13px; background: rgba(255,255,255,.95); box-shadow: 0 14px 35px rgba(7,28,58,.12); backdrop-filter: blur(12px); }
 @media (max-width: 850px) { .admin-app { grid-template-columns: 1fr; } .admin-sidebar { position: static; height: auto; } .admin-nav { grid-template-columns: repeat(2,minmax(0,1fr)); } .admin-account { margin-top: 24px; } .admin-main { padding: 32px 18px 64px; } .admin-media-grid, .admin-form-grid { grid-template-columns: 1fr; } }
 @media (max-width: 520px) { .admin-nav { grid-template-columns: 1fr; } .admin-form-actions { align-items: stretch; flex-direction: column-reverse; } }

@@ -16,8 +16,8 @@ export default async function AdminDashboardPage() {
       <div className="admin-media-grid">
         <Link className="admin-card" href="/admin/content">
           <p className="section-eyebrow">Content</p>
-          <h2>Homepage content</h2>
-          <p>Update the main message and hero photograph.</p>
+          <h2>Visual website editor</h2>
+          <p>Update page text, buttons, links, images and approved layouts.</p>
         </Link>
         <Link className="admin-card" href="/admin/media">
           <p className="section-eyebrow">Media</p>

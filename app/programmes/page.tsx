@@ -4,6 +4,7 @@ import Link from "next/link";
 import { PageHero } from "@/components/ui/PageHero";
 
 import { createPageMetadata } from "@/lib/seo";
+import { getSiteEditorSettings, isExternalHref } from "@/lib/cms/siteEditor";
 export const metadata = createPageMetadata({
   title: "Our Programmes",
   description:
@@ -53,22 +54,27 @@ const programmes = [
   },
 ];
 
-export default function ProgrammesPage() {
+export default async function ProgrammesPage() {
+  const settings = await getSiteEditorSettings();
+  const hero = settings.pages.programmes;
+
   return (
     <>
       <PageHero
-        eyebrow="Our programmes"
-        title="Practical support designed around real needs."
-        description="Our programmes focus on food security, education, child protection and community support for vulnerable children and families in Uganda."
+        eyebrow={hero.eyebrow}
+        title={hero.title}
+        description={hero.description}
         actions={[
           {
-            label: "Support Our Work",
-            href: "/donate",
+            label: hero.primaryLabel,
+            href: hero.primaryHref,
+            external: isExternalHref(hero.primaryHref),
           },
           {
-            label: "Contact Our Team",
-            href: "/contact",
+            label: hero.secondaryLabel,
+            href: hero.secondaryHref,
             variant: "secondary",
+            external: isExternalHref(hero.secondaryHref),
           },
         ]}
       />
