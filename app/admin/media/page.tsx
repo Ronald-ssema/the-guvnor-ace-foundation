@@ -1,7 +1,10 @@
 import { redirect } from "next/navigation";
 import AdminShell from "@/components/admin/AdminShell";
 import { getAdminContext } from "@/lib/admin/auth";
-import { MediaCard, MediaUploadForm } from "./MediaForms";
+import { fallbackHomeHero } from "@/lib/cms/home";
+import { fallbackSiteEditorSettings, parseSiteEditorSettings } from "@/lib/cms/siteEditor";
+import { parseWebsiteImageSettings } from "@/lib/cms/websiteImages";
+import { MediaCard, MediaUploadForm, WebsiteImageManager } from "./MediaForms";
 
 export const dynamic = "force-dynamic";
 
@@ -9,11 +12,30 @@ export default async function AdminMediaPage() {
   const admin = await getAdminContext();
   if (!admin) redirect("/admin/mfa");
 
-  const { data: media } = await admin.supabase
-    .from("media_assets")
-    .select("id, storage_path, original_name, alt_text, caption, is_published")
-    .eq("media_kind", "image")
-    .order("created_at", { ascending: false });
+  const [{ data: media }, { data: storedHero }, { data: storedEditor }, { data: storedImages }] =
+    await Promise.all([
+      admin.supabase
+        .from("media_assets")
+        .select("id, storage_path, original_name, alt_text, caption, is_published, consent_confirmed, safeguarding_reviewed_at")
+        .eq("media_kind", "image")
+        .order("created_at", { ascending: false }),
+      admin.supabase
+        .from("site_content")
+        .select("content")
+        .eq("page_slug", "home")
+        .eq("section_key", "hero")
+        .maybeSingle(),
+      admin.supabase
+        .from("site_settings")
+        .select("value")
+        .eq("setting_key", "visual_editor")
+        .maybeSingle(),
+      admin.supabase
+        .from("site_settings")
+        .select("value")
+        .eq("setting_key", "website_images")
+        .maybeSingle(),
+    ]);
 
   const mediaWithUrls = await Promise.all(
     (media ?? []).map(async (item) => {
@@ -25,6 +47,17 @@ export default async function AdminMediaPage() {
     }),
   );
 
+  const eligibleMedia = mediaWithUrls.filter(
+    (item) => item.is_published && item.consent_confirmed && item.safeguarding_reviewed_at,
+  );
+  const heroContent =
+    storedHero?.content && typeof storedHero.content === "object"
+      ? (storedHero.content as Record<string, unknown>)
+      : {};
+  const editor = storedEditor
+    ? parseSiteEditorSettings(storedEditor.value)
+    : fallbackSiteEditorSettings;
+
   return (
     <AdminShell
       email={admin.email}
@@ -32,6 +65,19 @@ export default async function AdminMediaPage() {
       title="Photos and media"
       description="Upload, replace and safely delete consent-cleared photographs used across the website."
     >
+      <WebsiteImageManager
+        media={eligibleMedia}
+        settings={parseWebsiteImageSettings(storedImages?.value)}
+        hero={{
+          mediaPath: typeof heroContent.imagePath === "string" ? heroContent.imagePath : null,
+          alt: typeof heroContent.imageAlt === "string" ? heroContent.imageAlt : fallbackHomeHero.imageAlt,
+        }}
+        story={{
+          mediaPath: editor.homeSections.story.imagePath,
+          alt: editor.homeSections.story.imageAlt,
+        }}
+      />
+
       <MediaUploadForm />
       <section className="admin-library" aria-labelledby="library-heading">
         <div className="admin-section-heading">
