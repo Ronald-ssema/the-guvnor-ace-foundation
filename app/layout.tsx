@@ -7,6 +7,7 @@ import { siteConfig } from "@/lib/site";
 import { bodyFont, displayFont } from "./fonts";
 import { getSiteEditorSettings } from "@/lib/cms/siteEditor";
 import { getWebsiteImageSettings } from "@/lib/cms/websiteImages";
+import { getWebsiteTextSettings } from "@/lib/cms/websiteText";
 
 export const revalidate = 300;
 
@@ -114,9 +115,10 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const [editorSettings, websiteImages] = await Promise.all([
+  const [editorSettings, websiteImages, websiteText] = await Promise.all([
     getSiteEditorSettings(),
     getWebsiteImageSettings(),
+    getWebsiteTextSettings(),
   ]);
 
   return (
@@ -126,7 +128,11 @@ export default async function RootLayout({
       className={`${bodyFont.variable} ${displayFont.variable}`}
     >
       <body className={`theme-${editorSettings.appearance.accent} layout-${editorSettings.appearance.density}`}>
-        <SiteChrome settings={editorSettings} galleries={websiteImages.pageGalleries}>
+        <SiteChrome
+          settings={editorSettings}
+          galleries={websiteImages.pageGalleries}
+          textSettings={websiteText}
+        >
           {children}
         </SiteChrome>
       </body>

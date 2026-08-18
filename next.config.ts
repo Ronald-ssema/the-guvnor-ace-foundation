@@ -15,7 +15,7 @@ const csp = `
   object-src 'none';
   base-uri 'self';
   form-action 'self';
-  frame-ancestors 'none';
+  frame-ancestors 'self';
   ${isDev ? "" : "upgrade-insecure-requests;"}
 `;
 
@@ -30,7 +30,7 @@ const securityHeaders = [
   },
   {
     key: "X-Frame-Options",
-    value: "DENY",
+    value: "SAMEORIGIN",
   },
   {
     key: "Referrer-Policy",
