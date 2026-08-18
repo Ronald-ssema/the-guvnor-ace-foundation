@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build --webpack",
+    "generate:favicons": "node scripts/generate-favicons.mjs",
     "start": "next start",
     "lint": "eslint",
     "test": "vitest",
