@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import DonationOptions from "@/components/donations/DonationOptions";
+import DonationFaq from "@/components/donations/DonationFaq";
 import { PageHero } from "@/components/ui/PageHero";
 import { getSiteEditorSettings, isExternalHref } from "@/lib/cms/siteEditor";
 
@@ -100,6 +101,8 @@ export default async function DonatePage() {
           </div>
         </div>
       </section>
+
+      <DonationFaq paypalHref={settings.donations.paypal} />
 
       <section className="page-section">
         <div className="site-container">

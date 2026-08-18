@@ -17,6 +17,7 @@ export default function CookiesPage() {
       navigation={[
         { label: "Public website", href: "#public" },
         { label: "Administrator cookies", href: "#admin" },
+        { label: "Your choices", href: "#choices" },
         { label: "Changes", href: "#changes" },
       ]}
     >
@@ -36,6 +37,15 @@ export default function CookiesPage() {
           administrator signs in. They protect the admin session and enable the
           requested secure website-management service. The admin portal cannot
           operate correctly without them.
+        </p>
+      </section>
+      <section id="choices">
+        <h2>Your cookie choices</h2>
+        <p>
+          The cookie consent centre lets you accept or reject optional
+          categories and change your selection later using the Cookie settings
+          link in the website footer. Your preference is stored in your browser.
+          Optional analytics and marketing technologies are not currently active.
         </p>
       </section>
       <section id="changes">

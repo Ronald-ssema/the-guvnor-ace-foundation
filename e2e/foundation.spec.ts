@@ -31,9 +31,53 @@ test("safeguarding page loads", async ({ page }) => {
 test("donate navigation works", async ({ page }) => {
   await page.goto("/");
 
+  await page
+    .getByRole("button", { name: "Reject optional cookies" })
+    .click();
+
   await page.getByRole("link", { name: /donate/i }).first().click();
 
   await expect(page).toHaveURL(/\/donate/);
+});
+
+test("visitors can manage and reopen cookie preferences", async ({ page }) => {
+  await page.goto("/");
+
+  const dialog = page.getByRole("dialog", { name: "Our cookies" });
+  await expect(dialog).toBeVisible();
+  await dialog.getByRole("button", { name: "Manage cookies" }).click();
+
+  await expect(
+    page.getByRole("dialog", { name: "Manage cookies" }),
+  ).toBeVisible();
+  await page.getByRole("checkbox", { name: /analytics/i }).check();
+  await page.getByRole("button", { name: "Save my choices" }).click();
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+
+  await page.getByRole("button", { name: "Cookie settings" }).click();
+  await expect(
+    page.getByRole("dialog", { name: "Manage cookies" }),
+  ).toBeVisible();
+  await expect(page.getByRole("checkbox", { name: /analytics/i })).toBeChecked();
+});
+
+test("donation page provides expandable answers and a direct donation prompt", async ({ page }) => {
+  await page.goto("/donate");
+  await page
+    .getByRole("button", { name: "Reject optional cookies" })
+    .click();
+
+  await expect(
+    page.getByRole("heading", { name: "Frequently asked questions" }),
+  ).toBeVisible();
+  await expect(
+    page.locator(".donation-faq-appeal-button"),
+  ).toHaveAttribute("href", /paypal\.com\/donate/);
+
+  await page.getByText("How can I donate?", { exact: true }).click();
+  await expect(
+    page.getByText(/donate online through PayPal or GoFundMe/i),
+  ).toBeVisible();
 });
 
 test("donation page offers payment choices without an extra click", async ({ page }) => {

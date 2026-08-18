@@ -4115,6 +4115,438 @@ select {
 }
 
 /* =========================================================
+   COOKIE CONSENT AND PREFERENCE CENTRE
+   ========================================================= */
+
+.cookie-consent-backdrop {
+  position: fixed;
+  z-index: 1000100;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 28px;
+  background: rgba(3, 15, 32, 0.72);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+}
+
+.cookie-consent-panel {
+  width: min(1120px, 100%);
+  max-height: calc(100vh - 56px);
+  overflow-y: auto;
+  padding: clamp(28px, 5vw, 54px);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: 28px;
+  background: var(--colour-white);
+  box-shadow: 0 32px 90px rgba(3, 15, 32, 0.38);
+}
+
+.cookie-consent-panel:has(.cookie-consent-copy) {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(250px, 320px);
+  gap: clamp(34px, 6vw, 76px);
+  align-items: center;
+}
+
+.cookie-consent-copy h2,
+.cookie-settings-heading h2 {
+  margin: 8px 0 18px;
+  color: var(--colour-navy-950);
+  font-family: var(--font-display), Georgia, "Times New Roman", serif;
+  font-size: clamp(2rem, 4vw, 3.35rem);
+  font-weight: 500;
+  line-height: 1.05;
+}
+
+.cookie-consent-copy > p:last-child,
+.cookie-settings-intro {
+  margin: 0;
+  color: var(--colour-muted);
+  font-size: 1.02rem;
+  line-height: 1.75;
+}
+
+.cookie-consent-copy a {
+  color: var(--colour-green-600);
+  font-weight: 800;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.cookie-consent-actions,
+.cookie-settings-actions {
+  display: grid;
+  gap: 13px;
+}
+
+.cookie-consent-primary,
+.cookie-consent-secondary {
+  min-height: 54px;
+  padding: 13px 22px;
+  border-radius: var(--radius-pill);
+  font: inherit;
+  font-weight: 850;
+  cursor: pointer;
+  transition:
+    transform var(--transition-fast),
+    background-color var(--transition-fast),
+    border-color var(--transition-fast);
+}
+
+.cookie-consent-primary {
+  border: 2px solid var(--colour-green-600);
+  background: var(--colour-green-600);
+  color: var(--colour-white);
+}
+
+.cookie-consent-secondary {
+  border: 2px solid var(--colour-green-600);
+  background: var(--colour-white);
+  color: var(--colour-green-600);
+}
+
+.cookie-consent-primary:hover,
+.cookie-consent-secondary:hover {
+  transform: translateY(-2px);
+}
+
+.cookie-consent-primary:hover {
+  border-color: #196441;
+  background: #196441;
+}
+
+.cookie-consent-secondary:hover {
+  background: rgba(35, 122, 85, 0.08);
+}
+
+.cookie-settings-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.cookie-settings-close {
+  width: 46px;
+  height: 46px;
+  flex: 0 0 auto;
+  border: 1px solid var(--colour-border);
+  border-radius: 50%;
+  background: var(--colour-white);
+  color: var(--colour-navy-950);
+  font: inherit;
+  font-size: 1.8rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.cookie-preference-list {
+  display: grid;
+  margin: 30px 0;
+  border: 1px solid var(--colour-border);
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.cookie-preference-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 30px;
+  padding: 20px 22px;
+  background: var(--colour-white);
+}
+
+.cookie-preference-row + .cookie-preference-row {
+  border-top: 1px solid var(--colour-border);
+}
+
+.cookie-preference-row > div,
+.cookie-preference-row > span:first-child {
+  display: grid;
+  gap: 5px;
+}
+
+.cookie-preference-row strong {
+  color: var(--colour-navy-950);
+}
+
+.cookie-preference-row strong + span {
+  color: var(--colour-muted);
+  line-height: 1.55;
+}
+
+.cookie-preference-row input {
+  width: 24px;
+  height: 24px;
+  flex: 0 0 auto;
+  accent-color: var(--colour-green-600);
+}
+
+.cookie-always-on {
+  flex: 0 0 auto;
+  color: var(--colour-green-600);
+  font-size: 0.8rem;
+  font-weight: 850;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.cookie-settings-actions {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.compact-footer-cookie-button {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.compact-footer-cookie-button:hover {
+  color: var(--colour-gold-500);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+@media (max-width: 760px) {
+  .cookie-consent-backdrop {
+    align-items: end;
+    padding: 0;
+  }
+
+  .cookie-consent-panel {
+    width: 100%;
+    max-height: min(86vh, 760px);
+    padding: 28px 20px max(28px, env(safe-area-inset-bottom));
+    border-radius: 24px 24px 0 0;
+  }
+
+  .cookie-consent-panel:has(.cookie-consent-copy) {
+    grid-template-columns: 1fr;
+    gap: 26px;
+  }
+
+  .cookie-consent-copy h2,
+  .cookie-settings-heading h2 {
+    font-size: 2.25rem;
+  }
+
+  .cookie-settings-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .cookie-preference-row {
+    gap: 18px;
+    padding: 18px 16px;
+  }
+}
+
+/* =========================================================
+   DONATION FAQ
+   ========================================================= */
+
+.donation-faq-section {
+  background:
+    radial-gradient(circle at 85% 12%, rgba(232, 177, 31, 0.14), transparent 27%),
+    var(--colour-soft);
+}
+
+.donation-faq-appeal {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+  margin-bottom: clamp(56px, 8vw, 92px);
+  padding: clamp(25px, 4vw, 40px) clamp(26px, 5vw, 54px);
+  border-radius: var(--radius-large);
+  background: var(--colour-navy-950);
+  color: var(--colour-white);
+  box-shadow: var(--shadow-medium);
+}
+
+.donation-faq-appeal div {
+  display: grid;
+  gap: 7px;
+}
+
+.donation-faq-appeal p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 0.8rem;
+  font-weight: 850;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.donation-faq-appeal strong {
+  font-family: var(--font-display), Georgia, "Times New Roman", serif;
+  font-size: clamp(1.7rem, 3vw, 2.6rem);
+  font-weight: 500;
+}
+
+.donation-faq-appeal-button {
+  min-height: 58px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  flex: 0 0 auto;
+  padding: 14px 28px;
+  border-radius: var(--radius-pill);
+  background: var(--colour-gold-500);
+  color: var(--colour-navy-950);
+  font-weight: 900;
+  box-shadow: 0 14px 30px rgba(204, 148, 0, 0.24);
+  transition:
+    transform var(--transition-fast),
+    background-color var(--transition-fast);
+}
+
+.donation-faq-appeal-button:hover {
+  background: #f2c13b;
+  transform: translateY(-2px);
+}
+
+.donation-faq-layout {
+  display: grid;
+  grid-template-columns: minmax(250px, 0.72fr) minmax(0, 1.28fr);
+  gap: clamp(44px, 7vw, 92px);
+  align-items: start;
+}
+
+.donation-faq-intro {
+  position: sticky;
+  top: 130px;
+}
+
+.donation-faq-intro h2 {
+  margin: 12px 0 20px;
+  color: var(--colour-navy-950);
+  font-family: var(--font-display), Georgia, "Times New Roman", serif;
+  font-size: clamp(2.6rem, 5vw, 4.6rem);
+  font-weight: 500;
+  line-height: 0.98;
+}
+
+.donation-faq-intro > p:last-child {
+  margin: 0;
+  color: var(--colour-muted);
+  line-height: 1.72;
+}
+
+.donation-faq-list {
+  display: grid;
+  gap: 13px;
+}
+
+.donation-faq-item {
+  border: 1px solid var(--colour-border);
+  border-radius: 18px;
+  background: var(--colour-white);
+  box-shadow: var(--shadow-small);
+  overflow: hidden;
+}
+
+.donation-faq-item summary {
+  min-height: 86px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 21px 24px;
+  color: var(--colour-navy-950);
+  font-size: 1.03rem;
+  font-weight: 850;
+  cursor: pointer;
+  list-style: none;
+}
+
+.donation-faq-item summary::-webkit-details-marker {
+  display: none;
+}
+
+.donation-faq-icon {
+  position: relative;
+  width: 38px;
+  height: 38px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: var(--colour-green-600);
+}
+
+.donation-faq-icon::before,
+.donation-faq-icon::after {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 14px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--colour-white);
+  content: "";
+  transform: translate(-50%, -50%);
+  transition: transform var(--transition-fast);
+}
+
+.donation-faq-icon::after {
+  transform: translate(-50%, -50%) rotate(90deg);
+}
+
+.donation-faq-item[open] .donation-faq-icon::after {
+  transform: translate(-50%, -50%) rotate(0deg);
+}
+
+.donation-faq-answer {
+  padding: 0 76px 25px 24px;
+  color: var(--colour-muted);
+  line-height: 1.72;
+}
+
+.donation-faq-answer p {
+  margin: 0;
+}
+
+.donation-faq-answer a {
+  color: var(--colour-green-600);
+  font-weight: 800;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+@media (max-width: 860px) {
+  .donation-faq-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .donation-faq-intro {
+    position: static;
+  }
+}
+
+@media (max-width: 620px) {
+  .donation-faq-appeal {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .donation-faq-appeal-button {
+    width: 100%;
+  }
+
+  .donation-faq-item summary {
+    min-height: 78px;
+    padding: 18px;
+  }
+
+  .donation-faq-answer {
+    padding: 0 18px 22px;
+  }
+}
+
+/* =========================================================
    GAF MOBILE NAVIGATION — FINAL AUTHORITATIVE VERSION
    UNICEF-STYLE MOBILE BEHAVIOUR
    ========================================================= */

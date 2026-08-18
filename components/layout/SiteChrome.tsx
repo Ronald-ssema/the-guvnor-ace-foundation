@@ -8,6 +8,7 @@ import Footer from "@/components/layout/Footer";
 import Navbar from "@/components/layout/Navbar";
 import PageGalleryOutlet from "@/components/media/PageGalleryOutlet";
 import WebsiteCopyRuntime from "@/components/cms/WebsiteCopyRuntime";
+import CookieConsent from "@/components/privacy/CookieConsent";
 import type { SiteEditorSettings } from "@/lib/cms/siteEditor";
 import type { ResolvedWebsiteImages } from "@/lib/cms/websiteImages";
 import type { WebsiteTextSettings } from "@/lib/cms/websiteText";
@@ -46,6 +47,7 @@ export default function SiteChrome({
       <div className="cms-copy-scope" data-cms-scope="global-tools">
         {pathname !== "/donate" && <GlobalDonateCta donations={settings.donations} />}
         <FoundationAssistant contact={settings.contact} />
+        <CookieConsent />
       </div>
       <WebsiteCopyRuntime settings={textSettings} />
     </>
