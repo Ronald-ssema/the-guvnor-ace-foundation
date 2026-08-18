@@ -5,6 +5,12 @@ import { revalidatePath } from "next/cache";
 import sharp from "sharp";
 import { getAdminContext } from "@/lib/admin/auth";
 import { containsStoragePath } from "@/lib/admin/mediaReferences";
+import { fallbackHomeHero } from "@/lib/cms/home";
+import { parseSiteEditorSettings } from "@/lib/cms/siteEditor";
+import {
+  websiteImageSlotKeys,
+  type WebsiteImageSettings,
+} from "@/lib/cms/websiteImages";
 
 export type MediaActionState = {
   status: "idle" | "success" | "error";
@@ -69,6 +75,186 @@ async function processImage(file: File) {
 
 function revalidateMediaPages() {
   for (const path of MEDIA_REVALIDATION_PATHS) revalidatePath(path);
+}
+
+function mediaPath(formData: FormData, name: string) {
+  const value = String(formData.get(name) ?? "").trim();
+  if (value.length > 500) throw new Error("An image reference is too long.");
+  return value || null;
+}
+
+export async function updateWebsiteImages(
+  _previousState: MediaActionState,
+  formData: FormData,
+): Promise<MediaActionState> {
+  const admin = await getAdminContext();
+  if (!admin) return { status: "error", message: "Your session has expired. Sign in again." };
+
+  try {
+    const heroImagePath = mediaPath(formData, "hero_imagePath");
+    const storyImagePath = mediaPath(formData, "story_imagePath");
+    const galleryMediaPaths = [
+      ...new Set(
+        formData
+          .getAll("gallery_mediaPath")
+          .map((item) => String(item).trim())
+          .filter(Boolean),
+      ),
+    ].slice(0, 24);
+
+    const slots = Object.fromEntries(
+      websiteImageSlotKeys.map((key) => {
+        const alt = String(formData.get(`${key}_alt`) ?? "").trim();
+        if (!alt || alt.length > 180) {
+          throw new Error("Every visible website photograph needs a description of 180 characters or fewer.");
+        }
+        return [
+          key,
+          {
+            mediaPath: mediaPath(formData, `${key}_mediaPath`),
+            visible: formData.get(`${key}_visible`) === "on",
+            alt,
+          },
+        ];
+      }),
+    ) as WebsiteImageSettings["slots"];
+
+    const galleryTitle = String(formData.get("gallery_title") ?? "").trim();
+    if (!galleryTitle || galleryTitle.length > 100) {
+      throw new Error("Add a gallery heading of no more than 100 characters.");
+    }
+
+    const selectedPaths = [
+      heroImagePath,
+      storyImagePath,
+      ...websiteImageSlotKeys.map((key) => slots[key].mediaPath),
+      ...galleryMediaPaths,
+    ].filter((item): item is string => Boolean(item));
+
+    if (selectedPaths.length) {
+      const uniquePaths = [...new Set(selectedPaths)];
+      const { data: eligibleMedia, error: mediaError } = await admin.supabase
+        .from("media_assets")
+        .select("storage_path")
+        .in("storage_path", uniquePaths)
+        .eq("media_kind", "image")
+        .eq("is_published", true)
+        .eq("consent_confirmed", true)
+        .not("safeguarding_reviewed_at", "is", null);
+
+      if (mediaError || (eligibleMedia ?? []).length !== uniquePaths.length) {
+        throw new Error("Use only published, consent-confirmed photographs from the media library.");
+      }
+    }
+
+    const [{ data: storedHero }, { data: storedEditor }] = await Promise.all([
+      admin.supabase
+        .from("site_content")
+        .select("title, body, content")
+        .eq("page_slug", "home")
+        .eq("section_key", "hero")
+        .maybeSingle(),
+      admin.supabase
+        .from("site_settings")
+        .select("value")
+        .eq("setting_key", "visual_editor")
+        .maybeSingle(),
+    ]);
+
+    const storedHeroContent =
+      storedHero?.content && typeof storedHero.content === "object"
+        ? (storedHero.content as Record<string, unknown>)
+        : {};
+    const heroAlt = String(formData.get("hero_alt") ?? "").trim();
+    const storyAlt = String(formData.get("story_alt") ?? "").trim();
+    if (!heroAlt || heroAlt.length > 180 || !storyAlt || storyAlt.length > 180) {
+      throw new Error("The homepage image descriptions must be 180 characters or fewer.");
+    }
+
+    const editor = parseSiteEditorSettings(storedEditor?.value);
+    editor.homeSections.story.imagePath = storyImagePath;
+    editor.homeSections.story.imageUrl = null;
+    editor.homeSections.story.imageAlt = storyAlt;
+
+    const websiteImages: WebsiteImageSettings = {
+      slots,
+      gallery: {
+        visible: formData.get("gallery_visible") === "on",
+        title: galleryTitle,
+        mediaPaths: galleryMediaPaths,
+      },
+    };
+
+    const heroResult = await admin.supabase.from("site_content").upsert(
+      {
+        page_slug: "home",
+        section_key: "hero",
+        title: storedHero?.title || fallbackHomeHero.title,
+        body: storedHero?.body || fallbackHomeHero.description,
+        content: {
+          ...storedHeroContent,
+          kicker:
+            typeof storedHeroContent.kicker === "string"
+              ? storedHeroContent.kicker
+              : fallbackHomeHero.kicker,
+          imagePath: heroImagePath,
+          imageAlt: heroAlt,
+        },
+        is_published: true,
+        updated_by: admin.userId,
+      },
+      { onConflict: "page_slug,section_key" },
+    );
+    if (heroResult.error) throw heroResult.error;
+
+    const editorResult = await admin.supabase.from("site_settings").upsert(
+      {
+        setting_key: "visual_editor",
+        label: "Safe visual website editor",
+        value: editor,
+        is_public: true,
+        updated_by: admin.userId,
+      },
+      { onConflict: "setting_key" },
+    );
+    if (editorResult.error) throw editorResult.error;
+
+    const { data: saved, error } = await admin.supabase
+      .from("site_settings")
+      .upsert(
+        {
+          setting_key: "website_images",
+          label: "Website image placements and gallery",
+          value: websiteImages,
+          is_public: true,
+          updated_by: admin.userId,
+        },
+        { onConflict: "setting_key" },
+      )
+      .select("id")
+      .single();
+    if (error) throw error;
+
+    await admin.supabase.from("admin_audit_log").insert({
+      actor_id: admin.userId,
+      action: "update",
+      entity_type: "site_settings",
+      entity_id: saved.id,
+      details: {
+        setting_key: "website_images",
+        gallery_items: galleryMediaPaths.length,
+        controlled_fields: true,
+      },
+    });
+
+    revalidateMediaPages();
+    return { status: "success", message: "Website photographs and gallery saved and published." };
+  } catch (error) {
+    return {
+      status: "error",
+      message: error instanceof Error ? error.message : "Unable to save the website photographs.",
+    };
+  }
 }
 
 export async function uploadImage(

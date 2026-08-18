@@ -1,13 +1,14 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { SiteEditorSettings } from "@/lib/cms/siteEditor";
+import type { ResolvedWebsiteImages, WebsiteImageSlotKey } from "@/lib/cms/websiteImages";
 
 const programmes = [
   {
     title: "Food & Nutrition",
     description:
       "Providing practical food support and essential supplies to vulnerable children and families.",
-    image: "/images/food-drive.jpg",
+    imageKey: "food" as WebsiteImageSlotKey,
     href: "/programmes#food-and-nutrition",
     number: "01",
   },
@@ -15,7 +16,7 @@ const programmes = [
     title: "Education",
     description:
       "Helping children access learning materials, educational support and opportunities to build brighter futures.",
-    image: "/images/education.jpg",
+    imageKey: "education" as WebsiteImageSlotKey,
     href: "/programmes#education",
     number: "02",
   },
@@ -23,7 +24,7 @@ const programmes = [
     title: "Children & Families",
     description:
       "Supporting children and families facing hardship through compassionate, practical and community-led assistance.",
-    image: "/images/child-1.jpg",
+    imageKey: "childOne" as WebsiteImageSlotKey,
     href: "/programmes#family-support",
     number: "03",
   },
@@ -49,8 +50,10 @@ const principles = [
 
 export default function TrustSections({
   settings,
+  images,
 }: {
   settings: SiteEditorSettings;
+  images: ResolvedWebsiteImages["slots"];
 }) {
   const sections = settings.homeSections;
 
@@ -82,18 +85,21 @@ export default function TrustSections({
                 className="gaf-programme-card"
                 key={programme.title}
               >
+                {images[programme.imageKey].visible && (
                 <div className="gaf-programme-image">
                   <Image
-                    src={programme.image}
-                    alt={programme.title}
+                    src={images[programme.imageKey].src}
+                    alt={images[programme.imageKey].alt}
                     fill
                     sizes="(max-width: 800px) 100vw, 33vw"
+                    unoptimized={images[programme.imageKey].src.startsWith("http")}
                   />
 
                   <span className="gaf-programme-number">
                     {programme.number}
                   </span>
                 </div>
+                )}
 
                 <div className="gaf-programme-copy">
                   <div>

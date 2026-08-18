@@ -5,6 +5,7 @@ import { buildOrganizationJsonLd } from "@/lib/structured-data";
 import { createPageMetadata } from "@/lib/seo";
 import { getHomeHeroContent } from "@/lib/cms/home";
 import { getSiteEditorSettings } from "@/lib/cms/siteEditor";
+import { getWebsiteImageSettings } from "@/lib/cms/websiteImages";
 
 
 export const metadata = createPageMetadata({
@@ -17,9 +18,10 @@ export const metadata = createPageMetadata({
 export const revalidate = 300;
 
 export default async function HomePage() {
-  const [hero, editorSettings] = await Promise.all([
+  const [hero, editorSettings, websiteImages] = await Promise.all([
     getHomeHeroContent(),
     getSiteEditorSettings(),
+    getWebsiteImageSettings(),
   ]);
 
   return (
@@ -34,8 +36,8 @@ export default async function HomePage() {
       />
 
       <Hero content={hero} />
-      <HomeSections />
-      <TrustSections settings={editorSettings} />
+      <HomeSections image={websiteImages.slots.about} />
+      <TrustSections settings={editorSettings} images={websiteImages.slots} />
     </>
   );
 }

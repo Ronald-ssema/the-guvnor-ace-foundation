@@ -5,6 +5,7 @@ import { PageHero } from "@/components/ui/PageHero";
 
 import { createPageMetadata } from "@/lib/seo";
 import { getSiteEditorSettings, isExternalHref } from "@/lib/cms/siteEditor";
+import { getWebsiteImageSettings, type WebsiteImageSlotKey } from "@/lib/cms/websiteImages";
 export const metadata = createPageMetadata({
   title: "Our Programmes",
   description:
@@ -18,7 +19,7 @@ const programmes = [
     title: "Food and Nutrition",
     description:
       "Providing meals and essential food assistance to vulnerable children and families.",
-    image: "/images/food-drive.jpg",
+    imageKey: "food" as WebsiteImageSlotKey,
     activities: [
       "Community food distribution",
       "Emergency household food support",
@@ -31,7 +32,7 @@ const programmes = [
     title: "Education Support",
     description:
       "Helping children access learning materials, school support and educational opportunities.",
-    image: "/images/education.jpg",
+    imageKey: "education" as WebsiteImageSlotKey,
     activities: [
       "School materials and learning supplies",
       "Education-related family support",
@@ -44,7 +45,7 @@ const programmes = [
     title: "Community Outreach",
     description:
       "Working with communities to identify practical needs and deliver responsible assistance.",
-    image: "/images/about.jpg",
+    imageKey: "about" as WebsiteImageSlotKey,
     activities: [
       "Community needs assessment",
       "Family support referrals",
@@ -55,7 +56,10 @@ const programmes = [
 ];
 
 export default async function ProgrammesPage() {
-  const settings = await getSiteEditorSettings();
+  const [settings, websiteImages] = await Promise.all([
+    getSiteEditorSettings(),
+    getWebsiteImageSettings(),
+  ]);
   const hero = settings.pages.programmes;
 
   return (
@@ -87,19 +91,22 @@ export default async function ProgrammesPage() {
           id={programme.id}
           key={programme.id}
         >
-          <div className="site-container content-grid">
+          <div className={`site-container content-grid ${websiteImages.slots[programme.imageKey].visible ? "" : "content-grid-without-image"}`}>
+            {websiteImages.slots[programme.imageKey].visible && (
             <div
               className="content-image"
               style={{ order: index % 2 === 1 ? 2 : 1 }}
             >
               <Image
-                src={programme.image}
-                alt={`${programme.title} programme by The Guvnor Ace Foundation`}
+                src={websiteImages.slots[programme.imageKey].src}
+                alt={websiteImages.slots[programme.imageKey].alt}
                 fill
                 sizes="(max-width: 950px) 100vw, 50vw"
                 style={{ objectFit: "cover" }}
+                unoptimized={websiteImages.slots[programme.imageKey].src.startsWith("http")}
               />
             </div>
+            )}
 
             <div
               className="content-copy"
