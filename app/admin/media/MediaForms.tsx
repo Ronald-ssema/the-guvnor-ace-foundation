@@ -1,14 +1,16 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import Image from "next/image";
 import {
   deleteImage,
+  quickReplaceWebsiteImage,
   replaceImage,
   uploadImage,
   updateImage,
   updateWebsiteImages,
   type MediaActionState,
+  type QuickImageTarget,
 } from "./actions";
 import {
   websiteImageSlotDetails,
@@ -105,6 +107,79 @@ function ImageChoice({
   );
 }
 
+function PlacementImageButton({
+  src,
+  alt,
+  label,
+  onClick,
+}: {
+  src: string;
+  alt: string;
+  label: string;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      className="admin-placement-image-button"
+      type="button"
+      onClick={onClick}
+      aria-label={`Replace ${label}`}
+    >
+      <Image src={src} alt={alt} width={720} height={450} unoptimized />
+      <span><strong>Click photograph to replace</strong><small>JPG, PNG or WebP</small></span>
+    </button>
+  );
+}
+
+function QuickReplacePanel({
+  target,
+  label,
+  currentAlt,
+  onClose,
+}: {
+  target: QuickImageTarget;
+  label: string;
+  currentAlt: string;
+  onClose: () => void;
+}) {
+  const actionWithTarget = quickReplaceWebsiteImage.bind(null, target);
+  const [state, action, pending] = useActionState(actionWithTarget, initialState);
+
+  return (
+    <div className="admin-quick-replace-backdrop" role="presentation">
+      <section className="admin-quick-replace-panel" role="dialog" aria-modal="true" aria-labelledby="quick-replace-heading">
+        <div className="admin-card-heading">
+          <div><p>Direct replacement</p><h2 id="quick-replace-heading">Replace {label}</h2></div>
+          <button type="button" className="admin-modal-close" onClick={onClose} aria-label="Close replacement panel">×</button>
+        </div>
+        <form action={action} className="admin-form" encType="multipart/form-data">
+          <label>
+            New photograph
+            <input name="quickFile" type="file" accept="image/jpeg,image/png,image/webp" required autoFocus />
+            <small>JPG, PNG or WebP. Maximum file size 5 MB.</small>
+          </label>
+          <label>
+            Image description
+            <input name="quickAltText" defaultValue={currentAlt} maxLength={180} required />
+            <small>Briefly describe what is visible for visitors using screen readers.</small>
+          </label>
+          <label className="admin-check">
+            <input name="quickConsent" type="checkbox" required />
+            <span>I confirm the Foundation holds appropriate consent or permission to publish this photograph.</span>
+          </label>
+          {state.message && <p className={`admin-message admin-message-${state.status}`} role="status">{state.message}</p>}
+          <div className="admin-form-actions">
+            <button type="button" className="admin-secondary-button" onClick={onClose}>Cancel</button>
+            <button type="submit" className="admin-primary-button" disabled={pending}>
+              {pending ? "Replacing…" : "Upload, replace and publish"}
+            </button>
+          </div>
+        </form>
+      </section>
+    </div>
+  );
+}
+
 export function WebsiteImageManager({
   media,
   settings,
@@ -117,8 +192,14 @@ export function WebsiteImageManager({
   story: FeaturedImage;
 }) {
   const [state, action, pending] = useActionState(updateWebsiteImages, initialState);
+  const [quickTarget, setQuickTarget] = useState<{
+    target: QuickImageTarget;
+    label: string;
+    alt: string;
+  } | null>(null);
 
   return (
+    <>
     <form action={action} className="admin-card admin-form admin-image-placement-form">
       <div className="admin-card-heading">
         <div>
@@ -129,18 +210,17 @@ export function WebsiteImageManager({
       </div>
 
       <p className="admin-editor-intro">
-        Every card below names the pages where the photograph appears. Choose a
-        published upload to replace it, or choose the original to restore it.
+        Click any photograph to upload and publish its replacement directly.
+        You can also choose an existing library image or restore the original below it.
       </p>
 
       <div className="admin-placement-grid">
         <article className="admin-placement-card">
-          <Image
+          <PlacementImageButton
             src={imageSource(media, hero.mediaPath, "/images/hero.jpg")}
             alt={hero.alt}
-            width={720}
-            height={450}
-            unoptimized
+            label="homepage main photograph"
+            onClick={() => setQuickTarget({ target: "hero", label: "homepage main photograph", alt: hero.alt })}
           />
           <div className="admin-placement-card-body">
             <div><strong>Homepage main photograph</strong><span>Homepage hero</span></div>
@@ -156,12 +236,11 @@ export function WebsiteImageManager({
         </article>
 
         <article className="admin-placement-card">
-          <Image
+          <PlacementImageButton
             src={imageSource(media, story.mediaPath, "/images/child-2.jpg")}
             alt={story.alt}
-            width={720}
-            height={450}
-            unoptimized
+            label="homepage safeguarding story photograph"
+            onClick={() => setQuickTarget({ target: "story", label: "homepage safeguarding story photograph", alt: story.alt })}
           />
           <div className="admin-placement-card-body">
             <div><strong>Homepage safeguarding story</strong><span>Homepage story section</span></div>
@@ -181,12 +260,11 @@ export function WebsiteImageManager({
           const details = websiteImageSlotDetails[key];
           return (
             <article className="admin-placement-card" key={key}>
-              <Image
+              <PlacementImageButton
                 src={imageSource(media, slot.mediaPath, details.fallbackSrc)}
                 alt={slot.alt}
-                width={720}
-                height={450}
-                unoptimized
+                label={details.label.toLowerCase()}
+                onClick={() => setQuickTarget({ target: key, label: details.label.toLowerCase(), alt: slot.alt })}
               />
               <div className="admin-placement-card-body">
                 <div><strong>{details.label}</strong><span>{details.usedOn}</span></div>
@@ -258,6 +336,16 @@ export function WebsiteImageManager({
         </button>
       </div>
     </form>
+    {quickTarget && (
+      <QuickReplacePanel
+        key={quickTarget.target}
+        target={quickTarget.target}
+        label={quickTarget.label}
+        currentAlt={quickTarget.alt}
+        onClose={() => setQuickTarget(null)}
+      />
+    )}
+    </>
   );
 }
 
