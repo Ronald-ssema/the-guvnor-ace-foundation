@@ -64,3 +64,24 @@ test("public pages provide a persistent one-click donation link", async ({ page 
     quickDonation.getByRole("link", { name: /donate now/i }),
   ).toHaveAttribute("href", /paypal\.com\/donate/);
 });
+
+test("public pages expose their wording to the same-origin admin preview", async ({ page }) => {
+  await page.goto("/");
+
+  const result = await page.evaluate(() => new Promise<{ path: string; count: number }>((resolve, reject) => {
+    const timeout = window.setTimeout(() => reject(new Error("CMS preview did not respond")), 8000);
+    const onMessage = (event: MessageEvent) => {
+      if (event.origin !== window.location.origin || event.data?.source !== "gaf-cms") return;
+      window.clearTimeout(timeout);
+      window.removeEventListener("message", onMessage);
+      resolve({ path: event.data.path, count: event.data.items?.length ?? 0 });
+    };
+    window.addEventListener("message", onMessage);
+    const iframe = document.createElement("iframe");
+    iframe.src = "/?cms-preview=1";
+    document.body.appendChild(iframe);
+  }));
+
+  expect(result.path).toBe("/");
+  expect(result.count).toBeGreaterThan(20);
+});

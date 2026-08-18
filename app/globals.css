@@ -5909,3 +5909,5 @@ r
     border-radius: 22px;
   }
 }
+/* Text CMS wrappers keep the original document layout intact. */
+.cms-copy-scope { display: contents; }

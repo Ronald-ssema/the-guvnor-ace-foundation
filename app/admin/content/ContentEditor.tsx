@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import type { HomeHeroContent } from "@/lib/cms/home";
+import CompleteWebsiteTextEditor from "./CompleteWebsiteTextEditor";
 import {
   editablePageKeys,
   homeSectionKeys,
@@ -41,7 +42,8 @@ export default function ContentEditor({
 
   return (
     <div className="admin-editor-stack">
-    <form action={heroAction} className="admin-card admin-form">
+      <CompleteWebsiteTextEditor />
+      <form action={heroAction} className="admin-card admin-form">
       <div className="admin-card-heading">
         <div>
           <p>Homepage</p>

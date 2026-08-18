@@ -10,11 +10,117 @@ import {
   type LayoutDensity,
   type SiteEditorSettings,
 } from "@/lib/cms/siteEditor";
+import {
+  editableWebsitePages,
+  parseWebsiteTextSettings,
+} from "@/lib/cms/websiteText";
 
 export type ContentActionState = {
   status: "idle" | "success" | "error";
   message: string;
 };
+
+type WebsiteTextChange = {
+  key: string;
+  scope: "page" | "global";
+  fallback: string;
+  value: string;
+};
+
+export async function updateCompleteWebsiteText(
+  _previousState: ContentActionState,
+  formData: FormData,
+): Promise<ContentActionState> {
+  const admin = await getAdminContext();
+  if (!admin) return { status: "error", message: "Your session has expired. Sign in again." };
+
+  try {
+    const path = String(formData.get("pagePath") ?? "").trim();
+    if (!editableWebsitePages.some((page) => page.path === path)) {
+      throw new Error("Choose a valid public website page.");
+    }
+
+    const raw = String(formData.get("changes") ?? "");
+    if (raw.length > 300_000) throw new Error("This page contains too much text to save at once.");
+    const parsed = JSON.parse(raw) as unknown;
+    if (!Array.isArray(parsed) || parsed.length > 800) {
+      throw new Error("The submitted page wording is not valid.");
+    }
+
+    const changes = parsed.map((item): WebsiteTextChange => {
+      if (!item || typeof item !== "object") throw new Error("The submitted wording is not valid.");
+      const change = item as Record<string, unknown>;
+      const key = String(change.key ?? "");
+      const scope = change.scope;
+      const fallback = typeof change.fallback === "string" ? change.fallback : "";
+      const value = typeof change.value === "string" ? change.value : "";
+      if (
+        !/^[a-z-]+:[a-f0-9]{8}:\d+$/.test(key) ||
+        (scope !== "page" && scope !== "global") ||
+        fallback.length > 2000 ||
+        value.length > 2000 ||
+        /[\u0000\u0008\u000B\u000C\u000E-\u001F]/.test(value)
+      ) {
+        throw new Error("One of the submitted text fields is not valid.");
+      }
+      if (scope === "page" && !key.startsWith("page:")) {
+        throw new Error("A page text field has an invalid position.");
+      }
+      if (scope === "global" && !key.startsWith("global-")) {
+        throw new Error("A global text field has an invalid position.");
+      }
+      return { key, scope, fallback, value: value.trim() };
+    });
+
+    const { data: stored, error: readError } = await admin.supabase
+      .from("site_settings")
+      .select("value")
+      .eq("setting_key", "website_text")
+      .maybeSingle();
+    if (readError) throw readError;
+    const settings = parseWebsiteTextSettings(stored?.value);
+    settings.pages[path] ??= {};
+
+    for (const change of changes) {
+      const target = change.scope === "global" ? settings.global : settings.pages[path];
+      if (change.value === change.fallback) delete target[change.key];
+      else target[change.key] = change.value;
+    }
+
+    const { data: saved, error } = await admin.supabase
+      .from("site_settings")
+      .upsert(
+        {
+          setting_key: "website_text",
+          label: "Complete website wording editor",
+          value: settings,
+          is_public: true,
+          updated_by: admin.userId,
+        },
+        { onConflict: "setting_key" },
+      )
+      .select("id")
+      .single();
+    if (error) throw error;
+
+    await admin.supabase.from("admin_audit_log").insert({
+      actor_id: admin.userId,
+      action: "update",
+      entity_type: "site_settings",
+      entity_id: saved.id,
+      details: { setting_key: "website_text", path, fields_reviewed: changes.length },
+    });
+
+    revalidatePath(path);
+    revalidatePath("/admin/content");
+    return { status: "success", message: "All wording on this page has been saved and published." };
+  } catch (error) {
+    return {
+      status: "error",
+      message: error instanceof Error ? error.message : "Unable to save this page wording.",
+    };
+  }
+}
 
 function field(
   formData: FormData,
