@@ -66,7 +66,10 @@ test("public pages provide a persistent one-click donation link", async ({ page 
 });
 
 test("public pages expose their wording to the same-origin admin preview", async ({ page }) => {
-  await page.goto("/");
+  // WebKit can receive a final Next.js development reload while the first page
+  // compilation settles. Wait for the page to become idle before creating the
+  // preview frame so the message listener is not attached to a stale document.
+  await page.goto("/", { waitUntil: "networkidle" });
 
   const result = await page.evaluate(() => new Promise<{ path: string; count: number }>((resolve, reject) => {
     const timeout = window.setTimeout(() => reject(new Error("CMS preview did not respond")), 8000);
