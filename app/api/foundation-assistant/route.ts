@@ -1,6 +1,7 @@
 import OpenAI from "openai";
 import { NextRequest, NextResponse } from "next/server";
 import { clientAddress, consumeRateLimit } from "@/lib/security/rateLimit";
+import { getSiteEditorSettings, type SiteEditorSettings } from "@/lib/cms/siteEditor";
 
 export const runtime = "nodejs";
 
@@ -15,7 +16,7 @@ type ChatMessage = {
   content: string;
 };
 
-const FOUNDATION_INFORMATION = `
+const foundationInformation = (settings: SiteEditorSettings) => `
 You are the official AI assistant for The Guvnor Ace Foundation.
 
 IDENTITY
@@ -23,7 +24,7 @@ The Guvnor Ace Foundation is a charitable organisation supporting vulnerable
 children, families and communities in Uganda.
 
 LOCATION
-Bunamwaya–Lubowa area, Entebbe Road, Wakiso District, Uganda.
+${settings.contact.location}
 
 PROGRAMME AREAS
 - Food assistance and nutrition
@@ -34,11 +35,12 @@ PROGRAMME AREAS
 - Sustainable opportunities for vulnerable families
 
 OFFICIAL CONTACT DETAILS
-Phone: +256 752 462 740
-Email: guvnorace@gmail.com
+Phone: ${settings.contact.phoneDisplay}
+Email: ${settings.contact.email}
 
 OFFICIAL LINKS
-GoFundMe: https://gofund.me/07e5b2cbf
+PayPal: ${settings.donations.paypal}
+GoFundMe: ${settings.donations.goFundMe}
 Linktree: https://linktr.ee/guvnoracefoundation
 Instagram: https://instagram.com/guvnoracefoundation
 TikTok: https://www.tiktok.com/@guvnoracefoundation
@@ -51,7 +53,7 @@ HOW TO RESPOND
 - Use short paragraphs and clear headings where helpful.
 - Explain relevant next steps.
 - Answer in English unless the visitor requests another language.
-- Explain how to donate only through the approved GoFundMe or Linktree.
+- Explain how to donate only through the approved PayPal, GoFundMe or Airtel Money options.
 - Explain volunteering and partnership enquiries clearly.
 - When information is unknown, say that it has not been confirmed.
 - Offer the official phone number and email when human assistance is needed.
@@ -233,9 +235,10 @@ export async function POST(request: NextRequest) {
       maxRetries: 1,
     });
 
+    const settings = await getSiteEditorSettings();
     const response = await openai.responses.create({
       model: "gpt-5-mini",
-      instructions: FOUNDATION_INFORMATION,
+      instructions: foundationInformation(settings),
       input: messages.map((message) => ({
         role: message.role,
         content: message.content,
@@ -282,7 +285,7 @@ export async function POST(request: NextRequest) {
       return jsonResponse(
         {
           error:
-            "Our Foundation Assistant is temporarily unavailable. Please contact us at guvnorace@gmail.com or +256 752 462 740.",
+            "Our Foundation Assistant is temporarily unavailable. Please use the contact details published on our Contact page.",
         },
         503,
       );

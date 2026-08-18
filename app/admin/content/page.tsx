@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import AdminShell from "@/components/admin/AdminShell";
 import { getAdminContext } from "@/lib/admin/auth";
 import { fallbackHomeHero, getHomeHeroContent } from "@/lib/cms/home";
+import { getSiteEditorSettings } from "@/lib/cms/siteEditor";
 import ContentEditor from "./ContentEditor";
 
 export const dynamic = "force-dynamic";
@@ -10,7 +11,7 @@ export default async function AdminContentPage() {
   const admin = await getAdminContext();
   if (!admin) redirect("/admin/mfa");
 
-  const [{ data: storedHero }, { data: media }] = await Promise.all([
+  const [{ data: storedHero }, { data: media }, settings] = await Promise.all([
     admin.supabase
       .from("site_content")
       .select("title, body, content")
@@ -22,7 +23,10 @@ export default async function AdminContentPage() {
       .select("storage_path, original_name, alt_text")
       .eq("media_kind", "image")
       .eq("is_published", true)
+      .eq("consent_confirmed", true)
+      .not("safeguarding_reviewed_at", "is", null)
       .order("created_at", { ascending: false }),
+    getSiteEditorSettings(),
   ]);
 
   let hero = await getHomeHeroContent();
@@ -42,10 +46,10 @@ export default async function AdminContentPage() {
     <AdminShell
       email={admin.email}
       role={admin.role}
-      title="Homepage content"
-      description="Update the main message and choose a safeguarding-approved image."
+      title="Visual website editor"
+      description="Safely update public text, links, images, section layout and approved brand options."
     >
-      <ContentEditor hero={hero} media={media ?? []} />
+      <ContentEditor hero={hero} media={media ?? []} settings={settings} />
     </AdminShell>
   );
 }

@@ -47,6 +47,42 @@
   box-sizing: border-box;
 }
 
+.gaf-home-sections {
+  display: flex;
+  flex-direction: column;
+}
+
+.gaf-story-caption {
+  position: absolute;
+  right: 14px;
+  bottom: 14px;
+  left: 14px;
+  z-index: 2;
+  padding: 9px 12px;
+  border-radius: 10px;
+  background: rgba(6, 23, 46, 0.82);
+  color: white;
+  font-size: 0.8rem;
+  backdrop-filter: blur(8px);
+}
+
+body.theme-emerald {
+  --colour-gold-500: #2f9d72;
+  --colour-gold-600: #237a55;
+  --colour-gold-100: #e7f7f0;
+}
+
+body.theme-blue {
+  --colour-gold-500: #4d91d8;
+  --colour-gold-600: #2166a8;
+  --colour-gold-100: #eaf4ff;
+}
+
+body.layout-compact {
+  --section-spacing: 82px;
+  --section-spacing-mobile: 58px;
+}
+
 html {
   scroll-behavior: smooth;
 }

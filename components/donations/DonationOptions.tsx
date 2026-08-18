@@ -2,17 +2,16 @@
 
 import { useState } from "react";
 
-import { supportLinks } from "@/lib/supportLinks";
+import type { SiteEditorSettings } from "@/lib/cms/siteEditor";
 
-const AIRTEL_NUMBER = "+256 752 462 740";
-
-const donationOptions = [
+function donationOptions(donations: SiteEditorSettings["donations"]) {
+return [
   {
     name: "PayPal",
     label: "Fast online donation",
     description:
       "Donate securely by card or PayPal from the UK or internationally.",
-    href: supportLinks.paypal,
+    href: donations.paypal,
     action: "Donate with PayPal",
     symbol: "P",
     featured: true,
@@ -23,7 +22,7 @@ const donationOptions = [
     label: "Official campaign",
     description:
       "Support our official fundraising campaign and follow campaign updates.",
-    href: supportLinks.goFundMe,
+    href: donations.goFundMe,
     action: "Donate on GoFundMe",
     symbol: "G",
     featured: false,
@@ -40,13 +39,18 @@ const donationOptions = [
     type: "airtel" as const,
   },
 ];
+}
 
-export default function DonationOptions() {
+export default function DonationOptions({
+  donations,
+}: {
+  donations: SiteEditorSettings["donations"];
+}) {
   const [copied, setCopied] = useState(false);
 
   const copyAirtelNumber = async () => {
     try {
-      await navigator.clipboard.writeText(AIRTEL_NUMBER);
+      await navigator.clipboard.writeText(donations.airtelNumber);
       setCopied(true);
 
       window.setTimeout(() => {
@@ -59,7 +63,7 @@ export default function DonationOptions() {
 
   return (
     <div className="donation-options-grid">
-      {donationOptions.map((option) => {
+      {donationOptions(donations).map((option) => {
         const isAirtel = option.type === "airtel";
 
         return (
@@ -95,12 +99,12 @@ export default function DonationOptions() {
               <div className="airtel-donation-details">
                 <div>
                   <span>Send your contribution to</span>
-                  <strong>{AIRTEL_NUMBER}</strong>
+                  <strong>{donations.airtelNumber}</strong>
                 </div>
 
                 <div>
                   <span>Account name</span>
-                  <strong>Ssemawere Ronald</strong>
+                  <strong>{donations.airtelAccountName}</strong>
                 </div>
 
                 <p>

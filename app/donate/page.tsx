@@ -2,7 +2,7 @@ import Link from "next/link";
 
 import DonationOptions from "@/components/donations/DonationOptions";
 import { PageHero } from "@/components/ui/PageHero";
-import { supportLinks } from "@/lib/supportLinks";
+import { getSiteEditorSettings, isExternalHref } from "@/lib/cms/siteEditor";
 
 import { createPageMetadata } from "@/lib/seo";
 export const metadata = createPageMetadata({
@@ -12,24 +12,27 @@ export const metadata = createPageMetadata({
   path: "/donate",
 });
 
-export default function DonatePage() {
+export default async function DonatePage() {
+  const settings = await getSiteEditorSettings();
+  const hero = settings.pages.donate;
+
   return (
     <>
       <PageHero
-        eyebrow="Support our mission"
-        title="Help us give children food, education and hope."
-        description="Donate securely in moments. Choose PayPal, GoFundMe or Airtel Money and your support can help fund practical programmes for vulnerable children and families in Uganda."
+        eyebrow={hero.eyebrow}
+        title={hero.title}
+        description={hero.description}
         actions={[
           {
-            label: "Donate securely with PayPal",
-            href: supportLinks.paypal,
-            external: true,
+            label: hero.primaryLabel,
+            href: hero.primaryHref,
+            external: isExternalHref(hero.primaryHref),
           },
           {
-            label: "Donate on GoFundMe",
-            href: supportLinks.goFundMe,
+            label: hero.secondaryLabel,
+            href: hero.secondaryHref,
             variant: "secondary",
-            external: true,
+            external: isExternalHref(hero.secondaryHref),
           },
         ]}
       />
@@ -55,7 +58,7 @@ export default function DonatePage() {
             </p>
           </div>
 
-          <DonationOptions />
+          <DonationOptions donations={settings.donations} />
         </div>
       </section>
 
@@ -116,7 +119,7 @@ export default function DonatePage() {
               </Link>
 
               <a
-                href={supportLinks.paypal}
+                href={settings.donations.paypal}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="secondary-button"

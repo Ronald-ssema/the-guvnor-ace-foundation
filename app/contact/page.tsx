@@ -11,6 +11,7 @@ import { SiLinktree } from "react-icons/si";
 
 import { PageHero } from "@/components/ui/PageHero";
 import { createPageMetadata } from "@/lib/seo";
+import { getSiteEditorSettings, isExternalHref } from "@/lib/cms/siteEditor";
 
 
 export const metadata = createPageMetadata({
@@ -19,36 +20,6 @@ export const metadata = createPageMetadata({
     "Contact The Guvnor Ace Foundation in Uganda about donations, volunteering, partnerships, programmes and official Foundation enquiries.",
   path: "/contact",
 });
-
-const contactMethods = [
-  {
-    label: "Email",
-    title: "Foundation enquiries",
-    description:
-      "Contact us about donations, volunteering, partnerships and programmes.",
-    value: "guvnorace@gmail.com",
-    href: "mailto:guvnorace@gmail.com",
-    icon: <FaEnvelope aria-hidden="true" />,
-  },
-  {
-    label: "Telephone and WhatsApp",
-    title: "Speak with our team",
-    description:
-      "Contact The Guvnor Ace Foundation during normal working hours.",
-    value: "+256 752 462 740",
-    href: "tel:+256752462740",
-    icon: <FaPhoneAlt aria-hidden="true" />,
-  },
-  {
-    label: "Location",
-    title: "Wakiso District, Uganda",
-    description:
-      "Bunamwaya–Lubowa area, along Entebbe Road, Wakiso District.",
-    value: "Learn more about us",
-    href: "/about",
-    icon: <FaMapMarkerAlt aria-hidden="true" />,
-  },
-];
 
 const socialLinks = [
   {
@@ -93,22 +64,53 @@ const socialLinks = [
   },
 ];
 
-export default function ContactPage() {
+export default async function ContactPage() {
+  const settings = await getSiteEditorSettings();
+  const hero = settings.pages.contact;
+  const contactMethods = [
+    {
+      label: "Email",
+      title: "Foundation enquiries",
+      description: "Contact us about donations, volunteering, partnerships and programmes.",
+      value: settings.contact.email,
+      href: `mailto:${settings.contact.email}`,
+      icon: <FaEnvelope aria-hidden="true" />,
+    },
+    {
+      label: "Telephone and WhatsApp",
+      title: "Speak with our team",
+      description: "Contact The Guvnor Ace Foundation during normal working hours.",
+      value: settings.contact.phoneDisplay,
+      href: `tel:${settings.contact.phoneHref}`,
+      icon: <FaPhoneAlt aria-hidden="true" />,
+    },
+    {
+      label: "Location",
+      title: "Wakiso District, Uganda",
+      description: settings.contact.location,
+      value: "Learn more about us",
+      href: "/about",
+      icon: <FaMapMarkerAlt aria-hidden="true" />,
+    },
+  ];
+
   return (
     <>
       <PageHero
-        eyebrow="Contact us"
-        title="We would be pleased to hear from you."
-        description="Contact The Guvnor Ace Foundation about donations, volunteering, partnerships, programme enquiries or responsible community support."
+        eyebrow={hero.eyebrow}
+        title={hero.title}
+        description={hero.description}
         actions={[
           {
-            label: "Support Our Mission",
-            href: "/donate",
+            label: hero.primaryLabel,
+            href: hero.primaryHref,
+            external: isExternalHref(hero.primaryHref),
           },
           {
-            label: "Volunteer With Us",
-            href: "/volunteer",
+            label: hero.secondaryLabel,
+            href: hero.secondaryHref,
             variant: "secondary",
+            external: isExternalHref(hero.secondaryHref),
           },
         ]}
       />

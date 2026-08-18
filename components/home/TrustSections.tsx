@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import type { SiteEditorSettings } from "@/lib/cms/siteEditor";
 
 const programmes = [
   {
@@ -46,28 +47,27 @@ const principles = [
   },
 ];
 
-export default function TrustSections() {
+export default function TrustSections({
+  settings,
+}: {
+  settings: SiteEditorSettings;
+}) {
+  const sections = settings.homeSections;
+
   return (
-    <>
-      <section className="gaf-programmes">
+    <div className="gaf-home-sections">
+      {sections.programmes.visible && (
+      <section className="gaf-programmes" style={{ order: sections.programmes.order }}>
         <div className="site-container">
           <div className="gaf-section-intro">
             <div>
-              <p className="gaf-section-kicker">What we do</p>
+              <p className="gaf-section-kicker">{sections.programmes.kicker}</p>
 
-              <h2>
-                Practical action.
-                <br />
-                Meaningful change.
-              </h2>
+              <h2>{sections.programmes.title}</h2>
             </div>
 
             <div className="gaf-section-intro-copy">
-              <p>
-                Our programmes respond to real community needs while keeping
-                dignity, safeguarding and accountability at the centre of
-                every decision.
-              </p>
+              <p>{sections.programmes.body}</p>
 
               <Link href="/programmes">
                 Explore all programmes <span>→</span>
@@ -108,23 +108,18 @@ export default function TrustSections() {
           </div>
         </div>
       </section>
+      )}
 
-      <section className="gaf-principles">
+      {sections.principles.visible && (
+      <section className="gaf-principles" style={{ order: sections.principles.order }}>
         <div className="site-container">
           <div className="gaf-principles-grid">
             <div className="gaf-principles-heading">
-              <p className="gaf-section-kicker">How we work</p>
+              <p className="gaf-section-kicker">{sections.principles.kicker}</p>
 
-              <h2>
-                Trust must be
-                <br />
-                earned.
-              </h2>
+              <h2>{sections.principles.title}</h2>
 
-              <p>
-                Strong charitable work requires more than good intentions. It
-                requires responsible systems, safeguarding and accountability.
-              </p>
+              <p>{sections.principles.body}</p>
             </div>
 
             <div className="gaf-principle-list">
@@ -142,26 +137,21 @@ export default function TrustSections() {
           </div>
         </div>
       </section>
+      )}
 
-      <section className="gaf-reporting" id="impact">
+      {sections.impact.visible && (
+      <section className="gaf-reporting" id="impact" style={{ order: sections.impact.order }}>
         <div className="site-container gaf-reporting-grid">
           <div>
             <p className="gaf-section-kicker gaf-section-kicker-light">
-              Our impact
+              {sections.impact.kicker}
             </p>
 
-            <h2>
-              Evidence before
-              <br />
-              numbers.
-            </h2>
+            <h2>{sections.impact.title}</h2>
           </div>
 
           <div className="gaf-reporting-copy">
-            <p className="gaf-reporting-lead">
-              We are building a reporting system that prioritises verified
-              information over impressive but unconfirmed figures.
-            </p>
+            <p className="gaf-reporting-lead">{sections.impact.body}</p>
 
             <p>
               Programme totals, expenditure information and project outcomes
@@ -198,32 +188,29 @@ export default function TrustSections() {
           </div>
         </div>
       </section>
+      )}
 
-      <section className="gaf-story">
+      {sections.story.visible && (
+      <section className="gaf-story" style={{ order: sections.story.order }}>
         <div className="site-container gaf-story-grid">
           <div className="gaf-story-image">
             <Image
-              src="/images/child-2.jpg"
-              alt="Children and families supported through community work"
+              src={sections.story.imageUrl || "/images/child-2.jpg"}
+              alt={sections.story.imageAlt}
               fill
               sizes="(max-width: 900px) 100vw, 50vw"
             />
+            {sections.story.caption && (
+              <span className="gaf-story-caption">{sections.story.caption}</span>
+            )}
           </div>
 
           <div className="gaf-story-copy">
-            <p className="gaf-section-kicker">Stories with dignity</p>
+            <p className="gaf-section-kicker">{sections.story.kicker}</p>
 
-            <h2>
-              People are more
-              <br />
-              than their hardship.
-            </h2>
+            <h2>{sections.story.title}</h2>
 
-            <p>
-              We believe stories should demonstrate impact without exploiting
-              the children and families at the centre of our work. Privacy,
-              consent and safeguarding must always come first.
-            </p>
+            <p>{sections.story.body}</p>
 
             <Link href="/safeguarding">
               Our safeguarding commitment <span>→</span>
@@ -231,20 +218,18 @@ export default function TrustSections() {
           </div>
         </div>
       </section>
+      )}
 
-      <section className="gaf-action">
+      {sections.action.visible && (
+      <section className="gaf-action" style={{ order: sections.action.order }}>
         <div className="site-container">
           <div className="gaf-action-panel">
             <div>
               <p className="gaf-section-kicker gaf-section-kicker-light">
-                Take action
+                {sections.action.kicker}
               </p>
 
-              <h2>
-                Help build a brighter
-                <br />
-                future.
-              </h2>
+              <h2>{sections.action.title}</h2>
             </div>
 
             <div className="gaf-action-buttons">
@@ -266,6 +251,7 @@ export default function TrustSections() {
           </div>
         </div>
       </section>
-    </>
+      )}
+    </div>
   );
 }

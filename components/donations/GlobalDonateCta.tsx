@@ -1,8 +1,12 @@
 import Link from "next/link";
 
-import { supportLinks } from "@/lib/supportLinks";
+import type { SiteEditorSettings } from "@/lib/cms/siteEditor";
 
-export default function GlobalDonateCta() {
+export default function GlobalDonateCta({
+  donations,
+}: {
+  donations: SiteEditorSettings["donations"];
+}) {
   return (
     <aside className="global-donation-cta" aria-label="Quick donation">
       <div className="global-donation-cta-copy">
@@ -13,7 +17,7 @@ export default function GlobalDonateCta() {
       <div className="global-donation-cta-actions">
         <Link href="/donate">Ways to give</Link>
         <a
-          href={supportLinks.paypal}
+          href={donations.paypal}
           target="_blank"
           rel="noopener noreferrer"
           className="global-donation-cta-button"

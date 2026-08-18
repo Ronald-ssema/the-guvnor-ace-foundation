@@ -5,6 +5,9 @@ import "../styles/admin.css";
 import SiteChrome from "@/components/layout/SiteChrome";
 import { siteConfig } from "@/lib/site";
 import { bodyFont, displayFont } from "./fonts";
+import { getSiteEditorSettings } from "@/lib/cms/siteEditor";
+
+export const revalidate = 300;
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
@@ -101,19 +104,21 @@ export const metadata: Metadata = {
   category: "charity",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const editorSettings = await getSiteEditorSettings();
+
   return (
     <html
       lang="en"
       data-scroll-behavior="smooth"
       className={`${bodyFont.variable} ${displayFont.variable}`}
     >
-      <body>
-        <SiteChrome>{children}</SiteChrome>
+      <body className={`theme-${editorSettings.appearance.accent} layout-${editorSettings.appearance.density}`}>
+        <SiteChrome settings={editorSettings}>{children}</SiteChrome>
       </body>
     </html>
   );

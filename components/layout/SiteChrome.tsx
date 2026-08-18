@@ -6,8 +6,15 @@ import FoundationAssistant from "@/components/ai/FoundationAssistant";
 import GlobalDonateCta from "@/components/donations/GlobalDonateCta";
 import Footer from "@/components/layout/Footer";
 import Navbar from "@/components/layout/Navbar";
+import type { SiteEditorSettings } from "@/lib/cms/siteEditor";
 
-export default function SiteChrome({ children }: { children: ReactNode }) {
+export default function SiteChrome({
+  children,
+  settings,
+}: {
+  children: ReactNode;
+  settings: SiteEditorSettings;
+}) {
   const pathname = usePathname();
   const isAdmin = pathname.startsWith("/admin");
 
@@ -20,9 +27,9 @@ export default function SiteChrome({ children }: { children: ReactNode }) {
       </a>
       <Navbar />
       <main id="main-content">{children}</main>
-      <Footer />
-      {pathname !== "/donate" && <GlobalDonateCta />}
-      <FoundationAssistant />
+      <Footer contact={settings.contact} />
+      {pathname !== "/donate" && <GlobalDonateCta donations={settings.donations} />}
+      <FoundationAssistant contact={settings.contact} />
     </>
   );
 }
