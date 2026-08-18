@@ -10,6 +10,7 @@ import {
 } from "react-icons/fa";
 import { SiLinktree } from "react-icons/si";
 import type { SiteEditorSettings } from "@/lib/cms/siteEditor";
+import CookieSettingsButton from "@/components/privacy/CookieSettingsButton";
 
 const socialLinks = [
   {
@@ -118,6 +119,7 @@ export default function Footer({
             <Link href="/safeguarding">Safeguarding</Link>
             <Link href="/privacy">Privacy</Link>
             <Link href="/cookies">Cookies</Link>
+            <CookieSettingsButton />
             <Link href="/accessibility">Accessibility</Link>
             <Link href="/terms">Terms</Link>
             <Link href="/complaints">Complaints</Link>
