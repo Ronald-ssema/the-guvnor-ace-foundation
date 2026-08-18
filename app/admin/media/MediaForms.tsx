@@ -13,6 +13,8 @@ import {
   type QuickImageTarget,
 } from "./actions";
 import {
+  pageGalleryDetails,
+  pageGalleryKeys,
   websiteImageSlotDetails,
   websiteImageSlotKeys,
   type WebsiteImageSettings,
@@ -43,6 +45,21 @@ export function MediaUploadForm() {
         Caption <span className="admin-optional">Optional</span>
         <textarea name="caption" rows={3} maxLength={300} />
       </label>
+      <fieldset className="admin-upload-destinations">
+        <legend>Add this photograph to pages <span className="admin-optional">Optional</span></legend>
+        <p>
+          Choose one or several pages. The photograph will be published in the photo gallery
+          section on every selected page. You can add up to 24 photographs per page.
+        </p>
+        <div className="admin-destination-grid">
+          {pageGalleryKeys.map((key) => (
+            <label className="admin-destination-choice" key={key}>
+              <input name="destinations" type="checkbox" value={key} />
+              <span><strong>{pageGalleryDetails[key].label}</strong><small>{pageGalleryDetails[key].path}</small></span>
+            </label>
+          ))}
+        </div>
+      </fieldset>
       <label className="admin-check">
         <input name="consentConfirmed" type="checkbox" required />
         <span>I confirm the Foundation holds appropriate consent or permission to use this image.</span>
@@ -288,49 +305,79 @@ export function WebsiteImageManager({
 
       <section className="admin-gallery-editor" aria-labelledby="gallery-editor-heading">
         <div className="admin-section-heading">
-          <div><p>Add more images</p><h2 id="gallery-editor-heading">Public photo gallery</h2></div>
-          <span>{settings.gallery.mediaPaths.length} selected</span>
+          <div><p>Add more images</p><h2 id="gallery-editor-heading">Page photo galleries</h2></div>
+          <span>Up to 24 per page</span>
         </div>
-        <div className="admin-form-grid">
-          <label>
-            Gallery heading
-            <input name="gallery_title" defaultValue={settings.gallery.title} maxLength={100} required />
-          </label>
-          <label className="admin-check admin-gallery-visible">
-            <input name="gallery_visible" type="checkbox" defaultChecked={settings.gallery.visible} />
-            <span>Show the gallery on the Stories page</span>
-          </label>
-        </div>
+        <p className="admin-editor-intro">
+          Open a page below to change its gallery title, show or hide the gallery, or add and remove photographs.
+          A photograph can be used on several pages.
+        </p>
 
-        {media.length ? (
-          <div className="admin-gallery-choice-grid">
-            {media.map((item) => (
-              <label className="admin-gallery-choice" key={item.storage_path}>
-                {item.image_url && (
-                  <Image src={item.image_url} alt={item.alt_text} width={420} height={280} unoptimized />
-                )}
-                <span>
-                  <input
-                    name="gallery_mediaPath"
-                    type="checkbox"
-                    value={item.storage_path}
-                    defaultChecked={settings.gallery.mediaPaths.includes(item.storage_path)}
-                  />
-                  <strong>{item.original_name}</strong>
-                </span>
-              </label>
-            ))}
-          </div>
-        ) : (
-          <div className="admin-empty-state admin-empty-state-compact">
-            Upload and publish photographs below; they will then appear here for you to add to the gallery.
-          </div>
-        )}
+        <div className="admin-page-gallery-list">
+          {pageGalleryKeys.map((key) => {
+            const gallery = settings.pageGalleries[key];
+            const details = pageGalleryDetails[key];
+            return (
+              <details className="admin-page-gallery" key={key} open={key === "stories"}>
+                <summary>
+                  <span><strong>{details.label}</strong><small>{details.path}</small></span>
+                  <em>{gallery.mediaPaths.length} {gallery.mediaPaths.length === 1 ? "photo" : "photos"}</em>
+                </summary>
+                <div className="admin-page-gallery-content">
+                  <div className="admin-form-grid">
+                    <label>
+                      Gallery heading
+                      <input
+                        name={`${key}_gallery_title`}
+                        defaultValue={gallery.title}
+                        maxLength={100}
+                        required
+                      />
+                    </label>
+                    <label className="admin-check admin-gallery-visible">
+                      <input
+                        name={`${key}_gallery_visible`}
+                        type="checkbox"
+                        defaultChecked={gallery.visible}
+                      />
+                      <span>Show this photo gallery on {details.label}</span>
+                    </label>
+                  </div>
+
+                  {media.length ? (
+                    <div className="admin-gallery-choice-grid">
+                      {media.map((item) => (
+                        <label className="admin-gallery-choice" key={item.storage_path}>
+                          {item.image_url && (
+                            <Image src={item.image_url} alt={item.alt_text} width={420} height={280} unoptimized />
+                          )}
+                          <span>
+                            <input
+                              name={`${key}_gallery_mediaPath`}
+                              type="checkbox"
+                              value={item.storage_path}
+                              defaultChecked={gallery.mediaPaths.includes(item.storage_path)}
+                            />
+                            <strong>{item.original_name}</strong>
+                          </span>
+                        </label>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="admin-empty-state admin-empty-state-compact">
+                      Upload and publish photographs below; they will then appear here.
+                    </div>
+                  )}
+                </div>
+              </details>
+            );
+          })}
+        </div>
       </section>
 
       {state.message && <p className={`admin-message admin-message-${state.status}`} role="status">{state.message}</p>}
       <div className="admin-form-actions admin-sticky-actions">
-        <a href="/stories" target="_blank" rel="noreferrer" className="admin-secondary-button">Preview stories</a>
+        <a href="/" target="_blank" rel="noreferrer" className="admin-secondary-button">Preview website</a>
         <button className="admin-primary-button" type="submit" disabled={pending}>
           {pending ? "Publishing…" : "Save and publish images"}
         </button>

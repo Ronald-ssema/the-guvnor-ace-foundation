@@ -10,6 +10,37 @@ export const websiteImageSlotKeys = [
 
 export type WebsiteImageSlotKey = (typeof websiteImageSlotKeys)[number];
 
+export const pageGalleryKeys = [
+  "home",
+  "about",
+  "programmes",
+  "impact",
+  "stories",
+  "getInvolved",
+  "volunteer",
+  "partnerships",
+  "donate",
+  "contact",
+] as const;
+
+export type PageGalleryKey = (typeof pageGalleryKeys)[number];
+
+export const pageGalleryDetails: Record<
+  PageGalleryKey,
+  { label: string; path: string; defaultTitle: string }
+> = {
+  home: { label: "Homepage", path: "/", defaultTitle: "Our work in pictures" },
+  about: { label: "About us", path: "/about", defaultTitle: "Our Foundation in pictures" },
+  programmes: { label: "Programmes", path: "/programmes", defaultTitle: "Our programmes in action" },
+  impact: { label: "Impact", path: "/impact", defaultTitle: "Our impact in pictures" },
+  stories: { label: "Stories", path: "/stories", defaultTitle: "Our work in pictures" },
+  getInvolved: { label: "Get involved", path: "/get-involved", defaultTitle: "Get involved with our work" },
+  volunteer: { label: "Volunteer", path: "/volunteer", defaultTitle: "Volunteering in pictures" },
+  partnerships: { label: "Partnerships", path: "/partnerships", defaultTitle: "Working together" },
+  donate: { label: "Donate", path: "/donate", defaultTitle: "Your support in action" },
+  contact: { label: "Contact", path: "/contact", defaultTitle: "Our community" },
+};
+
 export type WebsiteImageSlot = {
   mediaPath: string | null;
   visible: boolean;
@@ -18,11 +49,11 @@ export type WebsiteImageSlot = {
 
 export type WebsiteImageSettings = {
   slots: Record<WebsiteImageSlotKey, WebsiteImageSlot>;
-  gallery: {
+  pageGalleries: Record<PageGalleryKey, {
     visible: boolean;
     title: string;
     mediaPaths: string[];
-  };
+  }>;
 };
 
 export type ResolvedWebsiteImage = WebsiteImageSlot & {
@@ -38,11 +69,11 @@ export type ResolvedGalleryImage = {
 
 export type ResolvedWebsiteImages = {
   slots: Record<WebsiteImageSlotKey, ResolvedWebsiteImage>;
-  gallery: {
+  pageGalleries: Record<PageGalleryKey, {
     visible: boolean;
     title: string;
     images: ResolvedGalleryImage[];
-  };
+  }>;
 };
 
 export const websiteImageSlotDetails: Record<
@@ -92,11 +123,12 @@ export const fallbackWebsiteImageSettings: WebsiteImageSettings = {
       },
     ]),
   ) as Record<WebsiteImageSlotKey, WebsiteImageSlot>,
-  gallery: {
-    visible: true,
-    title: "Our work in pictures",
-    mediaPaths: [],
-  },
+  pageGalleries: Object.fromEntries(
+    pageGalleryKeys.map((key) => [
+      key,
+      { visible: true, title: pageGalleryDetails[key].defaultTitle, mediaPaths: [] },
+    ]),
+  ) as unknown as WebsiteImageSettings["pageGalleries"],
 };
 
 function objectValue(value: unknown): Record<string, unknown> {
@@ -108,7 +140,8 @@ function objectValue(value: unknown): Record<string, unknown> {
 export function parseWebsiteImageSettings(value: unknown): WebsiteImageSettings {
   const source = objectValue(value);
   const slots = objectValue(source.slots);
-  const gallery = objectValue(source.gallery);
+  const pageGalleries = objectValue(source.pageGalleries);
+  const legacyStoriesGallery = objectValue(source.gallery);
 
   return {
     slots: Object.fromEntries(
@@ -131,17 +164,30 @@ export function parseWebsiteImageSettings(value: unknown): WebsiteImageSettings 
         ];
       }),
     ) as Record<WebsiteImageSlotKey, WebsiteImageSlot>,
-    gallery: {
-      visible: typeof gallery.visible === "boolean" ? gallery.visible : true,
-      title:
-        typeof gallery.title === "string" && gallery.title.trim()
-          ? gallery.title.trim()
-          : fallbackWebsiteImageSettings.gallery.title,
-      mediaPaths: Array.isArray(gallery.mediaPaths)
-        ? [...new Set(gallery.mediaPaths.filter((item): item is string => typeof item === "string" && Boolean(item.trim())))]
-            .slice(0, 24)
-        : [],
-    },
+    pageGalleries: Object.fromEntries(
+      pageGalleryKeys.map((key) => {
+        const configured = objectValue(pageGalleries[key]);
+        const gallery = key === "stories" && !Object.keys(configured).length
+          ? legacyStoriesGallery
+          : configured;
+        const fallback = fallbackWebsiteImageSettings.pageGalleries[key];
+        return [
+          key,
+          {
+            visible: typeof gallery.visible === "boolean" ? gallery.visible : fallback.visible,
+            title:
+              typeof gallery.title === "string" && gallery.title.trim()
+                ? gallery.title.trim()
+                : fallback.title,
+            mediaPaths: Array.isArray(gallery.mediaPaths)
+              ? [...new Set(gallery.mediaPaths.filter(
+                  (item): item is string => typeof item === "string" && Boolean(item.trim()),
+                ))].slice(0, 24)
+              : [],
+          },
+        ];
+      }),
+    ) as WebsiteImageSettings["pageGalleries"],
   };
 }
 
@@ -159,7 +205,16 @@ export async function getWebsiteImageSettings(): Promise<ResolvedWebsiteImages> 
         },
       ]),
     ) as Record<WebsiteImageSlotKey, ResolvedWebsiteImage>,
-    gallery: { visible: true, title: fallbackWebsiteImageSettings.gallery.title, images: [] },
+    pageGalleries: Object.fromEntries(
+      pageGalleryKeys.map((key) => [
+        key,
+        {
+          visible: fallbackWebsiteImageSettings.pageGalleries[key].visible,
+          title: fallbackWebsiteImageSettings.pageGalleries[key].title,
+          images: [],
+        },
+      ]),
+    ) as unknown as ResolvedWebsiteImages["pageGalleries"],
   });
 
   if (!url || !key) return fallbackResolved();
@@ -178,7 +233,7 @@ export async function getWebsiteImageSettings(): Promise<ResolvedWebsiteImages> 
     const settings = parseWebsiteImageSettings(data?.value);
     const mediaPaths = [
       ...websiteImageSlotKeys.map((slotKey) => settings.slots[slotKey].mediaPath),
-      ...settings.gallery.mediaPaths,
+      ...pageGalleryKeys.flatMap((key) => settings.pageGalleries[key].mediaPaths),
     ].filter((item): item is string => Boolean(item));
 
     const mediaByPath = new Map<string, { alt_text: string; caption: string | null }>();
@@ -219,15 +274,25 @@ export async function getWebsiteImageSettings(): Promise<ResolvedWebsiteImages> 
           ];
         }),
       ) as Record<WebsiteImageSlotKey, ResolvedWebsiteImage>,
-      gallery: {
-        visible: settings.gallery.visible,
-        title: settings.gallery.title,
-        images: settings.gallery.mediaPaths.flatMap((mediaPath) => {
-          const media = mediaByPath.get(mediaPath);
-          const src = signedByPath.get(mediaPath);
-          return media && src ? [{ mediaPath, src, alt: media.alt_text, caption: media.caption }] : [];
+      pageGalleries: Object.fromEntries(
+        pageGalleryKeys.map((key) => {
+          const gallery = settings.pageGalleries[key];
+          return [
+            key,
+            {
+              visible: gallery.visible,
+              title: gallery.title,
+              images: gallery.mediaPaths.flatMap((mediaPath) => {
+                const media = mediaByPath.get(mediaPath);
+                const src = signedByPath.get(mediaPath);
+                return media && src
+                  ? [{ mediaPath, src, alt: media.alt_text, caption: media.caption }]
+                  : [];
+              }),
+            },
+          ];
         }),
-      },
+      ) as ResolvedWebsiteImages["pageGalleries"],
     };
   } catch {
     return fallbackResolved();
