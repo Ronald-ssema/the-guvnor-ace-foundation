@@ -6,13 +6,17 @@ import FoundationAssistant from "@/components/ai/FoundationAssistant";
 import GlobalDonateCta from "@/components/donations/GlobalDonateCta";
 import Footer from "@/components/layout/Footer";
 import Navbar from "@/components/layout/Navbar";
+import PageGalleryOutlet from "@/components/media/PageGalleryOutlet";
 import type { SiteEditorSettings } from "@/lib/cms/siteEditor";
+import type { ResolvedWebsiteImages } from "@/lib/cms/websiteImages";
 
 export default function SiteChrome({
   children,
+  galleries,
   settings,
 }: {
   children: ReactNode;
+  galleries: ResolvedWebsiteImages["pageGalleries"];
   settings: SiteEditorSettings;
 }) {
   const pathname = usePathname();
@@ -26,7 +30,10 @@ export default function SiteChrome({
         Skip to main content
       </a>
       <Navbar />
-      <main id="main-content">{children}</main>
+      <main id="main-content">
+        {children}
+        <PageGalleryOutlet galleries={galleries} />
+      </main>
       <Footer contact={settings.contact} />
       {pathname !== "/donate" && <GlobalDonateCta donations={settings.donations} />}
       <FoundationAssistant contact={settings.contact} />

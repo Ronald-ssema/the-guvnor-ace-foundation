@@ -9,7 +9,7 @@ describe("parseWebsiteImageSettings", () => {
     expect(parseWebsiteImageSettings(null)).toEqual(fallbackWebsiteImageSettings);
   });
 
-  it("keeps supported placements and removes duplicate gallery paths", () => {
+  it("keeps supported placements and migrates the legacy Stories gallery", () => {
     const settings = parseWebsiteImageSettings({
       slots: {
         food: {
@@ -36,10 +36,39 @@ describe("parseWebsiteImageSettings", () => {
       alt: "Food parcels prepared for distribution",
     });
     expect(settings.slots.about).toEqual(fallbackWebsiteImageSettings.slots.about);
-    expect(settings.gallery).toEqual({
+    expect(settings.pageGalleries.stories).toEqual({
       visible: false,
       title: "Community visits",
       mediaPaths: ["images/2026/one.webp", "images/2026/two.webp"],
     });
+    expect(settings.pageGalleries.about).toEqual(
+      fallbackWebsiteImageSettings.pageGalleries.about,
+    );
+  });
+
+  it("supports separate multi-photo galleries on several pages", () => {
+    const settings = parseWebsiteImageSettings({
+      pageGalleries: {
+        home: {
+          visible: true,
+          title: "Latest photographs",
+          mediaPaths: ["images/2026/shared.webp", "images/2026/home.webp"],
+        },
+        donate: {
+          visible: true,
+          title: "Your support at work",
+          mediaPaths: ["images/2026/shared.webp", "images/2026/donate.webp"],
+        },
+      },
+    });
+
+    expect(settings.pageGalleries.home.mediaPaths).toEqual([
+      "images/2026/shared.webp",
+      "images/2026/home.webp",
+    ]);
+    expect(settings.pageGalleries.donate.mediaPaths).toEqual([
+      "images/2026/shared.webp",
+      "images/2026/donate.webp",
+    ]);
   });
 });

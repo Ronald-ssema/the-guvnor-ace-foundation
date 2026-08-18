@@ -80,29 +80,6 @@ export default async function StoriesPage() {
         </div>
       </section>
 
-      {websiteImages.gallery.visible && websiteImages.gallery.images.length > 0 && (
-        <section className="section page-section-soft" aria-labelledby="public-gallery-heading">
-          <div className="site-container">
-            <div className="page-section-header">
-              <div>
-                <p className="section-eyebrow">Photo gallery</p>
-                <h2 id="public-gallery-heading">{websiteImages.gallery.title}</h2>
-              </div>
-              <p>Consent-cleared photographs from our programmes and community work.</p>
-            </div>
-            <div className="public-gallery-grid">
-              {websiteImages.gallery.images.map((image) => (
-                <figure className="public-gallery-item" key={image.mediaPath}>
-                  <div>
-                    <Image src={image.src} alt={image.alt} fill sizes="(max-width: 700px) 100vw, 33vw" unoptimized />
-                  </div>
-                  {image.caption && <figcaption>{image.caption}</figcaption>}
-                </figure>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
     </main>
   );
 }

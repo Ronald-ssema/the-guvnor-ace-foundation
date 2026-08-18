@@ -8,8 +8,11 @@ import { containsStoragePath } from "@/lib/admin/mediaReferences";
 import { fallbackHomeHero } from "@/lib/cms/home";
 import { parseSiteEditorSettings } from "@/lib/cms/siteEditor";
 import {
+  pageGalleryDetails,
+  pageGalleryKeys,
   parseWebsiteImageSettings,
   websiteImageSlotKeys,
+  type PageGalleryKey,
   type WebsiteImageSlotKey,
   type WebsiteImageSettings,
 } from "@/lib/cms/websiteImages";
@@ -37,6 +40,12 @@ const MEDIA_REVALIDATION_PATHS = [
   "/programmes",
   "/impact",
   "/reports",
+  "/about",
+  "/get-involved",
+  "/volunteer",
+  "/partnerships",
+  "/donate",
+  "/contact",
 ];
 
 function hasValidSignature(bytes: Uint8Array, mime: string) {
@@ -267,6 +276,50 @@ function mediaPath(formData: FormData, name: string) {
   return value || null;
 }
 
+function selectedGalleryDestinations(formData: FormData): PageGalleryKey[] {
+  const submitted = new Set(
+    formData.getAll("destinations").map((item) => String(item).trim()),
+  );
+  return pageGalleryKeys.filter((key) => submitted.has(key));
+}
+
+async function addImageToPageGalleries(
+  admin: NonNullable<Awaited<ReturnType<typeof getAdminContext>>>,
+  storagePath: string,
+  destinations: PageGalleryKey[],
+) {
+  const { data: storedImages, error: readError } = await admin.supabase
+    .from("site_settings")
+    .select("value")
+    .eq("setting_key", "website_images")
+    .maybeSingle();
+  if (readError) throw readError;
+
+  const settings = parseWebsiteImageSettings(storedImages?.value);
+  for (const key of destinations) {
+    const existingPaths = settings.pageGalleries[key].mediaPaths;
+    if (existingPaths.length >= 24 && !existingPaths.includes(storagePath)) {
+      throw new Error(`${pageGalleryDetails[key].label} already has the maximum of 24 photographs.`);
+    }
+    settings.pageGalleries[key].mediaPaths = [
+      ...new Set([...existingPaths, storagePath]),
+    ].slice(0, 24);
+    settings.pageGalleries[key].visible = true;
+  }
+
+  const { error } = await admin.supabase.from("site_settings").upsert(
+    {
+      setting_key: "website_images",
+      label: "Website image placements and page galleries",
+      value: settings,
+      is_public: true,
+      updated_by: admin.userId,
+    },
+    { onConflict: "setting_key" },
+  );
+  if (error) throw error;
+}
+
 export async function updateWebsiteImages(
   _previousState: MediaActionState,
   formData: FormData,
@@ -277,14 +330,29 @@ export async function updateWebsiteImages(
   try {
     const heroImagePath = mediaPath(formData, "hero_imagePath");
     const storyImagePath = mediaPath(formData, "story_imagePath");
-    const galleryMediaPaths = [
-      ...new Set(
-        formData
-          .getAll("gallery_mediaPath")
-          .map((item) => String(item).trim())
-          .filter(Boolean),
-      ),
-    ].slice(0, 24);
+    const pageGalleries = Object.fromEntries(
+      pageGalleryKeys.map((key) => {
+        const title = String(formData.get(`${key}_gallery_title`) ?? "").trim();
+        if (!title || title.length > 100) {
+          throw new Error(`Add a gallery heading of no more than 100 characters for ${pageGalleryDetails[key].label}.`);
+        }
+        return [
+          key,
+          {
+            visible: formData.get(`${key}_gallery_visible`) === "on",
+            title,
+            mediaPaths: [
+              ...new Set(
+                formData
+                  .getAll(`${key}_gallery_mediaPath`)
+                  .map((item) => String(item).trim())
+                  .filter(Boolean),
+              ),
+            ].slice(0, 24),
+          },
+        ];
+      }),
+    ) as WebsiteImageSettings["pageGalleries"];
 
     const slots = Object.fromEntries(
       websiteImageSlotKeys.map((key) => {
@@ -303,16 +371,11 @@ export async function updateWebsiteImages(
       }),
     ) as WebsiteImageSettings["slots"];
 
-    const galleryTitle = String(formData.get("gallery_title") ?? "").trim();
-    if (!galleryTitle || galleryTitle.length > 100) {
-      throw new Error("Add a gallery heading of no more than 100 characters.");
-    }
-
     const selectedPaths = [
       heroImagePath,
       storyImagePath,
       ...websiteImageSlotKeys.map((key) => slots[key].mediaPath),
-      ...galleryMediaPaths,
+      ...pageGalleryKeys.flatMap((key) => pageGalleries[key].mediaPaths),
     ].filter((item): item is string => Boolean(item));
 
     if (selectedPaths.length) {
@@ -362,11 +425,7 @@ export async function updateWebsiteImages(
 
     const websiteImages: WebsiteImageSettings = {
       slots,
-      gallery: {
-        visible: formData.get("gallery_visible") === "on",
-        title: galleryTitle,
-        mediaPaths: galleryMediaPaths,
-      },
+      pageGalleries,
     };
 
     const heroResult = await admin.supabase.from("site_content").upsert(
@@ -408,7 +467,7 @@ export async function updateWebsiteImages(
       .upsert(
         {
           setting_key: "website_images",
-          label: "Website image placements and gallery",
+          label: "Website image placements and page galleries",
           value: websiteImages,
           is_public: true,
           updated_by: admin.userId,
@@ -426,13 +485,16 @@ export async function updateWebsiteImages(
       entity_id: saved.id,
       details: {
         setting_key: "website_images",
-        gallery_items: galleryMediaPaths.length,
+        gallery_items: pageGalleryKeys.reduce(
+          (total, key) => total + pageGalleries[key].mediaPaths.length,
+          0,
+        ),
         controlled_fields: true,
       },
     });
 
     revalidateMediaPages();
-    return { status: "success", message: "Website photographs and gallery saved and published." };
+    return { status: "success", message: "Website photographs and page galleries saved and published." };
   } catch (error) {
     return {
       status: "error",
@@ -452,7 +514,8 @@ export async function uploadImage(
   const altText = String(formData.get("altText") ?? "").trim();
   const caption = String(formData.get("caption") ?? "").trim();
   const consentConfirmed = formData.get("consentConfirmed") === "on";
-  const publish = formData.get("publish") === "on";
+  const destinations = selectedGalleryDestinations(formData);
+  const publish = formData.get("publish") === "on" || destinations.length > 0;
 
   if (!(file instanceof File) || file.size === 0) {
     return { status: "error", message: "Choose an image to upload." };
@@ -514,6 +577,21 @@ export async function uploadImage(
     return { status: "error", message: "The image record could not be saved." };
   }
 
+  if (destinations.length > 0) {
+    try {
+      await addImageToPageGalleries(admin, storagePath, destinations);
+    } catch (error) {
+      await admin.supabase.from("media_assets").delete().eq("id", data.id);
+      await admin.supabase.storage.from("site-media").remove([storagePath]);
+      return {
+        status: "error",
+        message: error instanceof Error
+          ? error.message
+          : "The image could not be safely added to the selected website pages.",
+      };
+    }
+  }
+
   await admin.supabase.from("admin_audit_log").insert({
     actor_id: admin.userId,
     action: "create",
@@ -522,13 +600,20 @@ export async function uploadImage(
     details: {
       storage_path: storagePath,
       published: publish,
+      destinations,
       metadata_removed: true,
       original_mime_type: file.type,
     },
   });
 
   revalidateMediaPages();
-  return { status: "success", message: "Image uploaded successfully." };
+  const destinationLabels = destinations.map((key) => pageGalleryDetails[key].label);
+  return {
+    status: "success",
+    message: destinationLabels.length
+      ? `Image uploaded and added to ${destinationLabels.join(", ")}.`
+      : "Image uploaded successfully.",
+  };
 }
 
 export async function updateImage(

@@ -6,6 +6,7 @@ import SiteChrome from "@/components/layout/SiteChrome";
 import { siteConfig } from "@/lib/site";
 import { bodyFont, displayFont } from "./fonts";
 import { getSiteEditorSettings } from "@/lib/cms/siteEditor";
+import { getWebsiteImageSettings } from "@/lib/cms/websiteImages";
 
 export const revalidate = 300;
 
@@ -113,7 +114,10 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const editorSettings = await getSiteEditorSettings();
+  const [editorSettings, websiteImages] = await Promise.all([
+    getSiteEditorSettings(),
+    getWebsiteImageSettings(),
+  ]);
 
   return (
     <html
@@ -122,7 +126,9 @@ export default async function RootLayout({
       className={`${bodyFont.variable} ${displayFont.variable}`}
     >
       <body className={`theme-${editorSettings.appearance.accent} layout-${editorSettings.appearance.density}`}>
-        <SiteChrome settings={editorSettings}>{children}</SiteChrome>
+        <SiteChrome settings={editorSettings} galleries={websiteImages.pageGalleries}>
+          {children}
+        </SiteChrome>
       </body>
     </html>
   );
