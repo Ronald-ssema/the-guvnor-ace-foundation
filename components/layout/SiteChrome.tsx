@@ -46,7 +46,7 @@ export default function SiteChrome({
       </div>
       <div className="cms-copy-scope" data-cms-scope="global-tools">
         {pathname !== "/donate" && <GlobalDonateCta donations={settings.donations} />}
-        <FoundationAssistant contact={settings.contact} />
+        {pathname !== "/donate" && <FoundationAssistant contact={settings.contact} />}
         <CookieConsent />
       </div>
       <WebsiteCopyRuntime settings={textSettings} />

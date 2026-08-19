@@ -6,6 +6,7 @@ export const websiteImageSlotKeys = [
   "education",
   "childOne",
   "childTwo",
+  "donate",
 ] as const;
 
 export type WebsiteImageSlotKey = (typeof websiteImageSlotKeys)[number];
@@ -109,6 +110,12 @@ export const websiteImageSlotDetails: Record<
     usedOn: "Impact page and Stories page",
     fallbackSrc: "/images/child-2.jpg",
     fallbackAlt: "Children participating in a community programme in Uganda",
+  },
+  donate: {
+    label: "Donation page impact photograph",
+    usedOn: "Donation page hero",
+    fallbackSrc: "/images/donate-impact.jpg",
+    fallbackAlt: "Children receiving a freshly prepared meal during a community food programme in Uganda",
   },
 };
 

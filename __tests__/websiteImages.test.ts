@@ -36,6 +36,7 @@ describe("parseWebsiteImageSettings", () => {
       alt: "Food parcels prepared for distribution",
     });
     expect(settings.slots.about).toEqual(fallbackWebsiteImageSettings.slots.about);
+    expect(settings.slots.donate).toEqual(fallbackWebsiteImageSettings.slots.donate);
     expect(settings.pageGalleries.stories).toEqual({
       visible: false,
       title: "Community visits",

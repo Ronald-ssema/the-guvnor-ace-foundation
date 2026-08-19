@@ -223,7 +223,9 @@ export function WebsiteImageManager({
           <p>Images currently on the website</p>
           <h2>See, replace or hide photographs</h2>
         </div>
-        <span className="admin-status admin-status-live">7 image areas</span>
+        <span className="admin-status admin-status-live">
+          {websiteImageSlotKeys.length + 2} image areas
+        </span>
       </div>
 
       <p className="admin-editor-intro">

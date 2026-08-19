@@ -1,9 +1,10 @@
+import Image from "next/image";
 import Link from "next/link";
 
 import DonationOptions from "@/components/donations/DonationOptions";
 import DonationFaq from "@/components/donations/DonationFaq";
-import { PageHero } from "@/components/ui/PageHero";
 import { getSiteEditorSettings, isExternalHref } from "@/lib/cms/siteEditor";
+import { getWebsiteImageSettings } from "@/lib/cms/websiteImages";
 
 import { createPageMetadata } from "@/lib/seo";
 export const metadata = createPageMetadata({
@@ -14,29 +15,97 @@ export const metadata = createPageMetadata({
 });
 
 export default async function DonatePage() {
-  const settings = await getSiteEditorSettings();
+  const [settings, websiteImages] = await Promise.all([
+    getSiteEditorSettings(),
+    getWebsiteImageSettings(),
+  ]);
   const hero = settings.pages.donate;
+  const heroImage = websiteImages.slots.donate;
+
+  const heroActions = [
+    {
+      label: hero.primaryLabel,
+      href: hero.primaryHref,
+      external: isExternalHref(hero.primaryHref),
+      className: "primary-button",
+    },
+    {
+      label: hero.secondaryLabel,
+      href: hero.secondaryHref,
+      external: isExternalHref(hero.secondaryHref),
+      className: "secondary-button",
+    },
+  ];
 
   return (
-    <>
-      <PageHero
-        eyebrow={hero.eyebrow}
-        title={hero.title}
-        description={hero.description}
-        actions={[
-          {
-            label: hero.primaryLabel,
-            href: hero.primaryHref,
-            external: isExternalHref(hero.primaryHref),
-          },
-          {
-            label: hero.secondaryLabel,
-            href: hero.secondaryHref,
-            variant: "secondary",
-            external: isExternalHref(hero.secondaryHref),
-          },
-        ]}
-      />
+    <div className="donate-page">
+      <section className="donate-hero" aria-labelledby="donate-hero-heading">
+        <div
+          className={`site-container donate-hero-grid${heroImage.visible ? "" : " donate-hero-no-image"}`}
+        >
+          <div className="donate-hero-copy">
+            <p className="page-hero-eyebrow">{hero.eyebrow}</p>
+            <h1 id="donate-hero-heading">{hero.title}</h1>
+            <p className="donate-hero-description">{hero.description}</p>
+
+            <div className="donate-hero-actions">
+              {heroActions.map((action) => {
+                const content = (
+                  <>
+                    {action.label}
+                    <span aria-hidden="true">{action.external ? "↗" : "→"}</span>
+                  </>
+                );
+
+                return action.external ? (
+                  <a
+                    key={`${action.href}-${action.label}`}
+                    href={action.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={action.className}
+                  >
+                    {content}
+                  </a>
+                ) : (
+                  <Link
+                    key={`${action.href}-${action.label}`}
+                    href={action.href}
+                    className={action.className}
+                  >
+                    {content}
+                  </Link>
+                );
+              })}
+            </div>
+
+            <div className="donate-hero-assurance" aria-label="Donation assurance">
+              <span aria-hidden="true">✓</span>
+              <p>
+                <strong>Secure ways to give</strong>
+                PayPal and GoFundMe payments are completed on their official websites.
+              </p>
+            </div>
+          </div>
+
+          {heroImage.visible && (
+            <figure className="donate-hero-visual">
+              <Image
+                src={heroImage.src}
+                alt={heroImage.alt}
+                fill
+                sizes="(max-width: 900px) 100vw, 47vw"
+                priority
+                unoptimized={heroImage.src.startsWith("http")}
+              />
+              <figcaption>
+                <span>Your support in action</span>
+                <strong>Food, education and practical care</strong>
+              </figcaption>
+            </figure>
+          )}
+        </div>
+      </section>
 
       <section
         className="page-section page-section-soft"
@@ -134,6 +203,6 @@ export default async function DonatePage() {
           </div>
         </div>
       </section>
-    </>
+    </div>
   );
 }
