@@ -13,14 +13,14 @@
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "@supabase/ssr": "^0.12.4",
+    "@supabase/ssr": "^0.12.5",
     "@supabase/supabase-js": "^2.112.3",
-    "next": "16.3.1",
-    "openai": "^7.4.0",
+    "next": "16.3.3",
+    "openai": "^7.8.0",
     "react": "19.2.8",
     "react-dom": "19.2.8",
     "react-icons": "^5.7.0",
-    "sharp": "^0.35.3"
+    "sharp": "^0.35.4"
   },
   "devDependencies": {
     "@playwright/test": "^1.62.1",
