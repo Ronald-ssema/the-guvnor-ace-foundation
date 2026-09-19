@@ -4,6 +4,8 @@ import Link from "next/link";
 import { PageHero } from "@/components/ui/PageHero";
 
 import { createPageMetadata } from "@/lib/seo";
+import { getSiteEditorSettings, isExternalHref } from "@/lib/cms/siteEditor";
+import { getWebsiteImageSettings, type WebsiteImageSlotKey } from "@/lib/cms/websiteImages";
 export const metadata = createPageMetadata({
   title: "Our Programmes",
   description:
@@ -17,7 +19,7 @@ const programmes = [
     title: "Food and Nutrition",
     description:
       "Providing meals and essential food assistance to vulnerable children and families.",
-    image: "/images/food-drive.jpg",
+    imageKey: "food" as WebsiteImageSlotKey,
     activities: [
       "Community food distribution",
       "Emergency household food support",
@@ -30,7 +32,7 @@ const programmes = [
     title: "Education Support",
     description:
       "Helping children access learning materials, school support and educational opportunities.",
-    image: "/images/education.jpg",
+    imageKey: "education" as WebsiteImageSlotKey,
     activities: [
       "School materials and learning supplies",
       "Education-related family support",
@@ -43,7 +45,7 @@ const programmes = [
     title: "Community Outreach",
     description:
       "Working with communities to identify practical needs and deliver responsible assistance.",
-    image: "/images/about.jpg",
+    imageKey: "about" as WebsiteImageSlotKey,
     activities: [
       "Community needs assessment",
       "Family support referrals",
@@ -53,22 +55,30 @@ const programmes = [
   },
 ];
 
-export default function ProgrammesPage() {
+export default async function ProgrammesPage() {
+  const [settings, websiteImages] = await Promise.all([
+    getSiteEditorSettings(),
+    getWebsiteImageSettings(),
+  ]);
+  const hero = settings.pages.programmes;
+
   return (
     <>
       <PageHero
-        eyebrow="Our programmes"
-        title="Practical support designed around real needs."
-        description="Our programmes focus on food security, education, child protection and community support for vulnerable children and families in Uganda."
+        eyebrow={hero.eyebrow}
+        title={hero.title}
+        description={hero.description}
         actions={[
           {
-            label: "Support Our Work",
-            href: "/donate",
+            label: hero.primaryLabel,
+            href: hero.primaryHref,
+            external: isExternalHref(hero.primaryHref),
           },
           {
-            label: "Contact Our Team",
-            href: "/contact",
+            label: hero.secondaryLabel,
+            href: hero.secondaryHref,
             variant: "secondary",
+            external: isExternalHref(hero.secondaryHref),
           },
         ]}
       />
@@ -81,24 +91,26 @@ export default function ProgrammesPage() {
           id={programme.id}
           key={programme.id}
         >
-          <div className="site-container content-grid">
+          <div className={`site-container content-grid ${websiteImages.slots[programme.imageKey].visible ? "" : "content-grid-without-image"}`}>
+            {websiteImages.slots[programme.imageKey].visible && (
             <div
-              className={`content-image ${
-                index % 2 === 1 ? "content-order-second" : "content-order-first"
-              }`}
+              className="content-image"
+              style={{ order: index % 2 === 1 ? 2 : 1 }}
             >
               <Image
-                src={programme.image}
-                alt={`${programme.title} programme by The Guvnor Ace Foundation`}
+                src={websiteImages.slots[programme.imageKey].src}
+                alt={websiteImages.slots[programme.imageKey].alt}
                 fill
                 sizes="(max-width: 950px) 100vw, 50vw"
+                style={{ objectFit: "cover" }}
+                unoptimized={websiteImages.slots[programme.imageKey].src.startsWith("http")}
               />
             </div>
+            )}
 
             <div
-              className={`content-copy ${
-                index % 2 === 1 ? "content-order-first" : "content-order-second"
-              }`}
+              className="content-copy"
+              style={{ order: index % 2 === 1 ? 1 : 2 }}
             >
               <p className="section-eyebrow">
                 Programme {String(index + 1).padStart(2, "0")}

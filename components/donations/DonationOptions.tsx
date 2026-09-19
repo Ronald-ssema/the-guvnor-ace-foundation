@@ -2,30 +2,29 @@
 
 import { useState } from "react";
 
-import { supportLinks } from "@/lib/supportLinks";
+import type { SiteEditorSettings } from "@/lib/cms/siteEditor";
 
-const AIRTEL_NUMBER = "+256 752 462 740";
-
-const donationOptions = [
+function donationOptions(donations: SiteEditorSettings["donations"]) {
+return [
   {
-    name: "GoFundMe",
-    label: "Primary campaign",
+    name: "PayPal",
+    label: "Fast online donation",
     description:
-      "Support our official fundraising campaign and follow campaign updates.",
-    href: supportLinks.goFundMe,
-    action: "Donate via GoFundMe",
-    symbol: "G",
+      "Donate securely by card or PayPal from the UK or internationally.",
+    href: donations.paypal,
+    action: "Donate with PayPal",
+    symbol: "P",
     featured: true,
     type: "external" as const,
   },
   {
-    name: "PayPal",
-    label: "Secure online donation",
+    name: "GoFundMe",
+    label: "Official campaign",
     description:
-      "Make a secure PayPal donation from the UK or internationally.",
-    href: supportLinks.paypal,
-    action: "Donate with PayPal",
-    symbol: "P",
+      "Support our official fundraising campaign and follow campaign updates.",
+    href: donations.goFundMe,
+    action: "Donate on GoFundMe",
+    symbol: "G",
     featured: false,
     type: "external" as const,
   },
@@ -39,25 +38,19 @@ const donationOptions = [
     featured: false,
     type: "airtel" as const,
   },
-  {
-    name: "More Ways to Support",
-    label: "Foundation Linktree",
-    description:
-      "Explore our official channels, campaigns and other ways to help.",
-    href: supportLinks.linktree,
-    action: "Visit our Linktree",
-    symbol: "+",
-    featured: false,
-    type: "external" as const,
-  },
 ];
+}
 
-export default function DonationOptions() {
+export default function DonationOptions({
+  donations,
+}: {
+  donations: SiteEditorSettings["donations"];
+}) {
   const [copied, setCopied] = useState(false);
 
   const copyAirtelNumber = async () => {
     try {
-      await navigator.clipboard.writeText(AIRTEL_NUMBER);
+      await navigator.clipboard.writeText(donations.airtelNumber);
       setCopied(true);
 
       window.setTimeout(() => {
@@ -70,7 +63,7 @@ export default function DonationOptions() {
 
   return (
     <div className="donation-options-grid">
-      {donationOptions.map((option) => {
+      {donationOptions(donations).map((option) => {
         const isAirtel = option.type === "airtel";
 
         return (
@@ -106,12 +99,12 @@ export default function DonationOptions() {
               <div className="airtel-donation-details">
                 <div>
                   <span>Send your contribution to</span>
-                  <strong>{AIRTEL_NUMBER}</strong>
+                  <strong>{donations.airtelNumber}</strong>
                 </div>
 
                 <div>
                   <span>Account name</span>
-                  <strong>Ssemawere Ronald</strong>
+                  <strong>{donations.airtelAccountName}</strong>
                 </div>
 
                 <p>

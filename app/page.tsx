@@ -1,9 +1,11 @@
 import Hero from "@/components/home/Hero";
 import HomeSections from "@/components/home/HomeSections";
 import TrustSections from "@/components/home/TrustSections";
-import { organizationJsonLd } from "@/lib/structured-data";
+import { buildOrganizationJsonLd } from "@/lib/structured-data";
 import { createPageMetadata } from "@/lib/seo";
-import { headers } from "next/headers";
+import { getHomeHeroContent } from "@/lib/cms/home";
+import { getSiteEditorSettings } from "@/lib/cms/siteEditor";
+import { getWebsiteImageSettings } from "@/lib/cms/websiteImages";
 
 
 export const metadata = createPageMetadata({
@@ -13,22 +15,29 @@ export const metadata = createPageMetadata({
   path: "/",
 });
 
+export const revalidate = 300;
+
 export default async function HomePage() {
-  const nonce = (await headers()).get("x-nonce") ?? undefined;
+  const [hero, editorSettings, websiteImages] = await Promise.all([
+    getHomeHeroContent(),
+    getSiteEditorSettings(),
+    getWebsiteImageSettings(),
+  ]);
 
   return (
     <>
       <script
-        nonce={nonce}
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify(organizationJsonLd).replace(/</g, "\\u003c"),
+          __html: JSON.stringify(
+            buildOrganizationJsonLd(editorSettings.contact),
+          ).replace(/</g, "\\u003c"),
         }}
       />
 
-      <Hero />
-      <HomeSections />
-      <TrustSections />
+      <Hero content={hero} />
+      <HomeSections image={websiteImages.slots.about} />
+      <TrustSections settings={editorSettings} images={websiteImages.slots} />
     </>
   );
 }

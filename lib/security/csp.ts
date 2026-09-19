@@ -32,6 +32,7 @@ export function createNonce() {
 export function buildContentSecurityPolicy(
   nonce: string,
   upgradeInsecureRequests = !isDevelopment,
+  allowSameOriginFraming = false,
 ) {
   const supabaseOrigin = getSupabaseOrigin();
   const connectSources = ["'self'", supabaseOrigin].filter(Boolean).join(" ");
@@ -51,8 +52,8 @@ export function buildContentSecurityPolicy(
     "object-src 'none'",
     "base-uri 'self'",
     "form-action 'self'",
-    "frame-ancestors 'none'",
-    "frame-src 'none'",
+    `frame-ancestors ${allowSameOriginFraming ? "'self'" : "'none'"}`,
+    "frame-src 'self'",
     "worker-src 'self' blob:",
     "manifest-src 'self'",
     ...(upgradeInsecureRequests ? ["upgrade-insecure-requests"] : []),

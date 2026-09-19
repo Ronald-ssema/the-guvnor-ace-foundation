@@ -21,6 +21,14 @@ describe("content security policy", () => {
 
     expect(policy).not.toContain("upgrade-insecure-requests");
   });
+
+  it("allows only same-origin framing for an explicit CMS preview", () => {
+    const policy = buildContentSecurityPolicy(createNonce(), false, true);
+
+    expect(policy).toContain("frame-src 'self'");
+    expect(policy).toContain("frame-ancestors 'self'");
+    expect(policy).not.toContain("frame-ancestors 'none'");
+  });
 });
 
 describe("assistant request validation", () => {

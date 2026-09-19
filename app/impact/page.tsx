@@ -4,6 +4,8 @@ import Link from "next/link";
 import { PageHero } from "@/components/ui/PageHero";
 
 import { createPageMetadata } from "@/lib/seo";
+import { getSiteEditorSettings, isExternalHref } from "@/lib/cms/siteEditor";
+import { getWebsiteImageSettings } from "@/lib/cms/websiteImages";
 export const metadata = createPageMetadata({
   title: "Impact & Accountability",
   description:
@@ -34,36 +36,49 @@ const principles = [
   },
 ];
 
-export default function ImpactPage() {
+export default async function ImpactPage() {
+  const [settings, websiteImages] = await Promise.all([
+    getSiteEditorSettings(),
+    getWebsiteImageSettings(),
+  ]);
+  const hero = settings.pages.impact;
+  const impactImage = websiteImages.slots.childTwo;
+
   return (
     <>
       <PageHero
-        eyebrow="Our impact"
-        title="Transparent action. Meaningful community change."
-        description="Supporters deserve clear information about what we do, how assistance is delivered and how programme results are documented."
+        eyebrow={hero.eyebrow}
+        title={hero.title}
+        description={hero.description}
         actions={[
           {
-            label: "View Reports",
-            href: "/reports",
+            label: hero.primaryLabel,
+            href: hero.primaryHref,
+            external: isExternalHref(hero.primaryHref),
           },
           {
-            label: "Support Our Mission",
-            href: "/donate",
+            label: hero.secondaryLabel,
+            href: hero.secondaryHref,
             variant: "secondary",
+            external: isExternalHref(hero.secondaryHref),
           },
         ]}
       />
 
       <section className="page-section">
-        <div className="site-container content-grid">
+        <div className={`site-container content-grid ${impactImage.visible ? "" : "content-grid-without-image"}`}>
+          {impactImage.visible && (
           <div className="content-image">
             <Image
-              src="/images/child-2.jpg"
-              alt="Children participating in a community programme in Uganda"
+              src={impactImage.src}
+              alt={impactImage.alt}
               fill
               sizes="(max-width: 950px) 100vw, 50vw"
+              style={{ objectFit: "cover" }}
+              unoptimized={impactImage.src.startsWith("http")}
             />
           </div>
+          )}
 
           <div className="content-copy">
             <p className="section-eyebrow">How we measure progress</p>

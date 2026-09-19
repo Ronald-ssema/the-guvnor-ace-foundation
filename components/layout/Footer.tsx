@@ -9,6 +9,8 @@ import {
   FaYoutube,
 } from "react-icons/fa";
 import { SiLinktree } from "react-icons/si";
+import type { SiteEditorSettings } from "@/lib/cms/siteEditor";
+import CookieSettingsButton from "@/components/privacy/CookieSettingsButton";
 
 const socialLinks = [
   {
@@ -43,7 +45,11 @@ const socialLinks = [
   },
 ];
 
-export default function Footer() {
+export default function Footer({
+  contact,
+}: {
+  contact: SiteEditorSettings["contact"];
+}) {
   return (
     <footer className="compact-footer">
       <div className="site-container compact-footer-grid">
@@ -59,26 +65,24 @@ export default function Footer() {
         </div>
 
         <a
-          href="mailto:guvnorace@gmail.com"
+          href={`mailto:${contact.email}`}
           className="compact-footer-item"
         >
           <FaEnvelope aria-hidden="true" />
-          <span>guvnorace@gmail.com</span>
+          <span>{contact.email}</span>
         </a>
 
         <a
-          href="tel:+256752462740"
+          href={`tel:${contact.phoneHref}`}
           className="compact-footer-item"
         >
           <FaPhoneAlt aria-hidden="true" />
-          <span>+256 752 462 740</span>
+          <span>{contact.phoneDisplay}</span>
         </a>
 
         <div className="compact-footer-item">
           <FaMapMarkerAlt aria-hidden="true" />
-          <span>
-            Bunamwaya–Lubowa, Entebbe Road, Wakiso District, Uganda.
-          </span>
+          <span>{contact.location}</span>
         </div>
 
         <div className="compact-footer-social-wrapper">
@@ -108,9 +112,15 @@ export default function Footer() {
           </span>
 
           <nav aria-label="Legal and policy links">
+            <Link href="/donate" className="compact-footer-donate-link">
+              Donate
+            </Link>
             <Link href="/policies">Policies</Link>
             <Link href="/safeguarding">Safeguarding</Link>
             <Link href="/privacy">Privacy</Link>
+            <Link href="/cookies">Cookies</Link>
+            <CookieSettingsButton />
+            <Link href="/accessibility">Accessibility</Link>
             <Link href="/terms">Terms</Link>
             <Link href="/complaints">Complaints</Link>
           </nav>

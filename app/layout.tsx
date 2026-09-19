@@ -2,11 +2,15 @@ import type { Metadata } from "next";
 import { connection } from "next/server";
 
 import "./globals.css";
-
-import FoundationAssistant from "@/components/ai/FoundationAssistant";
-import Footer from "@/components/layout/Footer";
-import Navbar from "@/components/layout/Navbar";
+import "../styles/admin.css";
+import SiteChrome from "@/components/layout/SiteChrome";
 import { siteConfig } from "@/lib/site";
+import { bodyFont, displayFont } from "./fonts";
+import { getSiteEditorSettings } from "@/lib/cms/siteEditor";
+import { getWebsiteImageSettings } from "@/lib/cms/websiteImages";
+import { getWebsiteTextSettings } from "@/lib/cms/websiteText";
+
+export const revalidate = 300;
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
@@ -92,8 +96,12 @@ export const metadata: Metadata = {
   },
 
   icons: {
-    icon: "/images/logo.png",
-    apple: "/images/logo.png",
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/images/favicon.png", sizes: "512x512", type: "image/png" },
+    ],
+    shortcut: "/favicon.ico",
+    apple: [{ url: "/apple-icon.png", sizes: "180x180", type: "image/png" }],
   },
 
   verification: {
@@ -108,19 +116,29 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // A per-request render is required for Next.js to nonce framework scripts.
+  // Force request-time rendering so Next.js can apply the CSP nonce.
   await connection();
 
+  const [editorSettings, websiteImages, websiteText] = await Promise.all([
+    getSiteEditorSettings(),
+    getWebsiteImageSettings(),
+    getWebsiteTextSettings(),
+  ]);
+
   return (
-    <html lang="en" data-scroll-behavior="smooth">
-      <body>
-        <Navbar />
-
-        <main id="main-content">{children}</main>
-
-        <Footer />
-
-        <FoundationAssistant />
+    <html
+      lang="en"
+      data-scroll-behavior="smooth"
+      className={`${bodyFont.variable} ${displayFont.variable}`}
+    >
+      <body className={`theme-${editorSettings.appearance.accent} layout-${editorSettings.appearance.density}`}>
+        <SiteChrome
+          settings={editorSettings}
+          galleries={websiteImages.pageGalleries}
+          textSettings={websiteText}
+        >
+          {children}
+        </SiteChrome>
       </body>
     </html>
   );

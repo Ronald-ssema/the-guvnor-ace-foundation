@@ -47,6 +47,42 @@
   box-sizing: border-box;
 }
 
+.gaf-home-sections {
+  display: flex;
+  flex-direction: column;
+}
+
+.gaf-story-caption {
+  position: absolute;
+  right: 14px;
+  bottom: 14px;
+  left: 14px;
+  z-index: 2;
+  padding: 9px 12px;
+  border-radius: 10px;
+  background: rgba(6, 23, 46, 0.82);
+  color: white;
+  font-size: 0.8rem;
+  backdrop-filter: blur(8px);
+}
+
+body.theme-emerald {
+  --colour-gold-500: #2f9d72;
+  --colour-gold-600: #237a55;
+  --colour-gold-100: #e7f7f0;
+}
+
+body.theme-blue {
+  --colour-gold-500: #4d91d8;
+  --colour-gold-600: #2166a8;
+  --colour-gold-100: #eaf4ff;
+}
+
+body.layout-compact {
+  --section-spacing: 82px;
+  --section-spacing-mobile: 58px;
+}
+
 html {
   scroll-behavior: smooth;
 }
@@ -58,6 +94,7 @@ body {
   line-height: 1.6;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
+  font-family: var(--font-body), Arial, Helvetica, sans-serif;
 }
 
 img {
@@ -68,6 +105,37 @@ img {
 a {
   color: inherit;
   text-decoration: none;
+}
+
+.skip-link {
+  position: fixed;
+  z-index: 9999;
+  top: 12px;
+  left: 12px;
+  padding: 12px 16px;
+  transform: translateY(-160%);
+  border-radius: 8px;
+  background: var(--colour-navy-950);
+  color: white;
+  font-weight: 800;
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+:focus-visible {
+  outline: 3px solid var(--colour-gold-500);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 button,
@@ -107,7 +175,7 @@ select {
   max-width: 780px;
   margin: 0;
   color: var(--colour-navy-950);
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-display), Georgia, "Times New Roman", serif;
   font-size: clamp(2.4rem, 5vw, 4.6rem);
   font-weight: 500;
   line-height: 1.04;
@@ -183,7 +251,7 @@ select {
   max-width: 920px;
   margin: 0;
   color: var(--colour-navy-950);
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-display), Georgia, "Times New Roman", serif;
   font-size: clamp(3.2rem, 6vw, 6rem);
   font-weight: 500;
   line-height: 0.99;
@@ -231,7 +299,7 @@ select {
   max-width: 760px;
   margin: 0;
   color: var(--colour-navy-950);
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-display), Georgia, "Times New Roman", serif;
   font-size: clamp(2.5rem, 5vw, 4.6rem);
   font-weight: 500;
   line-height: 1.04;
@@ -252,6 +320,12 @@ select {
   gap: clamp(50px, 8vw, 100px);
 }
 
+.content-grid-without-image,
+.about-grid-without-image {
+  grid-template-columns: minmax(0, 760px);
+  justify-content: center;
+}
+
 .content-image {
   position: relative;
   min-height: 570px;
@@ -268,18 +342,10 @@ select {
   object-fit: cover;
 }
 
-.content-order-first {
-  order: 1;
-}
-
-.content-order-second {
-  order: 2;
-}
-
 .content-copy h2 {
   margin: 0;
   color: var(--colour-navy-950);
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-display), Georgia, "Times New Roman", serif;
   font-size: clamp(2.6rem, 5vw, 4.5rem);
   font-weight: 500;
   line-height: 1.03;
@@ -394,7 +460,7 @@ select {
 .cta-panel h2 {
   margin: 0;
   color: var(--colour-white);
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-display), Georgia, "Times New Roman", serif;
   font-size: clamp(2.2rem, 4vw, 3.8rem);
   font-weight: 500;
   line-height: 1.06;
@@ -740,7 +806,7 @@ select {
 .donation-option-card h3 {
   margin: 0;
   color: var(--colour-navy-950);
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-display), Georgia, "Times New Roman", serif;
   font-size: clamp(1.8rem, 3vw, 2.4rem);
   font-weight: 500;
   line-height: 1.08;
@@ -1093,7 +1159,7 @@ select {
   max-width: 720px;
   margin: 0;
   color: var(--colour-navy-950);
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-display), Georgia, "Times New Roman", serif;
   font-size: clamp(3.4rem, 5.5vw, 5.65rem);
   font-weight: 500;
   line-height: 0.99;
@@ -1340,7 +1406,7 @@ select {
 .impact-strip-header h2 {
   max-width: 640px;
   margin: 0;
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-display), Georgia, "Times New Roman", serif;
   font-size: clamp(2rem, 4vw, 3.2rem);
   font-weight: 500;
   line-height: 1.1;
@@ -1447,7 +1513,7 @@ select {
 .about-grid h2 {
   margin: 0;
   color: var(--charity-navy);
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-display), Georgia, "Times New Roman", serif;
   font-size: clamp(2.3rem, 4vw, 4rem);
   line-height: 1.08;
 }
@@ -1825,6 +1891,47 @@ select {
   gap: 26px;
 }
 
+.public-gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 22px;
+  margin-top: 36px;
+}
+
+.public-gallery-item {
+  overflow: hidden;
+  margin: 0;
+  border-radius: 20px;
+  background: #fff;
+  box-shadow: var(--shadow-small);
+}
+
+.public-gallery-item > div {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background: var(--colour-background);
+}
+
+.public-gallery-item img {
+  object-fit: cover;
+}
+
+.public-gallery-item figcaption {
+  padding: 15px 18px 17px;
+  color: var(--colour-muted);
+  font-size: .92rem;
+  line-height: 1.55;
+}
+
+@media (max-width: 900px) {
+  .public-gallery-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 600px) {
+  .public-gallery-grid { grid-template-columns: 1fr; }
+}
+
 .story-card {
   overflow: hidden;
   border-radius: 22px;
@@ -1999,7 +2106,7 @@ select {
 .contact-grid h2 {
   margin-top: 0;
   color: var(--charity-navy);
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-display), Georgia, "Times New Roman", serif;
   font-size: clamp(2rem, 4vw, 3.4rem);
   line-height: 1.1;
 }
@@ -2176,7 +2283,7 @@ select {
   right: 24px;
   bottom: 24px;
   z-index: 200;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-body), Arial, Helvetica, sans-serif;
 }
 
 .foundation-ai-launcher {
@@ -2517,7 +2624,7 @@ select {
   max-width: 820px;
   margin: 0;
   color: #071c3a;
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-display), Georgia, "Times New Roman", serif;
   font-size: clamp(2.8rem, 5vw, 5rem);
   font-weight: 500;
   line-height: 1;
@@ -2976,7 +3083,7 @@ select {
 .partnership-cta h2 {
   margin: 0 0 18px;
   color: var(--charity-navy);
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-display), Georgia, "Times New Roman", serif;
   font-size: clamp(2.2rem, 4vw, 3.6rem);
   line-height: 1.08;
 }
@@ -3093,7 +3200,7 @@ select {
 .policy-content h2 {
   margin-top: 42px;
   color: var(--charity-navy);
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-display), Georgia, "Times New Roman", serif;
   font-size: 2rem;
 }
 
@@ -3145,7 +3252,7 @@ select {
 .not-found-content h1 {
   margin: 0;
   color: var(--charity-navy);
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-display), Georgia, "Times New Roman", serif;
   font-size: clamp(3.2rem, 7vw, 6rem);
   line-height: 1;
 }
@@ -3392,7 +3499,7 @@ select {
 .social-platform-content h3 {
   margin: 0;
   color: var(--colour-navy-950);
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-display), Georgia, "Times New Roman", serif;
   font-size: 2rem;
   font-weight: 500;
   line-height: 1.1;
@@ -3881,6 +3988,565 @@ select {
 }
 
 /* =========================================================
+   ALWAYS-AVAILABLE DONATION JOURNEY
+   ========================================================= */
+
+.global-donation-cta {
+  position: fixed;
+  z-index: 190;
+  bottom: 24px;
+  left: 24px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  max-width: calc(100vw - 340px);
+  padding: 10px 10px 10px 18px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 22px;
+  background: rgba(6, 23, 46, 0.97);
+  color: var(--colour-white);
+  box-shadow: 0 20px 55px rgba(6, 23, 46, 0.3);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.global-donation-cta-copy {
+  display: grid;
+  line-height: 1.25;
+}
+
+.global-donation-cta-copy strong {
+  font-size: 0.92rem;
+}
+
+.global-donation-cta-copy span {
+  margin-top: 3px;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.76rem;
+}
+
+.global-donation-cta-actions {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.global-donation-cta-actions > a:first-child {
+  color: rgba(255, 255, 255, 0.78);
+  text-decoration: underline;
+  text-decoration-color: rgba(255, 255, 255, 0.35);
+  text-underline-offset: 3px;
+}
+
+.global-donation-cta-button {
+  min-height: 46px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border-radius: var(--radius-pill);
+  background: var(--colour-gold-500);
+  color: var(--colour-navy-950);
+  white-space: nowrap;
+  box-shadow: 0 10px 25px rgba(204, 148, 0, 0.25);
+  transition:
+    transform var(--transition-fast),
+    background-color var(--transition-fast);
+}
+
+.global-donation-cta-button:hover {
+  background: #f2c13b;
+  transform: translateY(-2px);
+}
+
+.compact-footer-donate-link {
+  color: var(--colour-gold-500) !important;
+  font-weight: 850;
+}
+
+@media (max-width: 800px) {
+  body:has(.global-donation-cta) {
+    padding-bottom: 78px;
+  }
+
+  body:has(.global-donation-cta) .foundation-ai {
+    bottom: 90px !important;
+  }
+
+  .global-donation-cta {
+    right: 0;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    max-width: none;
+    min-height: 72px;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 9px 12px 9px 16px;
+    border-width: 1px 0 0;
+    border-radius: 0;
+  }
+
+  .global-donation-cta-actions > a:first-child {
+    display: none;
+  }
+
+  .global-donation-cta-button {
+    min-height: 50px;
+    padding-inline: 22px;
+  }
+}
+
+@media (max-width: 390px) {
+  .global-donation-cta-copy span {
+    display: none;
+  }
+
+  .global-donation-cta-copy strong {
+    font-size: 0.84rem;
+  }
+
+  .global-donation-cta-button {
+    padding-inline: 18px;
+  }
+}
+
+/* =========================================================
+   COOKIE CONSENT AND PREFERENCE CENTRE
+   ========================================================= */
+
+.cookie-consent-backdrop {
+  position: fixed;
+  z-index: 1000100;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 28px;
+  background: rgba(3, 15, 32, 0.72);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+}
+
+.cookie-consent-panel {
+  width: min(1120px, 100%);
+  max-height: calc(100vh - 56px);
+  overflow-y: auto;
+  padding: clamp(28px, 5vw, 54px);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: 28px;
+  background: var(--colour-white);
+  box-shadow: 0 32px 90px rgba(3, 15, 32, 0.38);
+}
+
+.cookie-consent-panel:has(.cookie-consent-copy) {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(250px, 320px);
+  gap: clamp(34px, 6vw, 76px);
+  align-items: center;
+}
+
+.cookie-consent-copy h2,
+.cookie-settings-heading h2 {
+  margin: 8px 0 18px;
+  color: var(--colour-navy-950);
+  font-family: var(--font-display), Georgia, "Times New Roman", serif;
+  font-size: clamp(2rem, 4vw, 3.35rem);
+  font-weight: 500;
+  line-height: 1.05;
+}
+
+.cookie-consent-copy > p:last-child,
+.cookie-settings-intro {
+  margin: 0;
+  color: var(--colour-muted);
+  font-size: 1.02rem;
+  line-height: 1.75;
+}
+
+.cookie-consent-copy a {
+  color: var(--colour-green-600);
+  font-weight: 800;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.cookie-consent-actions,
+.cookie-settings-actions {
+  display: grid;
+  gap: 13px;
+}
+
+.cookie-consent-primary,
+.cookie-consent-secondary {
+  min-height: 54px;
+  padding: 13px 22px;
+  border-radius: var(--radius-pill);
+  font: inherit;
+  font-weight: 850;
+  cursor: pointer;
+  transition:
+    transform var(--transition-fast),
+    background-color var(--transition-fast),
+    border-color var(--transition-fast);
+}
+
+.cookie-consent-primary {
+  border: 2px solid var(--colour-green-600);
+  background: var(--colour-green-600);
+  color: var(--colour-white);
+}
+
+.cookie-consent-secondary {
+  border: 2px solid var(--colour-green-600);
+  background: var(--colour-white);
+  color: var(--colour-green-600);
+}
+
+.cookie-consent-primary:hover,
+.cookie-consent-secondary:hover {
+  transform: translateY(-2px);
+}
+
+.cookie-consent-primary:hover {
+  border-color: #196441;
+  background: #196441;
+}
+
+.cookie-consent-secondary:hover {
+  background: rgba(35, 122, 85, 0.08);
+}
+
+.cookie-settings-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.cookie-settings-close {
+  width: 46px;
+  height: 46px;
+  flex: 0 0 auto;
+  border: 1px solid var(--colour-border);
+  border-radius: 50%;
+  background: var(--colour-white);
+  color: var(--colour-navy-950);
+  font: inherit;
+  font-size: 1.8rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.cookie-preference-list {
+  display: grid;
+  margin: 30px 0;
+  border: 1px solid var(--colour-border);
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.cookie-preference-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 30px;
+  padding: 20px 22px;
+  background: var(--colour-white);
+}
+
+.cookie-preference-row + .cookie-preference-row {
+  border-top: 1px solid var(--colour-border);
+}
+
+.cookie-preference-row > div,
+.cookie-preference-row > span:first-child {
+  display: grid;
+  gap: 5px;
+}
+
+.cookie-preference-row strong {
+  color: var(--colour-navy-950);
+}
+
+.cookie-preference-row strong + span {
+  color: var(--colour-muted);
+  line-height: 1.55;
+}
+
+.cookie-preference-row input {
+  width: 24px;
+  height: 24px;
+  flex: 0 0 auto;
+  accent-color: var(--colour-green-600);
+}
+
+.cookie-always-on {
+  flex: 0 0 auto;
+  color: var(--colour-green-600);
+  font-size: 0.8rem;
+  font-weight: 850;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.cookie-settings-actions {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.compact-footer-cookie-button {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.compact-footer-cookie-button:hover {
+  color: var(--colour-gold-500);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+@media (max-width: 760px) {
+  .cookie-consent-backdrop {
+    align-items: end;
+    padding: 0;
+  }
+
+  .cookie-consent-panel {
+    width: 100%;
+    max-height: min(86vh, 760px);
+    padding: 28px 20px max(28px, env(safe-area-inset-bottom));
+    border-radius: 24px 24px 0 0;
+  }
+
+  .cookie-consent-panel:has(.cookie-consent-copy) {
+    grid-template-columns: 1fr;
+    gap: 26px;
+  }
+
+  .cookie-consent-copy h2,
+  .cookie-settings-heading h2 {
+    font-size: 2.25rem;
+  }
+
+  .cookie-settings-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .cookie-preference-row {
+    gap: 18px;
+    padding: 18px 16px;
+  }
+}
+
+/* =========================================================
+   DONATION FAQ
+   ========================================================= */
+
+.donation-faq-section {
+  background:
+    radial-gradient(circle at 85% 12%, rgba(232, 177, 31, 0.14), transparent 27%),
+    var(--colour-soft);
+}
+
+.donation-faq-appeal {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+  margin-bottom: clamp(56px, 8vw, 92px);
+  padding: clamp(25px, 4vw, 40px) clamp(26px, 5vw, 54px);
+  border-radius: var(--radius-large);
+  background: var(--colour-navy-950);
+  color: var(--colour-white);
+  box-shadow: var(--shadow-medium);
+}
+
+.donation-faq-appeal div {
+  display: grid;
+  gap: 7px;
+}
+
+.donation-faq-appeal p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 0.8rem;
+  font-weight: 850;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.donation-faq-appeal strong {
+  font-family: var(--font-display), Georgia, "Times New Roman", serif;
+  font-size: clamp(1.7rem, 3vw, 2.6rem);
+  font-weight: 500;
+}
+
+.donation-faq-appeal-button {
+  min-height: 58px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  flex: 0 0 auto;
+  padding: 14px 28px;
+  border-radius: var(--radius-pill);
+  background: var(--colour-gold-500);
+  color: var(--colour-navy-950);
+  font-weight: 900;
+  box-shadow: 0 14px 30px rgba(204, 148, 0, 0.24);
+  transition:
+    transform var(--transition-fast),
+    background-color var(--transition-fast);
+}
+
+.donation-faq-appeal-button:hover {
+  background: #f2c13b;
+  transform: translateY(-2px);
+}
+
+.donation-faq-layout {
+  display: grid;
+  grid-template-columns: minmax(250px, 0.72fr) minmax(0, 1.28fr);
+  gap: clamp(44px, 7vw, 92px);
+  align-items: start;
+}
+
+.donation-faq-intro {
+  position: sticky;
+  top: 130px;
+}
+
+.donation-faq-intro h2 {
+  margin: 12px 0 20px;
+  color: var(--colour-navy-950);
+  font-family: var(--font-display), Georgia, "Times New Roman", serif;
+  font-size: clamp(2.6rem, 5vw, 4.6rem);
+  font-weight: 500;
+  line-height: 0.98;
+}
+
+.donation-faq-intro > p:last-child {
+  margin: 0;
+  color: var(--colour-muted);
+  line-height: 1.72;
+}
+
+.donation-faq-list {
+  display: grid;
+  gap: 13px;
+}
+
+.donation-faq-item {
+  border: 1px solid var(--colour-border);
+  border-radius: 18px;
+  background: var(--colour-white);
+  box-shadow: var(--shadow-small);
+  overflow: hidden;
+}
+
+.donation-faq-item summary {
+  min-height: 86px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 21px 24px;
+  color: var(--colour-navy-950);
+  font-size: 1.03rem;
+  font-weight: 850;
+  cursor: pointer;
+  list-style: none;
+}
+
+.donation-faq-item summary::-webkit-details-marker {
+  display: none;
+}
+
+.donation-faq-icon {
+  position: relative;
+  width: 38px;
+  height: 38px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: var(--colour-green-600);
+}
+
+.donation-faq-icon::before,
+.donation-faq-icon::after {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 14px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--colour-white);
+  content: "";
+  transform: translate(-50%, -50%);
+  transition: transform var(--transition-fast);
+}
+
+.donation-faq-icon::after {
+  transform: translate(-50%, -50%) rotate(90deg);
+}
+
+.donation-faq-item[open] .donation-faq-icon::after {
+  transform: translate(-50%, -50%) rotate(0deg);
+}
+
+.donation-faq-answer {
+  padding: 0 76px 25px 24px;
+  color: var(--colour-muted);
+  line-height: 1.72;
+}
+
+.donation-faq-answer p {
+  margin: 0;
+}
+
+.donation-faq-answer a {
+  color: var(--colour-green-600);
+  font-weight: 800;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+@media (max-width: 860px) {
+  .donation-faq-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .donation-faq-intro {
+    position: static;
+  }
+}
+
+@media (max-width: 620px) {
+  .donation-faq-appeal {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .donation-faq-appeal-button {
+    width: 100%;
+  }
+
+  .donation-faq-item summary {
+    min-height: 78px;
+    padding: 18px;
+  }
+
+  .donation-faq-answer {
+    padding: 0 18px 22px;
+  }
+}
+
+/* =========================================================
    GAF MOBILE NAVIGATION — FINAL AUTHORITATIVE VERSION
    UNICEF-STYLE MOBILE BEHAVIOUR
    ========================================================= */
@@ -4166,7 +4832,7 @@ select {
   max-width: 760px;
   margin: 0;
   color: var(--colour-navy-950);
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-display), Georgia, "Times New Roman", serif;
   font-size: clamp(3.6rem, 6vw, 6.6rem);
   line-height: 0.93;
   letter-spacing: -0.045em;
@@ -4312,14 +4978,14 @@ select {
 
 .gaf-hero-quote > span {
   color: var(--colour-gold-500);
-  font-family: Georgia, serif;
+  font-family: var(--font-display), Georgia, serif;
   font-size: 3.3rem;
   line-height: 0.7;
 }
 
 .gaf-hero-quote p {
   margin: 0;
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-display), Georgia, "Times New Roman", serif;
   font-size: 1.12rem;
   line-height: 1.55;
 }
@@ -4512,7 +5178,7 @@ select {
 .gaf-action-panel h2 {
   margin: 0;
   color: var(--colour-navy-950);
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-display), Georgia, "Times New Roman", serif;
   font-size: clamp(3rem, 5.3vw, 5.3rem);
   line-height: 0.98;
   letter-spacing: -0.045em;
@@ -5620,6 +6286,7 @@ r
   height: 100%;
   object-fit: cover;
   object-position: center center;
+  pointer-events: none;
 }
 
 
@@ -5672,5 +6339,273 @@ r
   .gaf-story-image {
     min-height: 420px;
     border-radius: 22px;
+  }
+}
+/* Text CMS wrappers keep the original document layout intact. */
+.cms-copy-scope { display: contents; }
+
+/* =========================================================
+   DONATION PAGE — PREMIUM, HUMAN-CENTRED EXPERIENCE
+   ========================================================= */
+
+.donate-hero {
+  position: relative;
+  overflow: hidden;
+  padding: clamp(58px, 7vw, 96px) 0;
+  background:
+    radial-gradient(circle at 8% 92%, rgba(35, 122, 85, 0.12), transparent 29%),
+    radial-gradient(circle at 92% 8%, rgba(232, 177, 31, 0.2), transparent 28%),
+    linear-gradient(135deg, #f8fafc 0%, #fffdf6 100%);
+}
+
+.donate-hero::before {
+  position: absolute;
+  top: -220px;
+  right: -160px;
+  width: 540px;
+  height: 540px;
+  border: 1px solid rgba(6, 23, 46, 0.08);
+  border-radius: 50%;
+  content: "";
+}
+
+.donate-hero-grid {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(440px, 1.1fr);
+  align-items: center;
+  gap: clamp(48px, 7vw, 104px);
+}
+
+.donate-hero-no-image {
+  grid-template-columns: minmax(0, 820px);
+}
+
+.donate-hero-copy h1 {
+  max-width: 780px;
+  margin: 0;
+  color: var(--colour-navy-950);
+  font-family: var(--font-display), Georgia, "Times New Roman", serif;
+  font-size: clamp(3.35rem, 5.5vw, 5.35rem);
+  font-weight: 500;
+  letter-spacing: -0.045em;
+  line-height: 0.98;
+  text-wrap: balance;
+}
+
+.donate-hero-description {
+  max-width: 650px;
+  margin: 28px 0 0;
+  color: var(--colour-muted);
+  font-size: clamp(1.05rem, 1.4vw, 1.18rem);
+  line-height: 1.75;
+}
+
+.donate-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 32px;
+}
+
+.donate-hero-actions a {
+  min-height: 56px;
+}
+
+.donate-hero-assurance {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  max-width: 590px;
+  margin-top: 28px;
+  padding-top: 25px;
+  border-top: 1px solid rgba(6, 23, 46, 0.11);
+}
+
+.donate-hero-assurance > span {
+  width: 40px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: var(--colour-green-600);
+  color: var(--colour-white);
+  font-weight: 900;
+  box-shadow: 0 9px 22px rgba(35, 122, 85, 0.22);
+}
+
+.donate-hero-assurance p {
+  display: grid;
+  gap: 3px;
+  margin: 0;
+  color: var(--colour-muted);
+  font-size: 0.88rem;
+  line-height: 1.55;
+}
+
+.donate-hero-assurance strong {
+  color: var(--colour-navy-950);
+  font-size: 0.94rem;
+}
+
+.donate-hero-visual {
+  position: relative;
+  min-height: clamp(490px, 45vw, 640px);
+  margin: 0;
+  overflow: hidden;
+  border: 8px solid rgba(255, 255, 255, 0.78);
+  border-radius: 34px 34px 92px 34px;
+  background: #e9edf0;
+  box-shadow:
+    0 35px 80px rgba(6, 23, 46, 0.17),
+    0 9px 24px rgba(6, 23, 46, 0.08);
+}
+
+.donate-hero-visual::after {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(6, 23, 46, 0.65), transparent 43%);
+  content: "";
+  pointer-events: none;
+}
+
+.donate-hero-visual img {
+  object-fit: cover;
+  object-position: 52% center;
+}
+
+.donate-hero-visual figcaption {
+  position: absolute;
+  z-index: 1;
+  right: 25px;
+  bottom: 24px;
+  left: 25px;
+  display: grid;
+  gap: 6px;
+  padding: 18px 20px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 18px;
+  background: rgba(6, 23, 46, 0.68);
+  color: var(--colour-white);
+  backdrop-filter: blur(14px);
+}
+
+.donate-hero-visual figcaption span {
+  color: #f4ca58;
+  font-size: 0.73rem;
+  font-weight: 850;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.donate-hero-visual figcaption strong {
+  font-family: var(--font-display), Georgia, "Times New Roman", serif;
+  font-size: clamp(1.35rem, 2vw, 1.8rem);
+  font-weight: 500;
+}
+
+.donate-page .page-section {
+  padding-block: clamp(76px, 8vw, 104px);
+}
+
+.donate-page .page-section-header {
+  align-items: center;
+  margin-bottom: 42px;
+}
+
+.donate-page .page-section-header h2 {
+  max-width: 680px;
+  font-size: clamp(2.7rem, 4.4vw, 4rem);
+}
+
+.donate-page .donation-options-grid {
+  gap: 20px;
+}
+
+.donate-page .donation-option-card {
+  min-height: 410px;
+  padding: 30px;
+  border-radius: 26px;
+  box-shadow: 0 16px 42px rgba(6, 23, 46, 0.08);
+}
+
+.donate-page .donation-option-card h3 {
+  font-size: clamp(1.9rem, 2.7vw, 2.35rem);
+}
+
+.donate-page .donation-option-icon {
+  margin-bottom: 24px;
+}
+
+.donate-page .donation-trust-section {
+  border-block: 1px solid var(--colour-border);
+}
+
+@media (max-width: 1040px) {
+  .donate-hero-grid {
+    grid-template-columns: minmax(0, 0.95fr) minmax(380px, 1.05fr);
+    gap: 44px;
+  }
+
+  .donate-hero-copy h1 {
+    font-size: clamp(3rem, 6vw, 4.3rem);
+  }
+}
+
+@media (max-width: 860px) {
+  .donate-hero-grid,
+  .donate-hero-no-image {
+    grid-template-columns: 1fr;
+  }
+
+  .donate-hero-copy {
+    max-width: 720px;
+  }
+
+  .donate-hero-visual {
+    min-height: 520px;
+  }
+}
+
+@media (max-width: 620px) {
+  .donate-hero {
+    padding: 58px 0 46px;
+  }
+
+  .donate-hero-grid {
+    gap: 38px;
+  }
+
+  .donate-hero-copy h1 {
+    font-size: clamp(2.6rem, 13vw, 3.7rem);
+    line-height: 1;
+  }
+
+  .donate-hero-actions {
+    flex-direction: column;
+  }
+
+  .donate-hero-actions a {
+    width: 100%;
+  }
+
+  .donate-hero-visual {
+    min-height: 430px;
+    border-width: 5px;
+    border-radius: 24px 24px 58px 24px;
+  }
+
+  .donate-hero-visual figcaption {
+    right: 14px;
+    bottom: 14px;
+    left: 14px;
+    padding: 15px 16px;
+  }
+
+  .donate-page .page-section-header h2 {
+    font-size: clamp(2.35rem, 11vw, 3.2rem);
   }
 }

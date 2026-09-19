@@ -1,17 +1,20 @@
 import Image from "next/image";
+import type { ResolvedWebsiteImage } from "@/lib/cms/websiteImages";
 
 
-export default function HomeSections() {
+export default function HomeSections({ image }: { image: ResolvedWebsiteImage }) {
   return (
     <section className="about-section section" aria-labelledby="about-heading">
-      <div className="site-container about-grid">
+      <div className={`site-container about-grid ${image.visible ? "" : "about-grid-without-image"}`}>
+        {image.visible && (
         <div className="about-image-card">
           <Image
-            src="/images/about.jpg"
-            alt="Children and community members supported by The Guvnor Ace Foundation"
+            src={image.src}
+            alt={image.alt}
             width={900}
             height={1100}
             className="about-image"
+            unoptimized={image.src.startsWith("http")}
           />
 
           <div className="about-image-badge">
@@ -19,6 +22,7 @@ export default function HomeSections() {
             <span>Delivered with dignity and care</span>
           </div>
         </div>
+        )}
 
         <div className="about-content">
           <p className="section-eyebrow">About our foundation</p>

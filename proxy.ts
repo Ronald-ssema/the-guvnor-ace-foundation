@@ -10,6 +10,7 @@ export async function proxy(request: NextRequest) {
   const contentSecurityPolicy = buildContentSecurityPolicy(
     nonce,
     process.env.NODE_ENV !== 'development' && !isLocalhost,
+    request.nextUrl.searchParams.get('cms-preview') === '1',
   )
   const requestHeaders = new Headers(request.headers)
 

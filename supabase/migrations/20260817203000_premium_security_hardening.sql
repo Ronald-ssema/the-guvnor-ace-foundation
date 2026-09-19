@@ -16,16 +16,20 @@ as $$
         and role in ('owner', 'editor')
     );
 $$;
+
 revoke all on function public.is_admin() from public;
 grant execute on function public.is_admin() to authenticated;
+
 update storage.buckets
 set
   public = false,
   file_size_limit = 5242880,
   allowed_mime_types = array['image/webp']::text[]
 where id = 'site-media';
+
 drop policy if exists "Public can view site media" on storage.objects;
 drop policy if exists "Public can view published site media" on storage.objects;
+
 create policy "Public can view published site media"
 on storage.objects for select
 to anon, authenticated
@@ -40,14 +44,17 @@ using (
       and media_assets.safeguarding_reviewed_at is not null
   )
 );
+
 create table if not exists public.security_rate_limits (
   key_hash text primary key check (char_length(key_hash) between 32 and 128),
   attempts integer not null default 0 check (attempts >= 0),
   window_started_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+
 alter table public.security_rate_limits enable row level security;
 revoke all on public.security_rate_limits from public, anon, authenticated;
+
 create or replace function public.consume_rate_limit(
   p_key_hash text,
   p_limit integer,
@@ -97,7 +104,9 @@ begin
   return true;
 end;
 $$;
+
 revoke all on function public.consume_rate_limit(text, integer, integer) from public;
 grant execute on function public.consume_rate_limit(text, integer, integer) to anon, authenticated;
+
 comment on function public.consume_rate_limit(text, integer, integer) is
   'Atomically enforces hashed, fixed-window request limits without storing raw identifiers.';

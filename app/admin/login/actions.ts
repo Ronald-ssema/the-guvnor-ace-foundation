@@ -81,5 +81,5 @@ export async function login(
     }
   }
 
-  redirect('/admin')
+  redirect('/admin/mfa')
 }

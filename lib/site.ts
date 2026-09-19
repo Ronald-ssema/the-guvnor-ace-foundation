@@ -10,5 +10,5 @@ export const siteConfig = {
 
   location: "Wakiso District, Uganda",
 
-  socialImage: "/images/hero.jpg",
+  socialImage: "/opengraph-image",
 };

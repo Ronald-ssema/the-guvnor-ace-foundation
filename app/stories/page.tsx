@@ -1,28 +1,29 @@
 import { createPageMetadata } from "@/lib/seo";
 
 import Image from "next/image";
+import { getWebsiteImageSettings, type WebsiteImageSlotKey } from "@/lib/cms/websiteImages";
 
 const stories = [
   {
-    image: "/images/child-1.jpg",
+    imageKey: "childOne" as WebsiteImageSlotKey,
     title: "Support that restores hope",
     text:
       "Practical assistance can help a vulnerable child regain dignity, confidence and a stronger sense of possibility.",
   },
   {
-    image: "/images/child-2.jpg",
+    imageKey: "childTwo" as WebsiteImageSlotKey,
     title: "Children at the centre of our mission",
     text:
       "Our work begins by listening to children and families and responding with compassion, safeguarding and respect.",
   },
   {
-    image: "/images/food-drive.jpg",
+    imageKey: "food" as WebsiteImageSlotKey,
     title: "Sharing food with vulnerable communities",
     text:
       "Food support can provide immediate relief while helping families and communities move towards greater stability.",
   },
   {
-    image: "/images/education.jpg",
+    imageKey: "education" as WebsiteImageSlotKey,
     title: "Education creates opportunity",
     text:
       "Learning support gives children the tools, confidence and encouragement they need to build brighter futures.",
@@ -36,7 +37,9 @@ export const metadata = createPageMetadata({
   path: "/stories",
 });
 
-export default function StoriesPage() {
+export default async function StoriesPage() {
+  const websiteImages = await getWebsiteImageSettings();
+
   return (
     <main>
       <section className="page-header">
@@ -54,15 +57,18 @@ export default function StoriesPage() {
         <div className="site-container story-grid">
           {stories.map((story) => (
             <article className="story-card" key={story.title}>
+              {websiteImages.slots[story.imageKey].visible && (
               <div className="story-image">
                 <Image
-                  src={story.image}
-                  alt={story.title}
+                  src={websiteImages.slots[story.imageKey].src}
+                  alt={websiteImages.slots[story.imageKey].alt}
                   fill
                   className="content-image"
                   sizes="(max-width: 640px) 100vw, 50vw"
+                  unoptimized={websiteImages.slots[story.imageKey].src.startsWith("http")}
                 />
               </div>
+              )}
 
               <div className="story-content">
                 <span>Foundation story</span>
@@ -73,6 +79,7 @@ export default function StoriesPage() {
           ))}
         </div>
       </section>
+
     </main>
   );
 }
