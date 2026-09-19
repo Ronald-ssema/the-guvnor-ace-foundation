@@ -12,7 +12,9 @@ alter table public.request_rate_limits enable row level security;
 revoke all on public.request_rate_limits from public, anon, authenticated;
 grant select, insert, update, delete on public.request_rate_limits to service_role;
 
-create or replace function public.consume_rate_limit(
+drop function if exists public.consume_rate_limit(text, integer, integer);
+
+create function public.consume_rate_limit(
   p_key text,
   p_limit integer,
   p_window_seconds integer
@@ -182,6 +184,7 @@ set public = false
 where id = 'site-media';
 
 drop policy if exists "Public can view site media" on storage.objects;
+drop policy if exists "Public can view published site media" on storage.objects;
 create policy "Public can view published site media"
 on storage.objects for select
 to anon, authenticated
@@ -192,5 +195,7 @@ using (
     from public.media_assets
     where media_assets.storage_path = storage.objects.name
       and media_assets.is_published = true
+      and media_assets.consent_confirmed = true
+      and media_assets.safeguarding_reviewed_at is not null
   )
 );
