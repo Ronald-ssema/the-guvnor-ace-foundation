@@ -29,7 +29,7 @@ security definer
 set search_path = ''
 as $$
 declare
-  current_time timestamptz := clock_timestamp();
+  request_time timestamptz := clock_timestamp();
   current_count integer;
   current_window timestamptz;
 begin
@@ -43,7 +43,7 @@ begin
 
   if random() < 0.01 then
     delete from public.request_rate_limits
-    where updated_at < current_time - interval '2 days';
+    where updated_at < request_time - interval '2 days';
   end if;
 
   insert into public.request_rate_limits as limits (
@@ -52,20 +52,20 @@ begin
     window_started_at,
     updated_at
   )
-  values (p_key, 1, current_time, current_time)
+  values (p_key, 1, request_time, request_time)
   on conflict (key) do update
   set
     request_count = case
-      when limits.window_started_at <= current_time - make_interval(secs => p_window_seconds)
+      when limits.window_started_at <= request_time - make_interval(secs => p_window_seconds)
         then 1
       else limits.request_count + 1
     end,
     window_started_at = case
-      when limits.window_started_at <= current_time - make_interval(secs => p_window_seconds)
-        then current_time
+      when limits.window_started_at <= request_time - make_interval(secs => p_window_seconds)
+        then request_time
       else limits.window_started_at
     end,
-    updated_at = current_time
+    updated_at = request_time
   returning request_count, window_started_at
   into current_count, current_window;
 
