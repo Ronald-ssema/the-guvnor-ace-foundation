@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { connection } from "next/server";
 
 import "./globals.css";
 
@@ -102,11 +103,14 @@ export const metadata: Metadata = {
   category: "charity",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // A per-request render is required for Next.js to nonce framework scripts.
+  await connection();
+
   return (
     <html lang="en" data-scroll-behavior="smooth">
       <body>

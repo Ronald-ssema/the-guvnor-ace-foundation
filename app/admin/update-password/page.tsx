@@ -30,17 +30,26 @@ export default function UpdatePasswordPage() {
     )
 
     const checkSession = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession()
+      try {
+        const {
+          data: { session },
+          error: sessionError,
+        } = await supabase.auth.getSession()
 
-      if (!active) return
+        if (!active) return
 
-      setReady(Boolean(session))
-      setChecking(false)
+        setReady(Boolean(session) && !sessionError)
+        setChecking(false)
 
-      if (!session) {
-        setError('This recovery link is invalid or has expired.')
+        if (!session || sessionError) {
+          setError('This recovery link is invalid or has expired.')
+        }
+      } catch {
+        if (!active) return
+
+        setReady(false)
+        setChecking(false)
+        setError('Unable to verify this recovery link. Please try again.')
       }
     }
 
@@ -56,8 +65,20 @@ export default function UpdatePasswordPage() {
     event.preventDefault()
     setError('')
 
-    if (password.length < 8) {
-      setError('Your password must be at least 8 characters.')
+    if (password.length < 12) {
+      setError('Your password must be at least 12 characters.')
+      return
+    }
+
+    if (
+      !/[a-z]/.test(password) ||
+      !/[A-Z]/.test(password) ||
+      !/[0-9]/.test(password) ||
+      !/[^A-Za-z0-9]/.test(password)
+    ) {
+      setError(
+        'Use upper and lower case letters, a number and a symbol.',
+      )
       return
     }
 
@@ -68,9 +89,14 @@ export default function UpdatePasswordPage() {
 
     setPending(true)
 
-    const { error: updateError } = await supabase.auth.updateUser({
-      password,
-    })
+    let updateError: Error | null = null
+
+    try {
+      const result = await supabase.auth.updateUser({ password })
+      updateError = result.error
+    } catch {
+      updateError = new Error('Password update request failed')
+    }
 
     if (updateError) {
       setError('Unable to update your password. Please request a new link.')
@@ -78,7 +104,11 @@ export default function UpdatePasswordPage() {
       return
     }
 
-    await supabase.auth.signOut()
+    try {
+      await supabase.auth.signOut()
+    } catch {
+      // The password is already changed; navigate away from the recovery view.
+    }
     router.replace('/admin/login?reset=success')
   }
 
@@ -113,10 +143,11 @@ export default function UpdatePasswordPage() {
               <input
                 id="password"
                 type="password"
+                autoComplete="new-password"
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
                 required
-                minLength={8}
+                minLength={12}
                 className="mt-2 w-full rounded-lg border border-slate-300 px-4 py-3 outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100"
               />
             </div>
@@ -132,10 +163,11 @@ export default function UpdatePasswordPage() {
               <input
                 id="confirmation"
                 type="password"
+                autoComplete="new-password"
                 value={confirmation}
                 onChange={(event) => setConfirmation(event.target.value)}
                 required
-                minLength={8}
+                minLength={12}
                 className="mt-2 w-full rounded-lg border border-slate-300 px-4 py-3 outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100"
               />
             </div>

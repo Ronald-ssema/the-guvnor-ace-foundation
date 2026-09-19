@@ -62,7 +62,6 @@ export default function ImpactPage() {
               alt="Children participating in a community programme in Uganda"
               fill
               sizes="(max-width: 950px) 100vw, 50vw"
-              style={{ objectFit: "cover" }}
             />
           </div>
 

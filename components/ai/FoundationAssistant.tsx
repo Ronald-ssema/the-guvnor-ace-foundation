@@ -60,14 +60,27 @@ export default function FoundationAssistant() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          messages: nextMessages,
+          messages: nextMessages.slice(-10),
         }),
       });
 
-      const data = await response.json();
+      const data: unknown = await response.json();
+
+      if (!data || typeof data !== "object") {
+        throw new Error("The assistant returned an invalid response.");
+      }
+
+      const responseData = data as {
+        answer?: unknown;
+        error?: unknown;
+      };
 
       if (!response.ok) {
-        throw new Error(data.error || "The assistant could not respond.");
+        throw new Error(
+          typeof responseData.error === "string"
+            ? responseData.error
+            : "The assistant could not respond.",
+        );
       }
 
       setMessages((current) => [
@@ -75,7 +88,8 @@ export default function FoundationAssistant() {
         {
           role: "assistant",
           content:
-            data.answer ||
+            (typeof responseData.answer === "string" &&
+              responseData.answer.trim()) ||
             "Please contact the foundation directly for more information.",
         },
       ]);

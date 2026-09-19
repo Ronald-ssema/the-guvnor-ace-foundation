@@ -83,21 +83,22 @@ export default function ProgrammesPage() {
         >
           <div className="site-container content-grid">
             <div
-              className="content-image"
-              style={{ order: index % 2 === 1 ? 2 : 1 }}
+              className={`content-image ${
+                index % 2 === 1 ? "content-order-second" : "content-order-first"
+              }`}
             >
               <Image
                 src={programme.image}
                 alt={`${programme.title} programme by The Guvnor Ace Foundation`}
                 fill
                 sizes="(max-width: 950px) 100vw, 50vw"
-                style={{ objectFit: "cover" }}
               />
             </div>
 
             <div
-              className="content-copy"
-              style={{ order: index % 2 === 1 ? 1 : 2 }}
+              className={`content-copy ${
+                index % 2 === 1 ? "content-order-first" : "content-order-second"
+              }`}
             >
               <p className="section-eyebrow">
                 Programme {String(index + 1).padStart(2, "0")}

@@ -3,6 +3,7 @@ import HomeSections from "@/components/home/HomeSections";
 import TrustSections from "@/components/home/TrustSections";
 import { organizationJsonLd } from "@/lib/structured-data";
 import { createPageMetadata } from "@/lib/seo";
+import { headers } from "next/headers";
 
 
 export const metadata = createPageMetadata({
@@ -12,10 +13,13 @@ export const metadata = createPageMetadata({
   path: "/",
 });
 
-export default function HomePage() {
+export default async function HomePage() {
+  const nonce = (await headers()).get("x-nonce") ?? undefined;
+
   return (
     <>
       <script
+        nonce={nonce}
         type="application/ld+json"
         dangerouslySetInnerHTML={{
           __html: JSON.stringify(organizationJsonLd).replace(/</g, "\\u003c"),

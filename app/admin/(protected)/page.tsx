@@ -1,27 +1,9 @@
-import { redirect } from 'next/navigation'
-import { createClient } from '@/lib/supabase/server'
-import { signOut } from './actions'
+import { signOut } from "../actions";
+
+import { requireOwner } from "@/lib/auth/require-owner";
 
 export default async function AdminDashboardPage() {
-  const supabase = await createClient()
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  if (!user) {
-    redirect('/admin/login')
-  }
-
-  const { data: adminUser } = await supabase
-    .from('admin_users')
-    .select('email, role')
-    .eq('user_id', user.id)
-    .maybeSingle()
-
-  if (!adminUser || adminUser.role !== 'owner') {
-    redirect('/admin/login?error=not-authorised')
-  }
+  const { adminUser } = await requireOwner();
 
   return (
     <main className="min-h-screen bg-slate-100 px-6 py-10 text-slate-900">
@@ -55,12 +37,12 @@ export default async function AdminDashboardPage() {
 
           <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {[
-              'Website content',
-              'Stories and news',
-              'Projects and programmes',
-              'Photos and videos',
-              'Reports and statistics',
-              'Volunteers and partnerships',
+              "Website content",
+              "Stories and news",
+              "Projects and programmes",
+              "Photos and videos",
+              "Reports and statistics",
+              "Volunteers and partnerships",
             ].map((item) => (
               <div key={item} className="rounded-xl border border-slate-200 p-5">
                 <h2 className="font-semibold">{item}</h2>
@@ -73,5 +55,5 @@ export default async function AdminDashboardPage() {
         </section>
       </div>
     </main>
-  )
+  );
 }

@@ -1,16 +1,15 @@
 import OpenAI from "openai";
 import { NextRequest, NextResponse } from "next/server";
 
+import { chatRequestSchema } from "@/lib/security/chat-request";
+import {
+  consumeRateLimit,
+  getClientAddress,
+} from "@/lib/security/rate-limit";
+
 export const runtime = "nodejs";
 
 const MAX_BODY_BYTES = 24_000;
-const MAX_MESSAGES = 10;
-const MAX_MESSAGE_LENGTH = 1200;
-
-type ChatMessage = {
-  role: "user" | "assistant";
-  content: string;
-};
 
 const FOUNDATION_INFORMATION = `
 You are the official AI assistant for The Guvnor Ace Foundation.
@@ -68,42 +67,46 @@ SAFETY AND TRUST RULES
 function jsonResponse(
   body: Record<string, string>,
   status = 200,
+  headers: HeadersInit = {},
 ) {
   return NextResponse.json(body, {
     status,
     headers: {
       "Cache-Control": "no-store, max-age=0",
       "X-Content-Type-Options": "nosniff",
+      ...headers,
     },
   });
 }
 
-function validateMessages(value: unknown): ChatMessage[] {
-  if (!Array.isArray(value)) {
-    return [];
+async function readLimitedBody(request: NextRequest) {
+  if (!request.body) {
+    return "";
   }
 
-  return value
-    .filter((item): item is ChatMessage => {
-      if (!item || typeof item !== "object") {
-        return false;
-      }
+  const reader = request.body.getReader();
+  const decoder = new TextDecoder();
+  let body = "";
+  let bytesRead = 0;
 
-      const candidate = item as Partial<ChatMessage>;
+  while (true) {
+    const { done, value } = await reader.read();
 
-      return (
-        (candidate.role === "user" ||
-          candidate.role === "assistant") &&
-        typeof candidate.content === "string" &&
-        candidate.content.trim().length > 0 &&
-        candidate.content.length <= MAX_MESSAGE_LENGTH
-      );
-    })
-    .slice(-MAX_MESSAGES)
-    .map((message) => ({
-      role: message.role,
-      content: message.content.trim(),
-    }));
+    if (done) {
+      break;
+    }
+
+    bytesRead += value.byteLength;
+
+    if (bytesRead > MAX_BODY_BYTES) {
+      await reader.cancel();
+      return null;
+    }
+
+    body += decoder.decode(value, { stream: true });
+  }
+
+  return body + decoder.decode();
 }
 
 export async function POST(request: NextRequest) {
@@ -124,35 +127,78 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const contentType = request.headers.get("content-type") || "";
+    const contentType = request.headers
+      .get("content-type")
+      ?.split(";", 1)[0]
+      ?.trim()
+      .toLowerCase();
 
-    if (!contentType.includes("application/json")) {
+    if (contentType !== "application/json") {
       return jsonResponse(
         { error: "Only JSON requests are accepted." },
         415,
       );
     }
 
-    const contentLength = Number(
-      request.headers.get("content-length") || "0",
-    );
+    const contentLengthHeader = request.headers.get("content-length");
+    const contentLength = contentLengthHeader
+      ? Number(contentLengthHeader)
+      : null;
 
     if (
-      Number.isFinite(contentLength) &&
-      contentLength > MAX_BODY_BYTES
+      contentLengthHeader &&
+      (!Number.isSafeInteger(contentLength) || (contentLength ?? -1) < 0)
     ) {
+      return jsonResponse({ error: "Invalid request size." }, 400);
+    }
+
+    if (contentLength !== null && contentLength > MAX_BODY_BYTES) {
       return jsonResponse(
         { error: "Request is too large." },
         413,
       );
     }
 
-    const rawBody = await request.text();
+    const rateLimit = await consumeRateLimit({
+      scope: "foundation-assistant",
+      identifier: getClientAddress(request.headers),
+      limit: 12,
+      windowSeconds: 60,
+    });
 
-    if (new TextEncoder().encode(rawBody).length > MAX_BODY_BYTES) {
+    if (rateLimit.status === "unavailable") {
+      return jsonResponse(
+        { error: "The Foundation Assistant is temporarily unavailable." },
+        503,
+      );
+    }
+
+    if (rateLimit.status === "limited") {
+      const retryAfter = Math.max(
+        1,
+        Math.ceil((Date.parse(rateLimit.resetAt) - Date.now()) / 1000),
+      );
+
+      return jsonResponse(
+        { error: "Too many requests. Please try again shortly." },
+        429,
+        { "Retry-After": String(retryAfter) },
+      );
+    }
+
+    const rawBody = await readLimitedBody(request);
+
+    if (rawBody === null) {
       return jsonResponse(
         { error: "Request is too large." },
         413,
+      );
+    }
+
+    if (!rawBody) {
+      return jsonResponse(
+        { error: "Please enter a valid question." },
+        400,
       );
     }
 
@@ -167,27 +213,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (
-      !body ||
-      typeof body !== "object" ||
-      !("messages" in body)
-    ) {
+    const parsedBody = chatRequestSchema.safeParse(body);
+
+    if (!parsedBody.success) {
       return jsonResponse(
         { error: "Please enter a valid question." },
         400,
       );
     }
 
-    const messages = validateMessages(
-      (body as { messages?: unknown }).messages,
-    );
-
-    if (messages.length === 0) {
-      return jsonResponse(
-        { error: "Please enter a valid question." },
-        400,
-      );
-    }
+    const messages = parsedBody.data.messages;
 
     const openai = new OpenAI({
       apiKey,
@@ -226,10 +261,10 @@ export async function POST(request: NextRequest) {
 
     return jsonResponse({ answer });
   } catch (error: unknown) {
-    const apiError = error as {
-      code?: string;
-      status?: number;
-    };
+    const apiError =
+      error && typeof error === "object"
+        ? (error as { code?: string; status?: number })
+        : {};
 
     console.error("Foundation Assistant request failed", {
       code: apiError.code,
