@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
+import { NextRequest } from "next/server";
 
 import { chatRequestSchema } from "@/lib/security/chat-request";
 import { buildContentSecurityPolicy, createNonce } from "@/lib/security/csp";
+import { updateSession } from "@/lib/supabase/proxy";
 
 describe("content security policy", () => {
   it("uses a strong per-request nonce without allowing inline scripts", () => {
@@ -28,6 +30,43 @@ describe("content security policy", () => {
     expect(policy).toContain("frame-src 'self'");
     expect(policy).toContain("frame-ancestors 'self'");
     expect(policy).not.toContain("frame-ancestors 'none'");
+  });
+});
+
+describe("Supabase session proxy", () => {
+  it("keeps public pages available and protected admin routes closed when configuration is missing", async () => {
+    const previousUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const previousKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+
+    delete process.env.NEXT_PUBLIC_SUPABASE_URL;
+    delete process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+
+    try {
+      const publicResponse = await updateSession(
+        new NextRequest("https://example.test/about"),
+      );
+      const adminResponse = await updateSession(
+        new NextRequest("https://example.test/admin"),
+      );
+
+      expect(publicResponse.status).toBe(200);
+      expect(adminResponse.status).toBe(307);
+      expect(adminResponse.headers.get("location")).toBe(
+        "https://example.test/admin/login",
+      );
+    } finally {
+      if (previousUrl === undefined) {
+        delete process.env.NEXT_PUBLIC_SUPABASE_URL;
+      } else {
+        process.env.NEXT_PUBLIC_SUPABASE_URL = previousUrl;
+      }
+
+      if (previousKey === undefined) {
+        delete process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+      } else {
+        process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY = previousKey;
+      }
+    }
   });
 });
 

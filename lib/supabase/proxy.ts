@@ -11,9 +11,29 @@ export async function updateSession(
     },
   })
 
+  const pathname = request.nextUrl.pathname
+  const isAdminLogin = pathname === '/admin/login'
+  const isPasswordRecovery = pathname === '/admin/update-password'
+  const isProtectedAdminRoute =
+    pathname.startsWith('/admin') && !isAdminLogin && !isPasswordRecovery
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
+
+  if (!supabaseUrl || !supabaseKey) {
+    if (isProtectedAdminRoute) {
+      const loginUrl = request.nextUrl.clone()
+      loginUrl.pathname = '/admin/login'
+      loginUrl.search = ''
+
+      return NextResponse.redirect(loginUrl)
+    }
+
+    return supabaseResponse
+  }
+
   const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
+    supabaseUrl,
+    supabaseKey,
     {
       cookies: {
         getAll() {
@@ -43,15 +63,6 @@ export async function updateSession(
   )
 
   const { data } = await supabase.auth.getClaims()
-  const pathname = request.nextUrl.pathname
-
-  const isAdminLogin = pathname === '/admin/login'
-  const isPasswordRecovery = pathname === '/admin/update-password'
-
-  const isProtectedAdminRoute =
-    pathname.startsWith('/admin') &&
-    !isAdminLogin &&
-    !isPasswordRecovery
   if (!data?.claims && isProtectedAdminRoute) {
     const loginUrl = request.nextUrl.clone()
     loginUrl.pathname = '/admin/login'
