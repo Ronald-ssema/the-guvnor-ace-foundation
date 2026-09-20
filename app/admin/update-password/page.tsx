@@ -1,13 +1,12 @@
 'use client'
 
-import { useEffect, useRef, useState, type FormEvent } from 'react'
+import { useEffect, useState, type FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
-import type { SupabaseClient } from '@supabase/supabase-js'
 import { createClient } from '@/lib/supabase/client'
 
 export default function UpdatePasswordPage() {
   const router = useRouter()
-  const supabaseRef = useRef<SupabaseClient | null>(null)
+  const [supabase] = useState(() => createClient())
   const [ready, setReady] = useState(false)
   const [checking, setChecking] = useState(true)
   const [password, setPassword] = useState('')
@@ -18,24 +17,7 @@ export default function UpdatePasswordPage() {
   useEffect(() => {
     let active = true
 
-    let client: SupabaseClient
-
-    try {
-      client = createClient()
-      supabaseRef.current = client
-    } catch {
-      queueMicrotask(() => {
-        if (!active) return
-        setError('Password recovery is temporarily unavailable.')
-        setChecking(false)
-      })
-
-      return () => {
-        active = false
-      }
-    }
-
-    const { data } = client.auth.onAuthStateChange(
+    const { data } = supabase.auth.onAuthStateChange(
       (_event, session) => {
         if (!active) return
 
@@ -48,17 +30,26 @@ export default function UpdatePasswordPage() {
     )
 
     const checkSession = async () => {
-      const {
-        data: { session },
-      } = await client.auth.getSession()
+      try {
+        const {
+          data: { session },
+          error: sessionError,
+        } = await supabase.auth.getSession()
 
-      if (!active) return
+        if (!active) return
 
-      setReady(Boolean(session))
-      setChecking(false)
+        setReady(Boolean(session) && !sessionError)
+        setChecking(false)
 
-      if (!session) {
-        setError('This recovery link is invalid or has expired.')
+        if (!session || sessionError) {
+          setError('This recovery link is invalid or has expired.')
+        }
+      } catch {
+        if (!active) return
+
+        setReady(false)
+        setChecking(false)
+        setError('Unable to verify this recovery link. Please try again.')
       }
     }
 
@@ -68,21 +59,26 @@ export default function UpdatePasswordPage() {
       active = false
       data.subscription.unsubscribe()
     }
-  }, [])
+  }, [supabase])
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     setError('')
 
-    const supabase = supabaseRef.current
-
-    if (!supabase) {
-      setError('Password recovery is temporarily unavailable.')
+    if (password.length < 12) {
+      setError('Your password must be at least 12 characters.')
       return
     }
 
-    if (password.length < 12) {
-      setError('Your password must be at least 12 characters.')
+    if (
+      !/[a-z]/.test(password) ||
+      !/[A-Z]/.test(password) ||
+      !/[0-9]/.test(password) ||
+      !/[^A-Za-z0-9]/.test(password)
+    ) {
+      setError(
+        'Use upper and lower case letters, a number and a symbol.',
+      )
       return
     }
 
@@ -93,9 +89,14 @@ export default function UpdatePasswordPage() {
 
     setPending(true)
 
-    const { error: updateError } = await supabase.auth.updateUser({
-      password,
-    })
+    let updateError: Error | null = null
+
+    try {
+      const result = await supabase.auth.updateUser({ password })
+      updateError = result.error
+    } catch {
+      updateError = new Error('Password update request failed')
+    }
 
     if (updateError) {
       setError('Unable to update your password. Please request a new link.')
@@ -103,7 +104,11 @@ export default function UpdatePasswordPage() {
       return
     }
 
-    await supabase.auth.signOut()
+    try {
+      await supabase.auth.signOut()
+    } catch {
+      // The password is already changed; navigate away from the recovery view.
+    }
     router.replace('/admin/login?reset=success')
   }
 
@@ -138,11 +143,11 @@ export default function UpdatePasswordPage() {
               <input
                 id="password"
                 type="password"
+                autoComplete="new-password"
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
                 required
                 minLength={12}
-                autoComplete="new-password"
                 className="mt-2 w-full rounded-lg border border-slate-300 px-4 py-3 outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100"
               />
             </div>
@@ -158,11 +163,11 @@ export default function UpdatePasswordPage() {
               <input
                 id="confirmation"
                 type="password"
+                autoComplete="new-password"
                 value={confirmation}
                 onChange={(event) => setConfirmation(event.target.value)}
                 required
                 minLength={12}
-                autoComplete="new-password"
                 className="mt-2 w-full rounded-lg border border-slate-300 px-4 py-3 outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100"
               />
             </div>

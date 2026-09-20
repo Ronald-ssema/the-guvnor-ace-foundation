@@ -1,15 +1,33 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
-export async function updateSession(request: NextRequest) {
+export async function updateSession(
+  request: NextRequest,
+  requestHeaders = new Headers(request.headers),
+) {
   let supabaseResponse = NextResponse.next({
-    request,
+    request: {
+      headers: requestHeaders,
+    },
   })
 
+  const pathname = request.nextUrl.pathname
+  const isAdminLogin = pathname === '/admin/login'
+  const isPasswordRecovery = pathname === '/admin/update-password'
+  const isProtectedAdminRoute =
+    pathname.startsWith('/admin') && !isAdminLogin && !isPasswordRecovery
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
   const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
 
   if (!supabaseUrl || !supabaseKey) {
+    if (isProtectedAdminRoute) {
+      const loginUrl = request.nextUrl.clone()
+      loginUrl.pathname = '/admin/login'
+      loginUrl.search = ''
+
+      return NextResponse.redirect(loginUrl)
+    }
+
     return supabaseResponse
   }
 
@@ -27,7 +45,9 @@ export async function updateSession(request: NextRequest) {
           })
 
           supabaseResponse = NextResponse.next({
-            request,
+            request: {
+              headers: requestHeaders,
+            },
           })
 
           cookiesToSet.forEach(({ name, value, options }) => {
@@ -43,15 +63,6 @@ export async function updateSession(request: NextRequest) {
   )
 
   const { data } = await supabase.auth.getClaims()
-  const pathname = request.nextUrl.pathname
-
-  const isAdminLogin = pathname === '/admin/login'
-  const isPasswordRecovery = pathname === '/admin/update-password'
-
-  const isProtectedAdminRoute =
-    pathname.startsWith('/admin') &&
-    !isAdminLogin &&
-    !isPasswordRecovery
   if (!data?.claims && isProtectedAdminRoute) {
     const loginUrl = request.nextUrl.clone()
     loginUrl.pathname = '/admin/login'

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { connection } from "next/server";
 
 import "./globals.css";
 import "../styles/admin.css";
@@ -115,6 +116,9 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Force request-time rendering so Next.js can apply the CSP nonce.
+  await connection();
+
   const [editorSettings, websiteImages, websiteText] = await Promise.all([
     getSiteEditorSettings(),
     getWebsiteImageSettings(),

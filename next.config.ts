@@ -1,36 +1,13 @@
 import type { NextConfig } from "next";
 
-const isDev = process.env.NODE_ENV === "development";
-
-const csp = `
-  default-src 'self';
-  script-src 'self' 'unsafe-inline' ${isDev ? "'unsafe-eval'" : ""};
-  style-src 'self' 'unsafe-inline';
-  img-src 'self' blob: data: https:;
-  font-src 'self' data:;
-  connect-src 'self' https://api.openai.com https://*.supabase.co wss://*.supabase.co;
-  media-src 'self';
-  worker-src 'self' blob:;
-  manifest-src 'self';
-  object-src 'none';
-  base-uri 'self';
-  form-action 'self';
-  frame-ancestors 'self';
-  ${isDev ? "" : "upgrade-insecure-requests;"}
-`;
-
 const securityHeaders = [
-  {
-    key: "Content-Security-Policy",
-    value: csp.replace(/\n/g, " ").replace(/\s{2,}/g, " ").trim(),
-  },
   {
     key: "X-Content-Type-Options",
     value: "nosniff",
   },
   {
     key: "X-Frame-Options",
-    value: "SAMEORIGIN",
+    value: "DENY",
   },
   {
     key: "Referrer-Policy",
@@ -54,8 +31,8 @@ const securityHeaders = [
     value: "same-origin",
   },
   {
-    key: "X-Permitted-Cross-Domain-Policies",
-    value: "none",
+    key: "Origin-Agent-Cluster",
+    value: "?1",
   },
 ];
 
@@ -85,6 +62,19 @@ const nextConfig: NextConfig = {
       {
         source: "/:path*",
         headers: securityHeaders,
+      },
+      {
+        source: "/admin/:path*",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "no-store, max-age=0",
+          },
+          {
+            key: "X-Robots-Tag",
+            value: "noindex, nofollow, noarchive",
+          },
+        ],
       },
     ];
   },

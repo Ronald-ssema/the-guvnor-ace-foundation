@@ -123,4 +123,3 @@ export default function DonationFaq({ paypalHref }: { paypalHref: string }) {
     </section>
   );
 }
-

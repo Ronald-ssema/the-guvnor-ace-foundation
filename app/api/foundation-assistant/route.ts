@@ -1,20 +1,16 @@
 import OpenAI from "openai";
 import { NextRequest, NextResponse } from "next/server";
-import { clientAddress, consumeRateLimit } from "@/lib/security/rateLimit";
+
 import { getSiteEditorSettings, type SiteEditorSettings } from "@/lib/cms/siteEditor";
+import { chatRequestSchema } from "@/lib/security/chat-request";
+import {
+  consumeRateLimit,
+  getClientAddress,
+} from "@/lib/security/rate-limit";
 
 export const runtime = "nodejs";
 
 const MAX_BODY_BYTES = 24_000;
-const MAX_MESSAGES = 10;
-const MAX_MESSAGE_LENGTH = 1200;
-const RATE_LIMIT_REQUESTS = 8;
-const RATE_LIMIT_WINDOW_MS = 60_000;
-
-type ChatMessage = {
-  role: "user" | "assistant";
-  content: string;
-};
 
 const foundationInformation = (settings: SiteEditorSettings) => `
 You are the official AI assistant for The Guvnor Ace Foundation.
@@ -41,6 +37,7 @@ Email: ${settings.contact.email}
 OFFICIAL LINKS
 PayPal: ${settings.donations.paypal}
 GoFundMe: ${settings.donations.goFundMe}
+Airtel Money: ${settings.donations.airtelNumber} (${settings.donations.airtelAccountName})
 Linktree: https://linktr.ee/guvnoracefoundation
 Instagram: https://instagram.com/guvnoracefoundation
 TikTok: https://www.tiktok.com/@guvnoracefoundation
@@ -70,21 +67,6 @@ SAFETY AND TRUST RULES
 - Clearly identify yourself as an AI assistant when relevant.
 `;
 
-function jsonResponse(
-  body: Record<string, string>,
-  status = 200,
-  extraHeaders: Record<string, string> = {},
-) {
-  return NextResponse.json(body, {
-    status,
-    headers: {
-      "Cache-Control": "no-store, max-age=0",
-      "X-Content-Type-Options": "nosniff",
-      ...extraHeaders,
-    },
-  });
-}
-
 function isCrossSiteRequest(request: NextRequest) {
   const fetchSite = request.headers.get("sec-fetch-site");
   if (fetchSite === "cross-site") return true;
@@ -99,52 +81,57 @@ function isCrossSiteRequest(request: NextRequest) {
   }
 }
 
-function validateMessages(value: unknown): ChatMessage[] {
-  if (!Array.isArray(value)) {
-    return [];
+function jsonResponse(
+  body: Record<string, string>,
+  status = 200,
+  headers: HeadersInit = {},
+) {
+  return NextResponse.json(body, {
+    status,
+    headers: {
+      "Cache-Control": "no-store, max-age=0",
+      "X-Content-Type-Options": "nosniff",
+      ...headers,
+    },
+  });
+}
+
+async function readLimitedBody(request: NextRequest) {
+  if (!request.body) {
+    return "";
   }
 
-  return value
-    .filter((item): item is ChatMessage => {
-      if (!item || typeof item !== "object") {
-        return false;
-      }
+  const reader = request.body.getReader();
+  const decoder = new TextDecoder();
+  let body = "";
+  let bytesRead = 0;
 
-      const candidate = item as Partial<ChatMessage>;
+  while (true) {
+    const { done, value } = await reader.read();
 
-      return (
-        (candidate.role === "user" ||
-          candidate.role === "assistant") &&
-        typeof candidate.content === "string" &&
-        candidate.content.trim().length > 0 &&
-        candidate.content.length <= MAX_MESSAGE_LENGTH
-      );
-    })
-    .slice(-MAX_MESSAGES)
-    .map((message) => ({
-      role: message.role,
-      content: message.content.trim(),
-    }));
+    if (done) {
+      break;
+    }
+
+    bytesRead += value.byteLength;
+
+    if (bytesRead > MAX_BODY_BYTES) {
+      await reader.cancel();
+      return null;
+    }
+
+    body += decoder.decode(value, { stream: true });
+  }
+
+  return body + decoder.decode();
 }
 
 export async function POST(request: NextRequest) {
   try {
     if (isCrossSiteRequest(request)) {
-      return jsonResponse({ error: "Cross-site requests are not accepted." }, 403);
-    }
-
-    const allowed = await consumeRateLimit({
-      scope: "foundation-assistant",
-      subject: clientAddress(request.headers),
-      limit: RATE_LIMIT_REQUESTS,
-      windowSeconds: RATE_LIMIT_WINDOW_MS / 1000,
-    });
-
-    if (!allowed) {
       return jsonResponse(
-        { error: "Too many requests. Please wait a minute and try again." },
-        429,
-        { "Retry-After": "60" },
+        { error: "Cross-site requests are not accepted." },
+        403,
       );
     }
 
@@ -164,35 +151,78 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const contentType = request.headers.get("content-type") || "";
+    const contentType = request.headers
+      .get("content-type")
+      ?.split(";", 1)[0]
+      ?.trim()
+      .toLowerCase();
 
-    if (!contentType.includes("application/json")) {
+    if (contentType !== "application/json") {
       return jsonResponse(
         { error: "Only JSON requests are accepted." },
         415,
       );
     }
 
-    const contentLength = Number(
-      request.headers.get("content-length") || "0",
-    );
+    const contentLengthHeader = request.headers.get("content-length");
+    const contentLength = contentLengthHeader
+      ? Number(contentLengthHeader)
+      : null;
 
     if (
-      Number.isFinite(contentLength) &&
-      contentLength > MAX_BODY_BYTES
+      contentLengthHeader &&
+      (!Number.isSafeInteger(contentLength) || (contentLength ?? -1) < 0)
     ) {
+      return jsonResponse({ error: "Invalid request size." }, 400);
+    }
+
+    if (contentLength !== null && contentLength > MAX_BODY_BYTES) {
       return jsonResponse(
         { error: "Request is too large." },
         413,
       );
     }
 
-    const rawBody = await request.text();
+    const rateLimit = await consumeRateLimit({
+      scope: "foundation-assistant",
+      identifier: getClientAddress(request.headers),
+      limit: 12,
+      windowSeconds: 60,
+    });
 
-    if (new TextEncoder().encode(rawBody).length > MAX_BODY_BYTES) {
+    if (rateLimit.status === "unavailable") {
+      return jsonResponse(
+        { error: "The Foundation Assistant is temporarily unavailable." },
+        503,
+      );
+    }
+
+    if (rateLimit.status === "limited") {
+      const retryAfter = Math.max(
+        1,
+        Math.ceil((Date.parse(rateLimit.resetAt) - Date.now()) / 1000),
+      );
+
+      return jsonResponse(
+        { error: "Too many requests. Please try again shortly." },
+        429,
+        { "Retry-After": String(retryAfter) },
+      );
+    }
+
+    const rawBody = await readLimitedBody(request);
+
+    if (rawBody === null) {
       return jsonResponse(
         { error: "Request is too large." },
         413,
+      );
+    }
+
+    if (!rawBody) {
+      return jsonResponse(
+        { error: "Please enter a valid question." },
+        400,
       );
     }
 
@@ -207,27 +237,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (
-      !body ||
-      typeof body !== "object" ||
-      !("messages" in body)
-    ) {
+    const parsedBody = chatRequestSchema.safeParse(body);
+
+    if (!parsedBody.success) {
       return jsonResponse(
         { error: "Please enter a valid question." },
         400,
       );
     }
 
-    const messages = validateMessages(
-      (body as { messages?: unknown }).messages,
-    );
-
-    if (messages.length === 0) {
-      return jsonResponse(
-        { error: "Please enter a valid question." },
-        400,
-      );
-    }
+    const messages = parsedBody.data.messages;
 
     const openai = new OpenAI({
       apiKey,
@@ -236,6 +255,7 @@ export async function POST(request: NextRequest) {
     });
 
     const settings = await getSiteEditorSettings();
+
     const response = await openai.responses.create({
       model: "gpt-5-mini",
       instructions: foundationInformation(settings),
@@ -267,10 +287,10 @@ export async function POST(request: NextRequest) {
 
     return jsonResponse({ answer });
   } catch (error: unknown) {
-    const apiError = error as {
-      code?: string;
-      status?: number;
-    };
+    const apiError =
+      error && typeof error === "object"
+        ? (error as { code?: string; status?: number })
+        : {};
 
     console.error("Foundation Assistant request failed", {
       code: apiError.code,
@@ -285,7 +305,7 @@ export async function POST(request: NextRequest) {
       return jsonResponse(
         {
           error:
-            "Our Foundation Assistant is temporarily unavailable. Please use the contact details published on our Contact page.",
+            "Our Foundation Assistant is temporarily unavailable. Please contact us at guvnorace@gmail.com or +256 752 462 740.",
         },
         503,
       );
